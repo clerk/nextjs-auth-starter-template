@@ -1,0 +1,37 @@
+.gradient {
+  position: relative;
+  background-image: repeating-linear-gradient(
+    to right,
+    #63DFFA,
+    #6C47FF,
+    #63DFFA
+  );
+  z-index: 1;
+  background-position-x: 0%;
+  background-size: 200%;
+  animation: gradimate 3s linear infinite;
+  background-clip: text;
+}
+
+@keyframes gradimate {
+  0% {
+    background-position-x: 0%;
+  }
+  50% {
+    background-position-x: 100%;
+  }
+  100% {
+    background-position-x: 200%;
+  }
+}
+
+/* .cta .arrow {
+  opacity: 0;
+  transition: 0.1s linear;
+  margin-left: -4px;
+}
+
+.cta:hover .arrow {
+  opacity: 100;
+  margin-left: 0;
+} */
