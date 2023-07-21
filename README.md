@@ -18,17 +18,17 @@ This template allows you to get started with Clerk and Next.js in a matter of mi
 
 ## Demo
 
-A hosted demo of this example is available at [clerk-nextjs-template.vercel.app](https://clerk-nextjs-template.vercel.app/)
+A hosted demo of this example is available at [clerk-next-app.vercel.app](https://clerk-next-app.vercel.app/)
 
 ## Deploy
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fdevagrawal09%2Fclerk-nextjs-template&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs%23set-environment-keys&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerkinc%2Fclerk-next-app&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs%23set-environment-keys&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs)
 
 ## Running the template
 
 ```bash
-git clone https://github.com/devagrawal09/clerk-nextjs-template
+git clone https://github.com/clerkinc/clerk-next-app
 ```
 
 To run the example locally you need to:
