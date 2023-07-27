@@ -1,4 +1,5 @@
 # Next.js Clerk Template
+
 ![Next.js Clerk Template](./public/og.png)
 
 This template shows how to use [Clerk](https://www.clerk.com/?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) in a Next.js application.
@@ -21,6 +22,7 @@ This template allows you to get started with Clerk and Next.js in a matter of mi
 A hosted demo of this example is available at [clerk-nextjs-template.vercel.app](https://clerk-nextjs-template.vercel.app/)
 
 ## Deploy
+
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerkinc%2Fclerk-next-app&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs%23set-environment-keys&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs)
@@ -33,7 +35,7 @@ git clone https://github.com/clerkinc/clerk-next-app
 
 To run the example locally you need to:
 
-1. Sign up for a Clerk account at https://clerk.com.
+1. [Sign up for a Clerk account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) at https://clerk.com.
 2. Go to [Clerk's dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
 3. Set the required Clerk environment variables as shown in [the example env file](./.env.example).
 4. `npm install` the required dependencies.
