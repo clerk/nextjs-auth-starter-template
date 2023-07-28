@@ -35,9 +35,9 @@ git clone https://github.com/clerkinc/clerk-next-app
 
 To run the example locally you need to:
 
-1. [Sign up for a Clerk account](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) at https://clerk.com.
+1. Sign up for a Clerk account at [https://clerk.com](<(https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)>).
 2. Go to [Clerk's dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
-3. Set the required Clerk environment variables as shown in [the example env file](./.env.example).
+3. Set the required Clerk environment variables as shown in [the example env file](./.env.template).
 4. `npm install` the required dependencies.
 5. `npm run dev` to launch the development server.
 
