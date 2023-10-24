@@ -39,19 +39,19 @@ This template allows you to get started with Clerk and Next.js (App Router) in a
 
 ## Demo
 
-A hosted demo of this example is available at [clerk-nextjs-template.vercel.app](https://clerk-nextjs-template.vercel.app/)
+A hosted demo of this example is available at https://clerk-nextjs-demo-app-router.clerkpreview.com/
 
 ## Deploy
 
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
 <!-- TODO: UPDATE THIS UTM -->
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerkinc%2Fclerk-next-app&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs%23set-environment-keys&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fnextjs%2Fget-started-with-nextjs)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerkinc%2Fclerk-nextjs-demo-app-router&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs)
 
 ## Running the template
 
 ```bash
-git clone https://github.com/clerkinc/clerk-next-app
+git clone https://github.com/clerkinc/clerk-nextjs-demo-app-router
 ```
 
 To run the example locally, you need to:
@@ -76,17 +76,14 @@ To learn more about Clerk and Next.js, check out the following resources:
 
 ## Found an issue?
 
-<!-- TODO: UPDATE THIS LINK TO NEW TITLE OF REPO -->
-If you have found an issue with our documentation, please create an [issue](https://github.com/clerkinc/clerk-next-app/issues).
+If you have found an issue with our documentation, please create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app-router/issues).
 
 If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating an issue.  
-<!-- TODO: UPDATE THIS LINK TO NEW TITLE OF REPO -->
-Go ahead and create a [pull request](https://github.com/clerkinc/clerk-next-app/pulls) with the solution. :rocket:
+Go ahead and create a [pull request](https://github.com/clerkinc/clerk-nextjs-demo-app-router/pulls) with the solution. :rocket:
 
 ## Want to leave feedback?
 
-<!-- TODO: UPDATE THIS LINK TO NEW TITLE OF REPO -->
-Feel free to create an [issue](https://github.com/clerkinc/clerk-next-app/issues) with the **feedback** label. Our team will take a look at it and get back to you as soon as we can!
+Feel free to create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app-router/issues) with the **feedback** label. Our team will take a look at it and get back to you as soon as we can!
 
 ## Connect with us
 
