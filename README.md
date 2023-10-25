@@ -1,8 +1,8 @@
 <p align="center">
   <a href="https://clerk.com?utm_source=github&utm_medium=clerk_docs" target="_blank" rel="noopener noreferrer">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://images.clerk.com/static/logo-dark-mode-400x400.png">
-      <img src="https://images.clerk.com/static/logo-light-mode-400x400.png" height="64">
+   <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="./public/light-logo.png">
+      <img src="./public/dark-logo.png" height="64">
     </picture>
   </a>
   <br />
@@ -45,6 +45,7 @@ A hosted demo of this example is available at https://clerk-nextjs-demo-app-rout
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
 <!-- TODO: UPDATE THIS UTM -->
+
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerkinc%2Fclerk-nextjs-demo-app-router&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs&redirect-url=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs)
 
 ## Running the template
@@ -56,6 +57,7 @@ git clone https://github.com/clerkinc/clerk-nextjs-demo-app-router
 To run the example locally, you need to:
 
 <!-- TODO: UPDATE THIS UTM -->
+
 1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template).
 <!-- TODO: UPDATE THIS UTM -->
 2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
@@ -68,6 +70,7 @@ To run the example locally, you need to:
 To learn more about Clerk and Next.js, check out the following resources:
 
 <!-- TODO: UPDATE THIS UTM -->
+
 - [Quickstart: Get started with Next.js and Clerk](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
 <!-- TODO: UPDATE THIS UTM -->
 - [Clerk Documentation](https://clerk.com/docs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
@@ -86,6 +89,6 @@ Feel free to create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app
 
 ## Connect with us
 
-You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://discord.com/invite/b5rXHjAg7A). 
+You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://discord.com/invite/b5rXHjAg7A).
 
 If you prefer, you can also find support through our [Twitter](https://twitter.com/ClerkDev), or you can [email](mailto:support@clerk.dev) us!
