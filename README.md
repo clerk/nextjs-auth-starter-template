@@ -11,7 +11,6 @@
   <h1>
     Clerk and Next.js App Router template
   </h1>
-  <h3>More than authentication.<br />Complete user management.</h3>
   <a href="https://www.npmjs.com/package/@clerk/clerk-js">
     <img alt="" src="https://img.shields.io/npm/dm/@clerk/clerk-js" />
   </a>
