@@ -1,4 +1,4 @@
-import { auth, clerkClient } from "@clerk/nextjs";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { OrgDetails, SessionDetails, UserDetails } from "./details";
 import Link from "next/link";
@@ -7,7 +7,7 @@ export default async function DashboardPage() {
   const { userId } = auth();
 
   if (!userId) {
-    redirect("/");
+    redirect("/sign-in");
   }
 
   const user = await clerkClient.users.getUser(userId);
@@ -17,7 +17,7 @@ export default async function DashboardPage() {
       {user && (
         <>
           <h1 className="text-3xl font-semibold text-black">
-            👋 Hi, {user.firstName || `Stranger`}
+            👋 Hi, {user.data?.firstName || `Stranger`}
           </h1>
           <div className="grid gap-4 mt-8 lg:grid-cols-3">
             <UserDetails />
