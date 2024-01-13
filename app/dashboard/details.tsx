@@ -19,13 +19,13 @@ export function UserDetails() {
 
   return (
     <div
-      className="bg-white overflow-hidden sm:rounded-lg"
+      className="overflow-hidden bg-white sm:rounded-lg"
       style={{
         boxShadow: `0px 20px 24px -4px rgba(16, 24, 40, 0.08)`,
       }}
     >
       <div className="flex p-8">
-        <h3 className="text-xl leading-6 font-semibold text-gray-900 my-auto">
+        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
           User
         </h3>
 
@@ -37,7 +37,7 @@ export function UserDetails() {
       </div>
       {isLoaded && user ? (
         jsonOutput ? (
-          <div className="overflow-scroll max-h-96 pb-6">
+          <div className="pb-6 overflow-scroll max-h-96">
             <JSONOutput json={user} />
           </div>
         ) : (
@@ -45,14 +45,14 @@ export function UserDetails() {
             <dl>
               <div className="px-8 py-2">
                 <dt className="text-sm font-semibold">User ID</dt>
-                <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2 flex gap-2">
+                <dd className="flex gap-2 mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {user.id}
                   <CopyButton text={user.id} />
                 </dd>
               </div>
               {user.firstName && (
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">First Name</dt>
+                  <dt className="mb-1 text-sm font-semibold">First Name</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     {user.firstName}
                   </dd>
@@ -60,14 +60,14 @@ export function UserDetails() {
               )}
               {user.lastName && (
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">Last Name</dt>
+                  <dt className="mb-1 text-sm font-semibold">Last Name</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     {user.lastName}
                   </dd>
                 </div>
               )}
               <div className="px-8 py-2">
-                <dt className="text-sm font-semibold mb-1">Email addresses</dt>
+                <dt className="mb-1 text-sm font-semibold">Email addresses</dt>
                 <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {user.emailAddresses.map((email) => (
                     <div key={email.id} className="flex gap-2 mb-1">
@@ -83,11 +83,11 @@ export function UserDetails() {
               </div>
               {user.imageUrl && (
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">Profile Image</dt>
+                  <dt className="mb-1 text-sm font-semibold">Profile Image</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     <img
                       src={user.imageUrl}
-                      className="rounded-full w-12 h-12"
+                      className="w-12 h-12 rounded-full"
                     />
                   </dd>
                 </div>
@@ -96,7 +96,7 @@ export function UserDetails() {
           </div>
         )
       ) : (
-        <div className="text-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           Loading user data...
         </div>
       )}
@@ -110,13 +110,13 @@ export function SessionDetails() {
 
   return (
     <div
-      className="bg-white shadow overflow-hidden sm:rounded-lg"
+      className="overflow-hidden bg-white shadow sm:rounded-lg"
       style={{
         boxShadow: `0px 20px 24px -4px rgba(16, 24, 40, 0.08)`,
       }}
     >
       <div className="flex p-8">
-        <h3 className="text-xl leading-6 font-semibold text-gray-900 my-auto">
+        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
           Session
         </h3>
         <Toggle
@@ -127,7 +127,7 @@ export function SessionDetails() {
       </div>
       {isLoaded && session ? (
         jsonOutput ? (
-          <div className="overflow-scroll max-h-96 pb-6">
+          <div className="pb-6 overflow-scroll max-h-96">
             <JSONOutput
               json={{
                 ...session,
@@ -140,13 +140,13 @@ export function SessionDetails() {
             <dl>
               <div className="px-8 py-2">
                 <dt className="text-sm font-semibold">Session ID</dt>
-                <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2 flex gap-2">
+                <dd className="flex gap-2 mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {session.id}
                   <CopyButton text={session.id} />
                 </dd>
               </div>
               <div className="px-8 py-2">
-                <dt className="text-sm font-semibold mb-1">Status</dt>
+                <dt className="mb-1 text-sm font-semibold">Status</dt>
                 <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {session.status === `active` && (
                     <span className="text-xs bg-success-50 text-success-700 flex w-min gap-1 px-2 py-[1px] rounded-2xl font-medium">
@@ -159,13 +159,13 @@ export function SessionDetails() {
                 </dd>
               </div>
               <div className="px-8 py-2">
-                <dt className="text-sm font-semibold mb-1">Last Active</dt>
+                <dt className="mb-1 text-sm font-semibold">Last Active</dt>
                 <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {session.lastActiveAt.toLocaleString()}
                 </dd>
               </div>
               <div className="px-8 py-2">
-                <dt className="text-sm font-semibold mb-1">Expiry</dt>
+                <dt className="mb-1 text-sm font-semibold">Expiry</dt>
                 <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                   {session.expireAt.toLocaleString()}
                 </dd>
@@ -174,7 +174,7 @@ export function SessionDetails() {
           </div>
         )
       ) : (
-        <div className="text-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           Loading user data...
         </div>
       )}
@@ -188,13 +188,13 @@ export function OrgDetails() {
 
   return (
     <div
-      className="bg-white shadow overflow-hidden sm:rounded-lg"
+      className="overflow-hidden bg-white shadow sm:rounded-lg"
       style={{
         boxShadow: `0px 20px 24px -4px rgba(16, 24, 40, 0.08)`,
       }}
     >
       <div className="flex p-8">
-        <h3 className="text-xl leading-6 font-semibold text-gray-900 my-auto">
+        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
           Organization
         </h3>
         <Toggle
@@ -206,7 +206,7 @@ export function OrgDetails() {
       {isLoaded ? (
         organization ? (
           jsonOutput ? (
-            <div className="overflow-scroll max-h-96 pb-6">
+            <div className="pb-6 overflow-scroll max-h-96">
               <JSONOutput json={organization} />
             </div>
           ) : (
@@ -214,25 +214,25 @@ export function OrgDetails() {
               <dl>
                 <div className="px-8 py-2">
                   <dt className="text-sm font-semibold">Organization ID</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2 flex gap-2">
+                  <dd className="flex gap-2 mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     {organization.id}
                     <CopyButton text={organization.id} />
                   </dd>
                 </div>
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">Name</dt>
+                  <dt className="mb-1 text-sm font-semibold">Name</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     {organization.name}
                   </dd>
                 </div>
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">Members</dt>
+                  <dt className="mb-1 text-sm font-semibold">Members</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     {organization.membersCount}
                   </dd>
                 </div>
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">
+                  <dt className="mb-1 text-sm font-semibold">
                     Pending invitations
                   </dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
@@ -240,7 +240,7 @@ export function OrgDetails() {
                   </dd>
                 </div>
                 <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold mb-1">Image</dt>
+                  <dt className="mb-1 text-sm font-semibold">Image</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
                     <Image
                       className="rounded"
@@ -255,14 +255,14 @@ export function OrgDetails() {
             </div>
           )
         ) : (
-          <div className="text-gray-700 px-8 pb-5 text-sm">
+          <div className="px-8 pb-5 text-sm text-gray-700">
             You are currently logged in to your personal workspace.
             <br />
             Create or switch to an organization to see its details.
           </div>
         )
       ) : (
-        <div className="text-gray-700 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           Loading organization data...
         </div>
       )}
@@ -349,7 +349,7 @@ function JSONOutput(props: { json: any }) {
   }, []);
 
   return (
-    <pre className="px-8 sm:px-6 text-black text-sm">
+    <pre className="px-8 text-sm text-black sm:px-6">
       <code className="language-json">
         {JSON.stringify(props.json, null, 2)}
       </code>
