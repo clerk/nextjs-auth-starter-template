@@ -1,4 +1,5 @@
 "use client";
+import * as React from "react";
 
 import { useOrganization, useSession, useUser } from "@clerk/nextjs";
 import classNames from "classnames";
@@ -183,8 +184,13 @@ export function SessionDetails() {
 }
 
 export function OrgDetails() {
+  const { user } = useUser();
   const { isLoaded, organization } = useOrganization();
   const [jsonOutput, setJsonOutput] = useState(false);
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div
@@ -252,6 +258,13 @@ export function OrgDetails() {
                   </dd>
                 </div>
               </dl>
+              <button
+                onClick={async () =>
+                  await user.leaveOrganization(organization.id)
+                }
+              >
+                Leave Organization
+              </button>
             </div>
           )
         ) : (
