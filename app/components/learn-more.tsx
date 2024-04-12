@@ -16,7 +16,7 @@ export function LearnMore() {
             <h3 className="text-sm font-medium text-[#131316] tracking-tight mb-1">{card.title}</h3>
             <p className="text-[13px] text-[#5E5F6E]">{card.description}</p>
           </div>
-          <div className="bg-[#F5F5F7] text-[#131316] px-4 py-2 text-[13px] font-medium flex items-center gap-1.5">
+          <div className="bg-[#F5F5F7] text-[#131316] px-4 py-2 text-[13px] font-medium flex items-center gap-1.5 border-t border-[#EDEDF0]">
             {card.linkText}
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
               <rect x="2" y="2" width="12" height="12" rx="3" fill="#EEEEF0" />
