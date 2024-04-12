@@ -1,6 +1,6 @@
 export function LearnMore() {
   return (
-    <div className="relative bg-white">
+    <div className="relative bg-white" id="features">
       <div className="grid grid-cols-4 gap-8 max-w-[1200px] mx-auto w-full pt-16 pb-24">
         <div className="flex flex-col">
           <span className="text-[13px] text-[#6C47FF] font-medium">What's next</span>
@@ -11,7 +11,7 @@ export function LearnMore() {
             Prebuilt components to handle essential functionality like user sign-in, sign-up, and account management.
           </p>
         </div>
-        {CARDS.map((card, index) => (
+        {CARDS.map((card) => (
           <a href={card.href} target="_blank" className="border border-[#F2F2F4] rounded-lg overflow-hidden">
             <div className="px-4 py-3 bg-[#FAFAFB]">
               <h3 className="text-sm font-medium text-[#131316] tracking-tight mb-1">{card.title}</h3>

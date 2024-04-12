@@ -1,12 +1,12 @@
-"use client";
-import * as React from "react";
+'use client';
+import * as React from 'react';
 
-import { useOrganization, useSession, useUser } from "@clerk/nextjs";
-import classNames from "classnames";
-import { useEffect, useState } from "react";
-import { CopyIcon, Dot } from "../icons";
-import Image from "next/image";
-import "./prism.css";
+import { useOrganization, useSession, useUser } from '@clerk/nextjs';
+import classNames from 'classnames';
+import { useEffect, useState } from 'react';
+import { CopyIcon, Dot } from '../icons';
+import Image from 'next/image';
+import './prism.css';
 
 declare global {
   interface Window {
@@ -26,15 +26,9 @@ export function UserDetails() {
       }}
     >
       <div className="flex p-8">
-        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
-          User
-        </h3>
+        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">User</h3>
 
-        <Toggle
-          checked={jsonOutput}
-          onChange={() => setJsonOutput(!jsonOutput)}
-          disabled={!isLoaded}
-        />
+        <Toggle checked={jsonOutput} onChange={() => setJsonOutput(!jsonOutput)} disabled={!isLoaded} />
       </div>
       {isLoaded && user ? (
         jsonOutput ? (
@@ -54,17 +48,13 @@ export function UserDetails() {
               {user.firstName && (
                 <div className="px-8 py-2">
                   <dt className="mb-1 text-sm font-semibold">First Name</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {user.firstName}
-                  </dd>
+                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">{user.firstName}</dd>
                 </div>
               )}
               {user.lastName && (
                 <div className="px-8 py-2">
                   <dt className="mb-1 text-sm font-semibold">Last Name</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {user.lastName}
-                  </dd>
+                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">{user.lastName}</dd>
                 </div>
               )}
               <div className="px-8 py-2">
@@ -86,10 +76,7 @@ export function UserDetails() {
                 <div className="px-8 py-2">
                   <dt className="mb-1 text-sm font-semibold">Profile Image</dt>
                   <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    <img
-                      src={user.imageUrl}
-                      className="w-12 h-12 rounded-full"
-                    />
+                    <img src={user.imageUrl} className="w-12 h-12 rounded-full" />
                   </dd>
                 </div>
               )}
@@ -97,9 +84,7 @@ export function UserDetails() {
           </div>
         )
       ) : (
-        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          Loading user data...
-        </div>
+        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">Loading user data...</div>
       )}
     </div>
   );
@@ -117,14 +102,8 @@ export function SessionDetails() {
       }}
     >
       <div className="flex p-8">
-        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
-          Session
-        </h3>
-        <Toggle
-          checked={jsonOutput}
-          onChange={() => setJsonOutput(!jsonOutput)}
-          disabled={!isLoaded}
-        />
+        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">Session</h3>
+        <Toggle checked={jsonOutput} onChange={() => setJsonOutput(!jsonOutput)} disabled={!isLoaded} />
       </div>
       {isLoaded && session ? (
         jsonOutput ? (
@@ -175,9 +154,7 @@ export function SessionDetails() {
           </div>
         )
       ) : (
-        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          Loading user data...
-        </div>
+        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">Loading user data...</div>
       )}
     </div>
   );
@@ -192,112 +169,19 @@ export function OrgDetails() {
     return null;
   }
 
-  return (
-    <div
-      className="overflow-hidden bg-white shadow sm:rounded-lg"
-      style={{
-        boxShadow: `0px 20px 24px -4px rgba(16, 24, 40, 0.08)`,
-      }}
-    >
-      <div className="flex p-8">
-        <h3 className="my-auto text-xl font-semibold leading-6 text-gray-900">
-          Organization
-        </h3>
-        <Toggle
-          checked={jsonOutput}
-          onChange={() => setJsonOutput(!jsonOutput)}
-          disabled={!(isLoaded && organization)}
-        />
-      </div>
-      {isLoaded ? (
-        organization ? (
-          jsonOutput ? (
-            <div className="pb-6 overflow-scroll max-h-96">
-              <JSONOutput json={organization} />
-            </div>
-          ) : (
-            <div className="pb-6 max-h-96">
-              <dl>
-                <div className="px-8 py-2">
-                  <dt className="text-sm font-semibold">Organization ID</dt>
-                  <dd className="flex gap-2 mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {organization.id}
-                    <CopyButton text={organization.id} />
-                  </dd>
-                </div>
-                <div className="px-8 py-2">
-                  <dt className="mb-1 text-sm font-semibold">Name</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {organization.name}
-                  </dd>
-                </div>
-                <div className="px-8 py-2">
-                  <dt className="mb-1 text-sm font-semibold">Members</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {organization.membersCount}
-                  </dd>
-                </div>
-                <div className="px-8 py-2">
-                  <dt className="mb-1 text-sm font-semibold">
-                    Pending invitations
-                  </dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    {organization.pendingInvitationsCount}
-                  </dd>
-                </div>
-                <div className="px-8 py-2">
-                  <dt className="mb-1 text-sm font-semibold">Image</dt>
-                  <dd className="mt-1 text-sm text-gray-600 sm:mt-0 sm:col-span-2">
-                    <Image
-                      className="rounded"
-                      src={organization.imageUrl}
-                      alt={`Logo for ${organization.name}`}
-                      width={48}
-                      height={48}
-                    />
-                  </dd>
-                </div>
-              </dl>
-              <button
-                onClick={async () =>
-                  await user.leaveOrganization(organization.id)
-                }
-              >
-                Leave Organization
-              </button>
-            </div>
-          )
-        ) : (
-          <div className="px-8 pb-5 text-sm text-gray-700">
-            You are currently logged in to your personal workspace.
-            <br />
-            Create or switch to an organization to see its details.
-          </div>
-        )
-      ) : (
-        <div className="px-4 py-5 text-gray-700 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          Loading organization data...
-        </div>
-      )}
-    </div>
-  );
+  return <div className="overflow-hidden bg-white shadow sm:rounded-lg"></div>;
 }
 
-function Toggle(props: {
-  checked: boolean;
-  onChange: () => void;
-  disabled: boolean;
-}) {
+function Toggle(props: { checked: boolean; onChange: () => void; disabled: boolean }) {
   return (
     <div className="flex items-center justify-end flex-1">
       <button
         disabled={props.disabled}
         onClick={props.onChange}
         className={classNames({
-          "rounded-l-lg py-2 px-4 border-solid border border-gray-300 transition text-sm font-semibold":
-            true,
-          "bg-gray-100": !props.checked,
-          "bg-gray-50 text-gray-500 cursor-not-allowed": props.disabled,
+          'rounded-l-lg py-2 px-4 border-solid border border-gray-300 transition text-sm font-semibold': true,
+          'bg-gray-100': !props.checked,
+          'bg-gray-50 text-gray-500 cursor-not-allowed': props.disabled,
         })}
       >
         List
@@ -306,10 +190,9 @@ function Toggle(props: {
         disabled={props.disabled}
         onClick={props.onChange}
         className={classNames({
-          "rounded-r-lg py-2 px-4 border-solid border border-gray-300 -ml-[1px] transition text-sm font-semibold":
-            true,
-          "bg-gray-100": props.checked,
-          "bg-gray-50 text-gray-500 cursor-not-allowed": props.disabled,
+          'rounded-r-lg py-2 px-4 border-solid border border-gray-300 -ml-[1px] transition text-sm font-semibold': true,
+          'bg-gray-100': props.checked,
+          'bg-gray-50 text-gray-500 cursor-not-allowed': props.disabled,
         })}
       >
         JSON
@@ -341,10 +224,10 @@ function CopyButton(props: { text: string }) {
 
       <div
         className={classNames({
-          "absolute z-10 bg-gray-900 text-white rounded p-2 text-xs transition-all ease-in-out translate-x-60 shadow-sm shadow-gray-500":
+          'absolute z-10 bg-gray-900 text-white rounded p-2 text-xs transition-all ease-in-out translate-x-60 shadow-sm shadow-gray-500':
             true,
-          "translate-y-10 opacity-0": !tooltipShown,
-          "translate-y-6": tooltipShown,
+          'translate-y-10 opacity-0': !tooltipShown,
+          'translate-y-6': tooltipShown,
         })}
       >
         Copied!
@@ -363,9 +246,7 @@ function JSONOutput(props: { json: any }) {
 
   return (
     <pre className="px-8 text-sm text-black sm:px-6">
-      <code className="language-json">
-        {JSON.stringify(props.json, null, 2)}
-      </code>
+      <code className="language-json">{JSON.stringify(props.json, null, 2)}</code>
     </pre>
   );
 }

@@ -7,6 +7,7 @@ import signUp from './images/sign-up@2xrl.webp';
 import logo from './images/logo.png';
 import './home.css';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -105,12 +106,15 @@ export default function Home() {
               A simple and powerful Next.js template featuring authentication and user management powered by Clerk.
             </p>
             <div className="flex gap-3 relative">
-              <button className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
+              <Link href="/dashboard" className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
                 View demo
-              </button>
-              <button className="px-4 py-2 rounded-full text-[#131316] text-sm font-semibold bg-[#F7F7F8]">
+              </Link>
+              <Link
+                href="/#features"
+                className="px-4 py-2 rounded-full text-[#131316] text-sm font-semibold bg-[#F7F7F8]"
+              >
                 Learn more
-              </button>
+              </Link>
             </div>
           </div>
           <div className="flex gap-8 w-full h-[660px] scale-[1.03]">
