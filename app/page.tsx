@@ -1,10 +1,16 @@
 import { LearnMore } from './components/learn-more';
+import screenshotDevices from './images/user-button@2xrl.webp';
+import signIn from './images/sign-in@2xrl.webp';
+import verify from './images/verify@2xrl.webp';
+import userButton2 from './images/user-button-2@2xrl.webp';
+import signUp from './images/sign-up@2xrl.webp';
 import './home.css';
+import Image from 'next/image';
 
 export default function Home() {
   return (
     <>
-      <main className="bg-[#FAFAFA] grid-rows-3">
+      <main className="bg-[#FAFAFA] grid-rows-3 relative">
         <div className="w-full bg-white max-w-[1200px] mx-auto flex flex-col border-l border-r border-[#F2F2F2]">
           <div className="px-12 py-16">
             <div className="bg-[#F4F4F5] px-4 py-3 rounded-full inline-flex gap-4">
@@ -97,10 +103,48 @@ export default function Home() {
                 View demo
               </button>
             </div>
-            <div className="absolute left-0 right-0 h-32 bg-gradient-to-t from-white -translate-y-20" />
-            <div className="absolute left-0 right-0 h-px bg-[#F2F2F2]" />
+            <div className="absolute left-0 right-0 h-px bg-[#F2F2F2] translate-y-10" />
+          </div>
+          <div className="flex gap-8 w-full h-[660px] scale-[1.03]">
+            <div className="space-y-8 translate-y-8">
+              <Image
+                alt="Device"
+                src={signUp}
+                unoptimized
+                className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
+              />
+            </div>
+            <div className="space-y-8 -translate-y-12">
+              <Image
+                alt="Device"
+                src={verify}
+                unoptimized
+                className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
+              />
+              <Image
+                alt="Device"
+                src={userButton2}
+                unoptimized
+                className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
+              />
+            </div>
+            <div className="space-y-8 -translate-y-[320px]">
+              <Image
+                alt="Device"
+                src={signIn}
+                unoptimized
+                className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
+              />
+              <Image
+                alt="Device"
+                src={screenshotDevices}
+                unoptimized
+                className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
+              />
+            </div>
           </div>
         </div>
+        <div className="absolute left-0 right-0 bottom-0 h-[300px] bg-gradient-to-t from-white" />
       </main>
       <LearnMore />
     </>

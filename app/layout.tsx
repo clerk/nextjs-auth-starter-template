@@ -31,7 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <body className={`min-h-screen flex flex-col antialiased`}>
           {children}
-          <footer className="max-w-[1200px] w-full mx-auto pt-7 border-t border-[#EEEEF0] flex justify-between mt-16">
+          <footer className="max-w-[1200px] bg-white w-full mx-auto pt-7 border-t border-[#EEEEF0] flex justify-between">
             <a href="https://clerk.dev" target="_blank" className="flex gap-2 font-medium text-[13px]">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
