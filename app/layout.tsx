@@ -3,6 +3,8 @@ import './globals.css';
 import Script from 'next/script';
 import { Metadata } from 'next';
 import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { LearnMore } from './components/learn-more';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://clerk-next-app.vercel.app/'),
@@ -13,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <ClerkProvider
         appearance={{
           variables: { colorPrimary: '#000000' },
@@ -31,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <body className={`min-h-screen flex flex-col antialiased`}>
           {children}
+          <LearnMore />
           <footer className="max-w-[1200px] bg-white w-full mx-auto pt-7 border-t border-[#EEEEF0] flex justify-between pb-24">
             <a href="https://clerk.dev" target="_blank" className="flex gap-2 font-medium text-[13px]">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

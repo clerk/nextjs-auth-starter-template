@@ -1,10 +1,12 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
-import { OrgDetails, SessionDetails, UserDetails } from './details';
+import { UserDetails } from '../components/user-details';
 
 export default async function DashboardPage() {
   const { userId } = auth().protect();
 
   const user = await clerkClient.users.getUser(userId);
+
+  if (!user) return null;
 
   return (
     <div className="max-w-[1200px] w-full mx-auto">
@@ -77,8 +79,8 @@ export default async function DashboardPage() {
           </defs>
         </svg>
       </header>
-      <div className="grid  grid-cols-[1fr_328px] gap-10">
-        <h1>test</h1>
+      <div className="grid grid-cols-[1fr_328px] gap-10 pb-10">
+        <UserDetails />
         <h1>test2</h1>
       </div>
     </div>
