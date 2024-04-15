@@ -20,9 +20,7 @@ function Row({ desc, value, children }: { desc: string; value: string; children:
 
 function PointerC({ label, width, className }: { label: string; width: number; className: string }) {
   return (
-    <div
-      className={classNames('absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full')}
-    >
+    <div className={classNames('absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full')}>
       <div className="relative">
         <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
         <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
@@ -76,15 +74,27 @@ export function UserDetails() {
           <Row desc="Last signed in" value={formatDate(user.lastSignInAt!)}>
             <PointerC label="user.lastSignInAt" />
           </Row>
-          <Row desc="Joined on" value={formatDate(user.createdAt!)} />
-          <Row desc="User ID" value={user.id} />
+          <Row desc="Joined on" value={formatDate(user.createdAt!)}>
+            <PointerC label="user.createdAt" />
+          </Row>
+          <Row desc="User ID" value={user.id}>
+            <PointerC label="user.user.id" />
+          </Row>
         </div>
         <h2 className="mt-6 mb-4 text-[15px] font-semibold">Session details</h2>
         <div className="px-2.5 bg-[#FAFAFB] rounded-lg divide-y divide-[#EEEEF0]">
-          <Row desc="Session ID" value={session.id} />
-          <Row desc="Status" value={session.status} />
-          <Row desc="Last active" value={formatDateWithNumbers(session.lastActiveAt)} />
-          <Row desc="Session expiration" value={formatDateWithNumbers(session.expireAt)} />
+          <Row desc="Session ID" value={session.id}>
+            <PointerC label="session.id" />
+          </Row>
+          <Row desc="Status" value={session.status}>
+            <PointerC label="session.status" />
+          </Row>
+          <Row desc="Last active" value={formatDateWithNumbers(session.lastActiveAt)}>
+            <PointerC label="session.lastActiveAt" />
+          </Row>
+          <Row desc="Session expiration" value={formatDateWithNumbers(session.expireAt)}>
+            <PointerC label="session.expireAt" />
+          </Row>
         </div>
         {organization ? (
           <>
