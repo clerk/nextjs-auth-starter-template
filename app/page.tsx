@@ -8,6 +8,7 @@ import logo from './images/logo.png';
 import './home.css';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Footer } from './components/footer';
 
 export default function Home() {
   return (
@@ -158,6 +159,8 @@ export default function Home() {
         </div>
         <div className="absolute left-0 right-0 bottom-0 h-[300px] bg-gradient-to-t from-white" />
       </main>
+      <LearnMore />
+      <Footer />
     </>
   );
 }
