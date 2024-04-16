@@ -75,23 +75,27 @@ export function UserDetails() {
               <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.imageUrl</div>
             </div>
           </div>
-          <h1 className="text-[17px] font-semibold relative w-full text-center">
-            {user.firstName} {user.lastName}
-            <div
-              className={classNames(
-                'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
-              )}
-            >
-              <div className="relative">
-                <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
-                <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
+          {user.firstName && user.lastName ? (
+            <h1 className="text-[17px] font-semibold relative w-full text-center">
+              {user.firstName} {user.lastName}
+              <div
+                className={classNames(
+                  'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
+                )}
+              >
+                <div className="relative">
+                  <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+                  <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
+                </div>
+                <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.firstName</div>
+                <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white -translate-x-3">
+                  user.lastName
+                </div>
               </div>
-              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.firstName</div>
-              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white -translate-x-3">
-                user.lastName
-              </div>
-            </div>
-          </h1>
+            </h1>
+          ) : (
+            <div className="h-4" />
+          )}
         </div>
 
         <div className="px-2.5 bg-[#FAFAFB] rounded-lg divide-y divide-[#EEEEF0]">
