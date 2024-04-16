@@ -1,4 +1,11 @@
-export function LearnMore() {
+interface Card {
+  title: string;
+  description: string;
+  href: string;
+  linkText: string;
+}
+
+export function LearnMore({ cards }: { cards: Card[] }) {
   return (
     <div className="relative bg-white" id="features">
       <div className="grid grid-cols-4 gap-8 max-w-[1200px] mx-auto w-full pt-16 pb-24">
@@ -11,7 +18,7 @@ export function LearnMore() {
             Prebuilt components to handle essential functionality like user sign-in, sign-up, and account management.
           </p>
         </div>
-        {CARDS.map((card) => (
+        {cards.map((card) => (
           <a href={card.href} target="_blank" className="border border-[#F2F2F4] rounded-lg overflow-hidden">
             <div className="px-4 py-3 bg-[#FAFAFB]">
               <h3 className="text-sm font-medium text-[#131316] tracking-tight mb-1">{card.title}</h3>
@@ -36,27 +43,3 @@ export function LearnMore() {
     </div>
   );
 }
-
-const CARDS = [
-  {
-    title: 'Use your JWT to authenticate requests?',
-    description:
-      'Prebuilt components to handle essential functionality like user sign-in, sign-up, and account management.',
-    href: 'https://clerk.dev',
-    linkText: 'Components',
-  },
-  {
-    title: 'Use your JWT to authenticate requests?',
-    description:
-      'Prebuilt components to handle essential functionality like user sign-in, sign-up, and account management.',
-    href: 'https://dashboard.clerk.dev',
-    linkText: 'Components',
-  },
-  {
-    title: 'Use your JWT to authenticate requests?',
-    description:
-      'Prebuilt components to handle essential functionality like user sign-in, sign-up, and account management.',
-    href: 'https://clerk.com',
-    linkText: 'Components',
-  },
-];
