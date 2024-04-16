@@ -35,6 +35,7 @@ export function CodeSwitcher() {
               'capitalize rounded h-7 text-[13px] flex-1 hover:text-black font-medium',
               selectedType === type ? 'bg-white shadow-sm text-black' : 'text-[#5E5F6E]'
             )}
+            key={type}
             onClick={() => setSelectedType(type)}
           >
             {type}
