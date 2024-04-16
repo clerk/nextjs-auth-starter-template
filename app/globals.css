@@ -14,7 +14,7 @@
     to bottom,
     rgba(0, 0, 0, 0) 0%,
     rgba(0, 0, 0, 1) 40px,
-    rgba(0, 0, 0, 1) calc(100% - 40px),
+    rgba(0, 0, 0, 1) calc(100% - 20px),
     rgba(0, 0, 0, 0) 100%
   );
 }

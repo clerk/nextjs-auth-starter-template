@@ -18,7 +18,7 @@ function Row({ desc, value, children }: { desc: string; value: string; children:
   );
 }
 
-function PointerC({ label, width, className }: { label: string; width: number; className: string }) {
+function PointerC({ label }: { label: string }) {
   return (
     <div className={classNames('absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full')}>
       <div className="relative">
@@ -61,9 +61,36 @@ export function UserDetails() {
     <div className="p-16 rounded-lg border border-[#EDEDED] bg-[#F1F1F2] background relative">
       <div className="p-8 rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5 max-w-[400px]">
         <div className="flex flex-col items-center gap-2 mb-6">
-          <img src={user.imageUrl} className="size-20 rounded-full" />
-          <h1 className="text-[17px] font-semibold">
+          <div className="w-full relative flex justify-center">
+            <img src={user.imageUrl} className="size-20 rounded-full" />
+            <div
+              className={classNames(
+                'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
+              )}
+            >
+              <div className="relative">
+                <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+                <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
+              </div>
+              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.imageUrl</div>
+            </div>
+          </div>
+          <h1 className="text-[17px] font-semibold relative w-full text-center">
             {user.firstName} {user.lastName}
+            <div
+              className={classNames(
+                'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
+              )}
+            >
+              <div className="relative">
+                <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+                <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
+              </div>
+              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.firstName</div>
+              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white -translate-x-3">
+                user.lastName
+              </div>
+            </div>
           </h1>
         </div>
 
@@ -98,12 +125,20 @@ export function UserDetails() {
         </div>
         {organization ? (
           <>
-            <h2 className="mt-6 mb-4 text-[15px] font-semibold">Organisation detail</h2>
+            <h2 className="mt-6 mb-4 text-[15px] font-semibold">Organization detail</h2>
             <div className="px-2.5 bg-[#FAFAFB] rounded-lg divide-y divide-[#EEEEF0]">
-              <Row desc="Organisation ID" value={organization.id} />
-              <Row desc="Name" value={organization.name} />
-              <Row desc="Members" value={String(organization.membersCount)} />
-              <Row desc="Pending invitations" value={String(organization.pendingInvitationsCount)} />
+              <Row desc="Organization ID" value={organization.id}>
+                <PointerC label="organization.id" />
+              </Row>
+              <Row desc="Name" value={organization.name}>
+                <PointerC label="organization.name" />
+              </Row>
+              <Row desc="Members" value={String(organization.membersCount)}>
+                <PointerC label="organization.membersCount" />
+              </Row>
+              <Row desc="Pending invitations" value={String(organization.pendingInvitationsCount)}>
+                <PointerC label="organization.pendingInvitationsCount" />
+              </Row>
             </div>
           </>
         ) : null}

@@ -27,7 +27,7 @@ export function CodeSwitcher() {
   const typesToShow = organization ? TYPES : TYPES.filter((type) => type !== 'organization');
 
   return (
-    <div className="h-[666px]">
+    <div className={classNames(organization ? 'h-[874px]' : 'h-[666px]')}>
       <div className="w-full bg-[#F7F7F8] rounded-md p-[3px] flex gap-1.5">
         {typesToShow.map((type) => (
           <button
