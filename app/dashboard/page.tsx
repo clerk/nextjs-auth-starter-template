@@ -40,7 +40,7 @@ export default async function DashboardPage() {
       <main className="max-w-[1200px] w-full mx-auto">
         <div className="grid grid-cols-[1fr_328px] gap-10 pb-10">
           <div className="flex flex-col">
-            <header className="flex gap-4 py-4 justify-between items-center w-full">
+            <header className="flex gap-4 h-16 justify-between items-center w-full">
               <div className="flex gap-4">
                 <a href="https://clerk.com/docs" target="_blank">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
