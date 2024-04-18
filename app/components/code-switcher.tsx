@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useOrganization, useSession, useUser } from '@clerk/nextjs';
-import classNames from 'classnames';
-import { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import theme from './theme';
+import { useOrganization, useSession, useUser } from "@clerk/nextjs";
+import classNames from "classnames";
+import { useState } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import theme from "./theme";
 
-const TYPES = ['user', 'session', 'organization'];
+const TYPES = ["user", "session", "organization"];
 
 export function CodeSwitcher() {
   const [selectedType, setSelectedType] = useState(TYPES[0]);
@@ -21,19 +21,23 @@ export function CodeSwitcher() {
       organization,
     }[selectedType],
     null,
-    2
+    2,
   );
 
-  const typesToShow = organization ? TYPES : TYPES.filter((type) => type !== 'organization');
+  const typesToShow = organization
+    ? TYPES
+    : TYPES.filter((type) => type !== "organization");
 
   return (
-    <div className={classNames(organization ? 'h-[874px]' : 'h-[666px]')}>
+    <div className={classNames(organization ? "h-[874px]" : "h-[666px]")}>
       <div className="w-full bg-[#F7F7F8] rounded-md p-[3px] flex gap-1.5">
         {typesToShow.map((type) => (
           <button
             className={classNames(
-              'capitalize rounded h-7 text-[13px] flex-1 hover:text-black font-medium',
-              selectedType === type ? 'bg-white shadow-sm text-black' : 'text-[#5E5F6E]'
+              "capitalize rounded h-7 text-[13px] flex-1 hover:text-black font-medium",
+              selectedType === type
+                ? "bg-white shadow-sm text-black"
+                : "text-[#5E5F6E]",
             )}
             key={type}
             onClick={() => setSelectedType(type)}
@@ -42,9 +46,9 @@ export function CodeSwitcher() {
           </button>
         ))}
       </div>
-      <div className="relative" style={{ height: 'calc(100% - 42px)' }}>
+      <div className="relative" style={{ height: "calc(100% - 42px)" }}>
         <div className="mask h-full">
-          {/* @ts-ignore */}
+          {/* @ts-expect-error */}
           <SyntaxHighlighter language="javascript" style={theme}>
             {selectedCode}
           </SyntaxHighlighter>
