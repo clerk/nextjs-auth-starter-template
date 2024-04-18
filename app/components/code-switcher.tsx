@@ -48,6 +48,7 @@ export function CodeSwitcher() {
       </div>
       <div className="relative" style={{ height: "calc(100% - 42px)" }}>
         <div className="mask h-full">
+          {/* @ts-expect-error */}
           <SyntaxHighlighter language="javascript" style={theme}>
             {selectedCode}
           </SyntaxHighlighter>
