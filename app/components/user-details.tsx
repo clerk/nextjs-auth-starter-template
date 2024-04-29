@@ -84,7 +84,7 @@ export function UserDetails() {
                 )}
               >
                 <div className="relative">
-                  <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+                  <div className="h-px bg-[#BFBFC4] w-[104px]" />
                   <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
                 </div>
                 <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.firstName</div>
