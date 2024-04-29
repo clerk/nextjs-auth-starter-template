@@ -1,10 +1,10 @@
 export function Footer() {
   return (
-    <footer className="max-w-[75rem] bg-white w-full mx-auto pt-7 border-t border-[#EEEEF0] flex justify-between pb-24">
+    <footer className="max-w-[75rem] bg-white w-full mx-auto pt-6 border-t border-[#EEEEF0] flex justify-between pb-24">
       <a
         href="https://clerk.dev"
         target="_blank"
-        className="flex gap-2 font-medium text-[0.8125rem]"
+        className="flex gap-2 font-medium text-[0.8125rem] items-center"
       >
         <svg
           width="16"
