@@ -1,9 +1,9 @@
-import { auth, clerkClient } from '@clerk/nextjs/server';
-import { UserDetails } from '../components/user-details';
-import { OrganizationSwitcher, UserButton } from '@clerk/nextjs';
-import { CodeSwitcher } from '../components/code-switcher';
-import { LearnMore } from '../components/learn-more';
-import { Footer } from '../components/footer';
+import { auth, clerkClient } from "@clerk/nextjs/server";
+import { UserDetails } from "../components/user-details";
+import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import { CodeSwitcher } from "../components/code-switcher";
+import { LearnMore } from "../components/learn-more";
+import { Footer } from "../components/footer";
 
 import { CARDS } from "../consts/cards";
 
@@ -18,11 +18,17 @@ export default async function DashboardPage() {
     <>
       <main className="max-w-[1200px] w-full mx-auto">
         <div className="grid grid-cols-[1fr_328px] gap-10 pb-10">
-          <div className="flex flex-col">
+          <div>
             <header className="flex gap-4 h-16 justify-between items-center w-full">
               <div className="flex gap-4">
                 <a href="https://clerk.com/docs" target="_blank">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
                     <path
                       d="M12.001 15.75C14.072 15.75 15.7509 14.0711 15.7509 12C15.7509 9.92893 14.072 8.25 12.001 8.25C9.9299 8.25 8.25098 9.92893 8.25098 12C8.25098 14.0711 9.9299 15.75 12.001 15.75Z"
                       fill="#131316"
@@ -40,11 +46,17 @@ export default async function DashboardPage() {
                 </a>
                 <div aria-hidden className="w-px h-6 bg-[#C7C7C8]" />
                 <a href="https://nextjs.org/" target="_blank">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
                     <g clipPath="url(#clip0_29_46694)">
                       <mask
                         id="mask0_29_46694"
-                        style={{ maskType: 'alpha' }}
+                        style={{ maskType: "alpha" }}
                         width="24"
                         height="24"
                         x="0"
@@ -65,7 +77,10 @@ export default async function DashboardPage() {
                           fill="url(#paint0_linear_29_46694)"
                           d="M19.935 21.003L9.219 7.2H7.2v9.596h1.615V9.251l9.852 12.728c.444-.297.868-.624 1.268-.976z"
                         ></path>
-                        <path fill="url(#paint1_linear_29_46694)" d="M16.934 7.2h-1.6v9.6h1.6V7.2z"></path>
+                        <path
+                          fill="url(#paint1_linear_29_46694)"
+                          d="M16.934 7.2h-1.6v9.6h1.6V7.2z"
+                        ></path>
                       </g>
                     </g>
                     <defs>
@@ -78,7 +93,11 @@ export default async function DashboardPage() {
                         gradientUnits="userSpaceOnUse"
                       >
                         <stop stopColor="#fff"></stop>
-                        <stop offset="1" stopColor="#fff" stopOpacity="0"></stop>
+                        <stop
+                          offset="1"
+                          stopColor="#fff"
+                          stopOpacity="0"
+                        ></stop>
                       </linearGradient>
                       <linearGradient
                         id="paint1_linear_29_46694"
@@ -89,7 +108,11 @@ export default async function DashboardPage() {
                         gradientUnits="userSpaceOnUse"
                       >
                         <stop stopColor="#fff"></stop>
-                        <stop offset="1" stopColor="#fff" stopOpacity="0"></stop>
+                        <stop
+                          offset="1"
+                          stopColor="#fff"
+                          stopOpacity="0"
+                        ></stop>
                       </linearGradient>
                       <clipPath id="clip0_29_46694">
                         <path fill="#fff" d="M0 0H24V24H0z"></path>
@@ -102,14 +125,14 @@ export default async function DashboardPage() {
                 <OrganizationSwitcher
                   appearance={{
                     elements: {
-                      organizationPreviewAvatarBox: 'size-6',
+                      organizationPreviewAvatarBox: "size-6",
                     },
                   }}
                 />
                 <UserButton
                   appearance={{
                     elements: {
-                      userButtonAvatarBox: 'size-6',
+                      userButtonAvatarBox: "size-6",
                     },
                   }}
                 />
