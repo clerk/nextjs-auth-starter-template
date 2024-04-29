@@ -1,12 +1,20 @@
-'use client';
+"use client";
 
-import { useOrganization, useSession, useUser } from '@clerk/nextjs';
+import { useOrganization, useSession, useUser } from "@clerk/nextjs";
 
 function classNames(...classes: (string | undefined | null)[]): string {
-  return classes.filter(Boolean).join(' ');
+  return classes.filter(Boolean).join(" ");
 }
 
-function Row({ desc, value, children }: { desc: string; value: string; children: React.ReactNode }) {
+function Row({
+  desc,
+  value,
+  children,
+}: {
+  desc: string;
+  value: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="h-[34px] grid grid-cols-2 items-center relative">
       <span className="text-xs font-semibold block flex-shrink-0">{desc}</span>
@@ -20,32 +28,38 @@ function Row({ desc, value, children }: { desc: string; value: string; children:
 
 function PointerC({ label }: { label: string }) {
   return (
-    <div className={classNames('absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full')}>
+    <div
+      className={classNames(
+        "absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full"
+      )}
+    >
       <div className="relative">
-        <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+        <div className="h-px bg-[#BFBFC4] w-[6.5rem]" />
         <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
       </div>
-      <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">{label}</div>
+      <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">
+        {label}
+      </div>
     </div>
   );
 }
 
 function formatDate(date: Date) {
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
 }
 
 function formatDateWithNumbers(date: Date): string {
-  return date.toLocaleString('en-US', {
-    month: 'numeric',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
+  return date.toLocaleString("en-US", {
+    month: "numeric",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
     hour12: true,
   });
 }
@@ -65,14 +79,16 @@ export function UserDetails() {
             <img src={user.imageUrl} className="size-20 rounded-full" />
             <div
               className={classNames(
-                'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
+                "absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full"
               )}
             >
               <div className="relative">
-                <div style={{ width: 104 }} className="h-px bg-[#BFBFC4]" />
+                <div className="h-px bg-[#BFBFC4] w-[6.5rem]" />
                 <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
               </div>
-              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.imageUrl</div>
+              <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">
+                user.imageUrl
+              </div>
             </div>
           </div>
           {user.firstName && user.lastName ? (
@@ -80,14 +96,16 @@ export function UserDetails() {
               {user.firstName} {user.lastName}
               <div
                 className={classNames(
-                  'absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full'
+                  "absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full"
                 )}
               >
                 <div className="relative">
                   <div className="h-px bg-[#BFBFC4] w-[104px]" />
                   <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
                 </div>
-                <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">user.firstName</div>
+                <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white">
+                  user.firstName
+                </div>
                 <div className="font-mono text-xs bg-black px-1.5 py-1 rounded-md text-white -translate-x-3">
                   user.lastName
                 </div>
@@ -120,16 +138,24 @@ export function UserDetails() {
           <Row desc="Status" value={session.status}>
             <PointerC label="session.status" />
           </Row>
-          <Row desc="Last active" value={formatDateWithNumbers(session.lastActiveAt)}>
+          <Row
+            desc="Last active"
+            value={formatDateWithNumbers(session.lastActiveAt)}
+          >
             <PointerC label="session.lastActiveAt" />
           </Row>
-          <Row desc="Session expiration" value={formatDateWithNumbers(session.expireAt)}>
+          <Row
+            desc="Session expiration"
+            value={formatDateWithNumbers(session.expireAt)}
+          >
             <PointerC label="session.expireAt" />
           </Row>
         </div>
         {organization ? (
           <>
-            <h2 className="mt-6 mb-4 text-[15px] font-semibold">Organization detail</h2>
+            <h2 className="mt-6 mb-4 text-[15px] font-semibold">
+              Organization detail
+            </h2>
             <div className="px-2.5 bg-[#FAFAFB] rounded-lg divide-y divide-[#EEEEF0]">
               <Row desc="Organization ID" value={organization.id}>
                 <PointerC label="organization.id" />
@@ -140,7 +166,10 @@ export function UserDetails() {
               <Row desc="Members" value={String(organization.membersCount)}>
                 <PointerC label="organization.membersCount" />
               </Row>
-              <Row desc="Pending invitations" value={String(organization.pendingInvitationsCount)}>
+              <Row
+                desc="Pending invitations"
+                value={String(organization.pendingInvitationsCount)}
+              >
                 <PointerC label="organization.pendingInvitationsCount" />
               </Row>
             </div>
