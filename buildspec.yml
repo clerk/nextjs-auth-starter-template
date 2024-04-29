@@ -1,20 +1,11 @@
-version: 0.2
+batch:
+  fast-fail: false
+  build-graph:
+    - identifier: build1
+      buildspec: build1.yml
+    
+    - identifier: build2
+      buildspec: build2.yml
 
-phases:
-  install:
-    commands:
-      - echo Entered the install phase...
-      - npm install
-
-  build:
-    commands:
-      - echo Entered the build phase...
-      - npm run build
-      - npm run build
-      - npm run build
-
-
-
-cache:
-  paths:
-    - '/root/.npm/**/*'
+    - identifier: build3
+      buildspec: build3.yml

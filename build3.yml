@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo Entered the install phase...
+      - npm install
+
+  build:
+    commands:
+      - echo Entered the build phase...
+      - npm run build
+
+cache:
+  paths:
+    - '/root/.npm/**/*'
