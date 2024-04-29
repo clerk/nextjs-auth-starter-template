@@ -16,8 +16,8 @@ export default async function DashboardPage() {
 
   return (
     <>
-      <main className="max-w-[1200px] w-full mx-auto">
-        <div className="grid grid-cols-[1fr_328px] gap-10 pb-10">
+      <main className="max-w-[75rem] w-full mx-auto">
+        <div className="grid grid-cols-[1fr_20.5rem] gap-10 pb-10">
           <div>
             <header className="flex gap-4 h-16 justify-between items-center w-full">
               <div className="flex gap-4">
@@ -140,7 +140,7 @@ export default async function DashboardPage() {
             </header>
             <UserDetails />
           </div>
-          <div className="pt-[56px]">
+          <div className="pt-[3.5rem]">
             <CodeSwitcher />
           </div>
         </div>

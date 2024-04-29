@@ -1,14 +1,14 @@
-import { LearnMore } from './components/learn-more';
-import screenshotDevices from './images/user-button@2xrl.webp';
-import signIn from './images/sign-in@2xrl.webp';
-import verify from './images/verify@2xrl.webp';
-import userButton2 from './images/user-button-2@2xrl.webp';
-import signUp from './images/sign-up@2xrl.webp';
-import logo from './images/logo.png';
-import './home.css';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Footer } from './components/footer';
+import { LearnMore } from "./components/learn-more";
+import screenshotDevices from "./images/user-button@2xrl.webp";
+import signIn from "./images/sign-in@2xrl.webp";
+import verify from "./images/verify@2xrl.webp";
+import userButton2 from "./images/user-button-2@2xrl.webp";
+import signUp from "./images/sign-up@2xrl.webp";
+import logo from "./images/logo.png";
+import "./home.css";
+import Image from "next/image";
+import Link from "next/link";
+import { Footer } from "./components/footer";
 
 import { CARDS } from "./consts/cards";
 
@@ -16,11 +16,11 @@ export default function Home() {
   return (
     <>
       <main className="bg-[#FAFAFA] relative">
-        <div className="w-full bg-white max-w-[1200px] mx-auto flex flex-col border-l border-r border-[#F2F2F2] row-span-3">
+        <div className="w-full bg-white max-w-[75rem] mx-auto flex flex-col border-l border-r border-[#F2F2F2] row-span-3">
           <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-[#F2F2F2]" />
           <Image
             alt="Device"
-            className="size-64 bg-transparent absolute left-1/2 -translate-x-[380px] -top-6 h-[822px] object-contain w-[625px]"
+            className="size-64 bg-transparent absolute left-1/2 -translate-x-[23.75rem] -top-6 h-[51.375rem] object-contain w-[39.0625rem]"
             src={logo}
             unoptimized
           />
@@ -28,7 +28,13 @@ export default function Home() {
           <div className="px-12 py-16 border-b border-[#F2F2F4]">
             <div className="bg-[#F4F4F5] px-4 py-3 rounded-full inline-flex gap-4">
               <a href="https://clerk.com/docs" target="_blank">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
                   <path
                     d="M12.001 15.75C14.072 15.75 15.7509 14.0711 15.7509 12C15.7509 9.92893 14.072 8.25 12.001 8.25C9.9299 8.25 8.25098 9.92893 8.25098 12C8.25098 14.0711 9.9299 15.75 12.001 15.75Z"
                     fill="#131316"
@@ -46,11 +52,17 @@ export default function Home() {
               </a>
               <div aria-hidden className="w-px h-6 bg-[#C7C7C8]" />
               <a href="https://nextjs.org/" target="_blank">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
                   <g clipPath="url(#clip0_29_46694)">
                     <mask
                       id="mask0_29_46694"
-                      style={{ maskType: 'alpha' }}
+                      style={{ maskType: "alpha" }}
                       width="24"
                       height="24"
                       x="0"
@@ -71,7 +83,10 @@ export default function Home() {
                         fill="url(#paint0_linear_29_46694)"
                         d="M19.935 21.003L9.219 7.2H7.2v9.596h1.615V9.251l9.852 12.728c.444-.297.868-.624 1.268-.976z"
                       ></path>
-                      <path fill="url(#paint1_linear_29_46694)" d="M16.934 7.2h-1.6v9.6h1.6V7.2z"></path>
+                      <path
+                        fill="url(#paint1_linear_29_46694)"
+                        d="M16.934 7.2h-1.6v9.6h1.6V7.2z"
+                      ></path>
                     </g>
                   </g>
                   <defs>
@@ -107,12 +122,18 @@ export default function Home() {
           </div>
 
           <div className="p-10 border-b border-[#F2F2F2]">
-            <h1 className="text-5xl font-bold tracking-tight text-[#131316] relative">Auth starts here</h1>
-            <p className="text-[#5E5F6E] pt-3 pb-6 max-w-[480px] text-[17px] relative">
-              A simple and powerful Next.js template featuring authentication and user management powered by Clerk.
+            <h1 className="text-5xl font-bold tracking-tight text-[#131316] relative">
+              Auth starts here
+            </h1>
+            <p className="text-[#5E5F6E] pt-3 pb-6 max-w-[30rem] text-[1.0625rem] relative">
+              A simple and powerful Next.js template featuring authentication
+              and user management powered by Clerk.
             </p>
             <div className="flex gap-3 relative">
-              <Link href="/dashboard" className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
+              >
                 View demo
               </Link>
               <Link
@@ -123,7 +144,7 @@ export default function Home() {
               </Link>
             </div>
           </div>
-          <div className="flex gap-8 w-full h-[660px] scale-[1.03]">
+          <div className="flex gap-8 w-full h-[41.25rem] scale-[1.03]">
             <div className="space-y-8 translate-y-12">
               <Image
                 alt="Device"
@@ -146,7 +167,7 @@ export default function Home() {
                 className="flex-none rounded-xl bg-white shadow-[0_5px_15px_rgba(0,0,0,0.08),0_15px_35px_-5px_rgba(25,28,33,0.2)] ring-1 ring-gray-950/5"
               />
             </div>
-            <div className="space-y-8 -translate-y-[360px]">
+            <div className="space-y-8 -translate-y-[22.5rem]">
               <Image
                 alt="Device"
                 src={signIn}
@@ -162,7 +183,7 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div className="absolute left-0 right-0 bottom-0 h-[300px] bg-gradient-to-t from-white" />
+        <div className="absolute left-0 right-0 bottom-0 h-[18.75rem] bg-gradient-to-t from-white" />
       </main>
       <LearnMore cards={CARDS} />
       <Footer />

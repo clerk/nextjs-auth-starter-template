@@ -21,7 +21,7 @@ export function CodeSwitcher() {
       organization,
     }[selectedType],
     null,
-    2,
+    2
   );
 
   const typesToShow = organization
@@ -29,15 +29,17 @@ export function CodeSwitcher() {
     : TYPES.filter((type) => type !== "organization");
 
   return (
-    <div className={classNames(organization ? "h-[874px]" : "h-[666px]")}>
-      <div className="w-full bg-[#F7F7F8] rounded-md p-[3px] flex gap-1.5">
+    <div
+      className={classNames(organization ? "h-[54.625rem]" : "h-[41.625rem]")}
+    >
+      <div className="w-full bg-[#F7F7F8] rounded-md p-[0.1875rem] flex gap-1.5">
         {typesToShow.map((type) => (
           <button
             className={classNames(
-              "capitalize rounded h-7 text-[13px] flex-1 hover:text-black font-medium",
+              "capitalize rounded h-7 text-[0.8125rem] flex-1 hover:text-black font-medium",
               selectedType === type
                 ? "bg-white shadow-sm text-black"
-                : "text-[#5E5F6E]",
+                : "text-[#5E5F6E]"
             )}
             key={type}
             onClick={() => setSelectedType(type)}
