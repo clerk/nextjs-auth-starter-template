@@ -5,7 +5,7 @@ import { CodeSwitcher } from "../components/code-switcher";
 import { LearnMore } from "../components/learn-more";
 import { Footer } from "../components/footer";
 
-import { CARDS } from "../consts/cards";
+import { DASHBOARD_CARDS } from "../consts/cards";
 
 export default async function DashboardPage() {
   const { userId } = auth().protect();
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
           </div>
         </div>
       </main>
-      <LearnMore cards={CARDS} />
+      <LearnMore cards={DASHBOARD_CARDS} />
       <Footer />
     </>
   );
