@@ -19,7 +19,7 @@
   </a>
   <a href="https://twitter.com/clerkdev">
     <img alt="Twitter" src="https://img.shields.io/twitter/url.svg?label=%40clerkdev&style=social&url=https%3A%2F%2Ftwitter.com%2Fclerkdev" />
-  </a> 
+  </a>
   <br />
   <br />
   <img alt="Clerk Hero Image" src="public/og.png">
@@ -62,8 +62,9 @@ To run the example locally, you need to:
 <!-- TODO: UPDATE THIS UTM -->
 2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
 3. Set the required Clerk environment variables as shown in [the example `env` file](./.env.template).
-4. `npm install` the required dependencies.
-5. `npm run dev` to launch the development server.
+4. Go to "Organization Settings" in your sidebar and enable Organizations
+5. `npm install` the required dependencies.
+6. `npm run dev` to launch the development server.
 
 ## Learn more
 
@@ -80,7 +81,7 @@ To learn more about Clerk and Next.js, check out the following resources:
 
 If you have found an issue with our documentation, please create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app-router/issues).
 
-If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating an issue.  
+If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating an issue.
 Go ahead and create a [pull request](https://github.com/clerkinc/clerk-nextjs-demo-app-router/pulls) with the solution. :rocket:
 
 ## Want to leave feedback?
