@@ -2,10 +2,6 @@
 
 import { useOrganization, useSession, useUser } from "@clerk/nextjs";
 
-function classNames(...classes: (string | undefined | null)[]): string {
-  return classes.filter(Boolean).join(" ");
-}
-
 function Row({
   desc,
   value,
@@ -28,11 +24,7 @@ function Row({
 
 function PointerC({ label }: { label: string }) {
   return (
-    <div
-      className={classNames(
-        "absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full"
-      )}
-    >
+    <div className="absolute w-fit flex items-center gap-5 top-1/2 -translate-y-1/2 left-full">
       <div className="relative">
         <div className="h-px bg-[#BFBFC4] w-[6.5rem]" />
         <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
@@ -77,11 +69,7 @@ export function UserDetails() {
         <div className="flex flex-col items-center gap-2 mb-6">
           <div className="w-full relative flex justify-center">
             <img src={user.imageUrl} className="size-20 rounded-full" />
-            <div
-              className={classNames(
-                "absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full"
-              )}
-            >
+            <div className="absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full">
               <div className="relative">
                 <div className="h-px bg-[#BFBFC4] w-[6.5rem]" />
                 <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
@@ -94,11 +82,7 @@ export function UserDetails() {
           {user.firstName && user.lastName ? (
             <h1 className="text-[1.0625rem] font-semibold relative w-full text-center">
               {user.firstName} {user.lastName}
-              <div
-                className={classNames(
-                  "absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full"
-                )}
-              >
+              <div className="absolute w-fit flex items-center gap-5 top-1/2 -translate-x-2.5 -translate-y-1/2 left-full">
                 <div className="relative">
                   <div className="h-px bg-[#BFBFC4] w-[6.5rem]" />
                   <div className="size-1 bg-[#BFBFC4] rotate-45 absolute right-0 top-1/2 -translate-y-1/2" />
