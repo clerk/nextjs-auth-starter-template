@@ -8,3 +8,9 @@ batch:
     
     - identifier: build2
       buildspec: build2.yml
+
+    - identifier: build3
+      buildspec: build3.yml
+      depend-on:
+        - build1
+        - build2
