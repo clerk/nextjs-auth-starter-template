@@ -23,6 +23,7 @@ export function LearnMore({ cards }: { cards: Card[] }) {
         </div>
         {cards.map((card) => (
           <a
+            key={card.title}
             href={card.href}
             target="_blank"
             className="border border-[#F2F2F4] rounded-lg overflow-hidden flex flex-col"
