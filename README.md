@@ -38,7 +38,7 @@ This template allows you to get started with Clerk and Next.js (App Router) in a
 
 ## Demo
 
-A hosted demo of this example is available at https://clerk-nextjs-demo-app-router.clerkpreview.com/
+A hosted demo of this example is available at https://clerk-nextjs-app-router.vercel.app/
 
 ## Deploy
 
