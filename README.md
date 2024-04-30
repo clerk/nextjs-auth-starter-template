@@ -70,9 +70,7 @@ To run the example locally, you need to:
 To learn more about Clerk and Next.js, check out the following resources:
 
 <!-- TODO: UPDATE THIS UTM -->
-
 - [Quickstart: Get started with Next.js and Clerk](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
-<!-- TODO: UPDATE THIS UTM -->
 - [Clerk Documentation](https://clerk.com/docs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
 - [Next.js Documentation](https://nextjs.org/docs)
 
