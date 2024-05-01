@@ -44,8 +44,6 @@ A hosted demo of this example is available at https://clerk-nextjs-app-router.ve
 
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
-<!-- TODO: UPDATE THIS UTM -->
-
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerk%2Fclerk-nextjs-demo-app-router&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY,NEXT_PUBLIC_CLERK_SIGN_IN_URL,NEXT_PUBLIC_CLERK_SIGN_UP_URL&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs)
 
 ## Running the template
@@ -55,8 +53,6 @@ git clone https://github.com/clerk/clerk-nextjs-demo-app-router
 ```
 
 To run the example locally, you need to:
-
-<!-- TODO: UPDATE THIS UTM -->
 
 1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template).
 2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
@@ -69,22 +65,16 @@ To run the example locally, you need to:
 
 To learn more about Clerk and Next.js, check out the following resources:
 
-<!-- TODO: UPDATE THIS UTM -->
-
 - [Quickstart: Get started with Next.js and Clerk](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
 - [Clerk Documentation](https://clerk.com/docs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
 - [Next.js Documentation](https://nextjs.org/docs)
 
-## Found an issue?
+## Found an issue or have feedback?
 
-If you have found an issue with our documentation, please create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app-router/issues).
+If you have found an issue with this repo or have feedback, please join our Discord and create a new thread inside of our [support](https://discord.gg/zjhYsWuSwD) channel.
 
-If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating an issue.
-Go ahead and create a [pull request](https://github.com/clerkinc/clerk-nextjs-demo-app-router/pulls) with the solution. :rocket:
-
-## Want to leave feedback?
-
-Feel free to create an [issue](https://github.com/clerkinc/clerk-nextjs-demo-app-router/issues) with the **feedback** label. Our team will take a look at it and get back to you as soon as we can!
+If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating a thread.
+Go ahead and create a [pull request](https://github.com/clerk/clerk-nextjs-demo-app-router/pulls) with the solution. :rocket:
 
 ## Connect with us
 
