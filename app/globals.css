@@ -18,3 +18,66 @@
     rgba(0, 0, 0, 0) 100%
   );
 }
+
+
+@keyframes moveOvals {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Add this to your globals.css file */
+
+@keyframes scrollOvals {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.oval {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: #ff5900;
+  border-radius: 50%;
+  /* Adjust the duration to control the speed of the scrolling */
+  animation: scrollOvals 1s linear infinite;
+}
+
+.oval-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden; /* Hide overflowing ovals */
+  white-space: nowrap; /* Ensure the ovals are in a single line */
+}
+
+.oval-container > .oval:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.oval-container > .oval:nth-child(2) {
+  animation-delay: 0s;
+}
+
+.oval-container > .oval:nth-child(3) {
+  animation-delay: 0s;
+}
+
+.oval-container > .oval:nth-child(4) {
+  animation-delay: 0s;
+}
+
+.oval-container > .oval:nth-child(5) {
+  animation-delay: 0s;
+}
+
+.oval-container > .oval:nth-child(6) {
+  animation-delay: 0s;
+}
