@@ -1,4 +1,3 @@
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { LearnMore } from "./components/learn-more";
 import screenshotDevices from "./images/user-button@2xrl.webp";
 import signIn from "./images/sign-in@2xrl.webp";
@@ -46,21 +45,13 @@ export default function Home() {
               and user management powered by Clerk.
             </p>
             <div className="relative flex gap-3">
-              <SignedIn>
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
-                >
-                  Dashboard
-                </Link>
-              </SignedIn>
-              <SignedOut>
-                <SignInButton>
-                  <button className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
-                    Sign In
-                  </button>
-                </SignInButton>
-              </SignedOut>
+              <Link
+                href="/dashboard"
+                className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
+              >
+                Dashboard
+              </Link>
+
               <Link
                 href="/#features"
                 className="px-4 py-2 rounded-full text-[#131316] text-sm font-semibold bg-[#F7F7F8]"

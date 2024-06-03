@@ -1,3 +1,4 @@
+import { auth } from "@clerk/nextjs/server";
 import { UserDetails } from "../components/user-details";
 import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { CodeSwitcher } from "../components/code-switcher";
@@ -9,6 +10,7 @@ import { NextLogo } from "../components/next-logo";
 import { DASHBOARD_CARDS } from "../consts/cards";
 
 export default async function DashboardPage() {
+  auth().protect();
   return (
     <>
       <main className="max-w-[75rem] w-full mx-auto">
