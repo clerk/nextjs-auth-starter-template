@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useOrganization, useSession, useUser } from '@clerk/nextjs';
-import clsx from 'clsx';
-import { useMemo, useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import theme from './theme';
+import { useOrganization, useSession, useUser } from "@clerk/nextjs";
+import clsx from "clsx";
+import { useState } from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import theme from "./theme";
 
-const TYPES = ['user', 'session', 'organization'];
+const TYPES = ["user", "session", "organization"];
 
 export function CodeSwitcher() {
   const [selectedType, setSelectedType] = useState(TYPES[0]);
@@ -14,30 +14,30 @@ export function CodeSwitcher() {
   const { session } = useSession();
   const { organization } = useOrganization();
 
-  const selectedCode = useMemo(
-    () =>
-      JSON.stringify(
-        {
-          user,
-          session,
-          organization,
-        }[selectedType],
-        null,
-        2
-      ),
-    [selectedType, user, session, organization]
+  const selectedCode = JSON.stringify(
+    {
+      user,
+      session,
+      organization,
+    }[selectedType],
+    null,
+    2
   );
 
-  const typesToShow = organization ? TYPES : TYPES.filter((type) => type !== 'organization');
+  const typesToShow = organization
+    ? TYPES
+    : TYPES.filter((type) => type !== "organization");
 
   return (
-    <div className={clsx(organization ? 'h-[54.625rem]' : 'h-[41.625rem]')}>
+    <div className={clsx(organization ? "h-[54.625rem]" : "h-[41.625rem]")}>
       <div className="w-full bg-[#F7F7F8] rounded-md p-[0.1875rem] flex gap-1.5">
         {typesToShow.map((type) => (
           <button
             className={clsx(
-              'capitalize rounded h-7 text-[0.8125rem] flex-1 hover:text-black font-medium',
-              selectedType === type ? 'bg-white shadow-sm text-black' : 'text-[#5E5F6E]'
+              "capitalize rounded h-7 text-[0.8125rem] flex-1 hover:text-black font-medium",
+              selectedType === type
+                ? "bg-white shadow-sm text-black"
+                : "text-[#5E5F6E]"
             )}
             key={type}
             onClick={() => setSelectedType(type)}
