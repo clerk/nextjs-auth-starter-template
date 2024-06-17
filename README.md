@@ -58,7 +58,7 @@ To run the example locally, you need to:
 2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
 3. Set the required Clerk environment variables as shown in [the example `env` file](./.env.template).
 4. Go to "Organization Settings" in your sidebar and enable Organizations
-5. `npm install` the required dependencies.
+5. `npm install --force` the required dependencies (we're using `--force` to bypass peer dependancy errors while other packages come to support React 19).
 6. `npm run dev` to launch the development server.
 
 ## Learn more
