@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://clerk.com?utm_source=github&utm_medium=clerk_docs" target="_blank" rel="noopener noreferrer">
+  <a href="https://go.clerk.com/e3UDpP4" target="_blank" rel="noopener noreferrer">
    <picture>
       <source media="(prefers-color-scheme: dark)" srcset="./public/light-logo.png">
       <img src="./public/dark-logo.png" height="64">
@@ -54,8 +54,8 @@ git clone https://github.com/clerk/clerk-nextjs-demo-app-router
 
 To run the example locally, you need to:
 
-1. Sign up for a Clerk account at [https://clerk.com](https://dashboard.clerk.com/sign-up?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template).
-2. Go to the [Clerk dashboard](https://dashboard.clerk.com?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template) and create an application.
+1. Sign up for a Clerk account at [https://clerk.com](https://go.clerk.com/31bREJU).
+2. Go to the [Clerk dashboard](https://go.clerk.com/4I5LXFj) and create an application.
 3. Set the required Clerk environment variables as shown in [the example `env` file](./.env.template).
 4. Go to "Organization Settings" in your sidebar and enable Organizations
 5. `npm install` the required dependencies.
@@ -65,19 +65,19 @@ To run the example locally, you need to:
 
 To learn more about Clerk and Next.js, check out the following resources:
 
-- [Quickstart: Get started with Next.js and Clerk](https://clerk.com/docs/quickstarts/nextjs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
-- [Clerk Documentation](https://clerk.com/docs?utm_source=github&utm_medium=template_repos&utm_campaign=nextjs_template)
+- [Quickstart: Get started with Next.js and Clerk](https://go.clerk.com/vgWhQ7B)
+- [Clerk Documentation](https://go.clerk.com/aNiTioa)
 - [Next.js Documentation](https://nextjs.org/docs)
 
 ## Found an issue or have feedback?
 
-If you have found an issue with this repo or have feedback, please join our Discord and create a new thread inside of our [support](https://discord.gg/zjhYsWuSwD) channel.
+If you have found an issue with this repo or have feedback, please join our Discord and create a new thread inside of our [support](https://clerk.com/discord) channel.
 
 If it's a quick fix, such as a misspelled word or a broken link, feel free to skip creating a thread.
 Go ahead and create a [pull request](https://github.com/clerk/clerk-nextjs-demo-app-router/pulls) with the solution. :rocket:
 
 ## Connect with us
 
-You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://discord.com/invite/b5rXHjAg7A).
+You can discuss ideas, ask questions, and meet others from the community in our [Discord](https://clerk.com/discord).
 
 If you prefer, you can also find support through our [Twitter](https://twitter.com/ClerkDev), or you can [email](mailto:support@clerk.dev) us!
