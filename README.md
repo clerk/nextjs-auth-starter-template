@@ -44,7 +44,7 @@ A hosted demo of this example is available at https://clerk-nextjs-app-router.ve
 
 Easily deploy the template to Vercel with the button below. You will need to set the required environment variables in the Vercel dashboard.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerk%2Fclerk-nextjs-demo-app-router&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY,NEXT_PUBLIC_CLERK_SIGN_IN_URL,NEXT_PUBLIC_CLERK_SIGN_UP_URL&envDescription=Clerk%20API%20keys&envLink=https%3A%2F%2Fclerk.com%2Fdocs%2Fquickstart%2Fnextjs)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fclerk%2Fnextjs-auth-starter-template&env=NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,CLERK_SECRET_KEY&envDescription=Your%20Clerk%20application's%20public%20and%20private%20keys%2C%20accessible%20from%20dashboard.clerk.com&envLink=https%3A%2F%2Fgithub.com%2Fclerk%2Fnextjs-auth-starter-template%3Ftab%3Dreadme-ov-file%23running-the-template)
 
 ## Running the template
 
@@ -56,7 +56,7 @@ To run the example locally, you need to:
 
 1. Sign up for a Clerk account at [https://clerk.com](https://go.clerk.com/31bREJU).
 2. Go to the [Clerk dashboard](https://go.clerk.com/4I5LXFj) and create an application.
-3. Set the required Clerk environment variables as shown in [the example `env` file](./.env.template).
+3. Set the required Clerk environment variables as shown in [the example `env` file](./.env.example).
 4. Go to "Organization Settings" in your sidebar and enable Organizations
 5. `npm install` the required dependencies.
 6. `npm run dev` to launch the development server.
