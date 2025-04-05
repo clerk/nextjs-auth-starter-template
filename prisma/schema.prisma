@@ -1,0 +1,193 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User model with role-based access control
+model User {
+  id            String    @id @default(cuid())
+  clerkId       String    @unique
+  email         String    @unique
+  firstName     String
+  lastName      String
+  phone         String?
+  role          Role      @default(PASSENGER)
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  chauffeurProfile Chauffeur?
+  rides         Ride[]    @relation("PassengerRides")
+  assignedRides Ride[]    @relation("AssignedRides")
+  bookings      Booking[]
+}
+
+enum Role {
+  ADMIN
+  SALES
+  CUSTOMER
+  PASSENGER
+  PLANNING
+  DISPATCHER
+  FIELD_MANAGER
+  FIELD_ASSISTANT
+  CHAUFFEUR
+}
+
+// Organization model for managing companies and clients
+model Organization {
+  id            String    @id @default(cuid())
+  clerkId       String?   @unique // Clerk organization ID
+  name          String
+  slug          String?   @unique // Clerk organization slug
+  address       String?
+  city          String?
+  country       String?
+  postalCode    String?
+  phone         String?
+  email         String?
+  website       String?
+  logoUrl       String?
+  active        Boolean   @default(true)
+  contractStart DateTime?
+  contractEnd   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  users         User[]
+  bookings      Booking[]
+  billingInfo   BillingInfo?
+}
+
+// Billing information for organizations
+model BillingInfo {
+  id              String       @id @default(cuid())
+  organizationId  String       @unique
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  billingAddress  String?
+  billingCity     String?
+  billingCountry  String?
+  billingPostalCode String?
+  taxId           String?
+  paymentTerms    String?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+// Chauffeur profile for users with CHAUFFEUR role
+model Chauffeur {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  licenseNumber String
+  licenseExpiry DateTime
+  vehicleId     String?
+  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id])
+  status        ChauffeurStatus @default(AVAILABLE)
+  rating        Float?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum ChauffeurStatus {
+  AVAILABLE
+  BUSY
+  ON_BREAK
+  OFF_DUTY
+  ON_LEAVE
+}
+
+// Vehicle management
+model Vehicle {
+  id            String    @id @default(cuid())
+  make          String
+  model         String
+  year          Int
+  licensePlate  String    @unique
+  color         String?
+  capacity      Int       @default(4)
+  vehicleType   VehicleType @default(SEDAN)
+  status        VehicleStatus @default(AVAILABLE)
+  lastMaintenance DateTime?
+  chauffeurs    Chauffeur[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum VehicleType {
+  SEDAN
+  SUV
+  VAN
+  LUXURY
+  LIMOUSINE
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+// Booking system
+model Booking {
+  id            String    @id @default(cuid())
+  bookingNumber String    @unique @default(cuid())
+  customerId    String
+  customer      User      @relation(fields: [customerId], references: [id])
+  organizationId String?
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  status        BookingStatus @default(PENDING)
+  totalAmount   Decimal?  @db.Decimal(10, 2)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  rides         Ride[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Individual rides within a booking
+model Ride {
+  id            String    @id @default(cuid())
+  rideNumber    String    @unique @default(cuid())
+  bookingId     String
+  booking       Booking   @relation(fields: [bookingId], references: [id])
+  passengerId   String
+  passenger     User      @relation("PassengerRides", fields: [passengerId], references: [id])
+  chauffeurId   String?
+  chauffeur     User?     @relation("AssignedRides", fields: [chauffeurId], references: [id])
+  pickupAddress String
+  dropoffAddress String
+  pickupTime    DateTime
+  dropoffTime   DateTime?
+  status        RideStatus @default(SCHEDULED)
+  fare          Decimal?  @db.Decimal(10, 2)
+  distance      Decimal?  @db.Decimal(10, 2)
+  duration      Int?      // in minutes
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum RideStatus {
+  SCHEDULED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
