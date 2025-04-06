@@ -29,7 +29,7 @@ export const RideCategoryEnum = z.enum([
 // Base schema for all ride types
 const baseRideSchema = z.object({
   passengerId: z.string().min(1, "Passenger is required"),
-  status: RideStatusEnum.optional().default("SCHEDULED"),
+  status: RideStatusEnum,
   fare: z.number().optional(),
   distance: z.number().optional(),
   duration: z.number().optional(),
@@ -112,7 +112,7 @@ export const rideSchema = z.discriminatedUnion("category", [
 export const bookingSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
   organizationId: z.string().optional(),
-  status: BookingStatusEnum.optional().default("PENDING"),
+  status: BookingStatusEnum,
   totalAmount: z.number().optional(),
   notes: z.string().optional(),
   rides: z.array(rideSchema).optional(),

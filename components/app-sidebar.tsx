@@ -11,11 +11,14 @@ import {
   FolderIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
+  MoonIcon,
   SearchIcon,
   SettingsIcon,
+  SunIcon,
   UsersIcon,
 } from "lucide-react"
 import { CustomUserButton } from "@/components/custom-user-button"
+import { ThemeToggleSimple } from "@/components/theme-toggle"
 
 import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
@@ -150,7 +153,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <CustomUserButton />
+            <div className="flex items-center justify-between w-full">
+              <CustomUserButton />
+              <ThemeToggleSimple />
+            </div>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>

@@ -39,7 +39,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { RideForm } from "@/components/forms/ride-form";
+import { RideForm } from "../../components/forms/RideForm";
 
 // Mock data for rides
 const mockRides = [
@@ -238,8 +238,16 @@ export default function RidesPage() {
   const handleCreateRide = (data: any) => {
     console.log("Creating ride:", data);
     // In a real app, this would be an API call
-    setRideDialogOpen(false);
+
+    // Close the appropriate dialog based on whether it's a mission or not
+    if (data.isMission) {
+      setMissionDialogOpen(false);
+    } else {
+      setRideDialogOpen(false);
+    }
+
     // Show success message or refresh data
+    alert("Ride created successfully!");
   };
 
   return (
@@ -262,7 +270,7 @@ export default function RidesPage() {
                   <div className="flex space-x-2">
                     <Dialog open={rideDialogOpen} onOpenChange={setRideDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button>
+                        <Button onClick={() => setRideDialogOpen(true)}>
                           <PlusIcon className="mr-2 h-4 w-4" />
                           New Ride
                         </Button>
@@ -283,7 +291,6 @@ export default function RidesPage() {
                             partners={mockPartners}
                             projects={mockProjects}
                             existingMissions={mockExistingMissions}
-                            showMissionButton={true}
                           />
                         </div>
                       </DialogContent>
@@ -291,7 +298,7 @@ export default function RidesPage() {
 
                     <Dialog open={missionDialogOpen} onOpenChange={setMissionDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline">
+                        <Button variant="outline" onClick={() => setMissionDialogOpen(true)}>
                           <PlusIcon className="mr-2 h-4 w-4" />
                           Create Mission
                         </Button>
@@ -314,7 +321,6 @@ export default function RidesPage() {
                             existingMissions={mockExistingMissions}
                             defaultValues={{ isMission: true }}
                             buttonText="Create Mission"
-                            showMissionButton={false}
                           />
                         </div>
                       </DialogContent>
@@ -498,3 +504,9 @@ export default function RidesPage() {
     </SidebarProvider>
   );
 }
+
+
+
+
+
+

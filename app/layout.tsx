@@ -4,6 +4,7 @@ import Script from "next/script";
 import { Metadata } from "next";
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://clerk-next-app.vercel.app/"),
@@ -29,8 +30,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ClerkProvider
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js" async />
+        <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js" async />
+      </head>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ClerkProvider
         appearance={{
           variables: { colorPrimary: "#000000" },
           elements: {
@@ -52,9 +58,7 @@ export default function RootLayout({
           <Toaster />
         </body>
       </ClerkProvider>
-
-      <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js" />
-      <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js" />
+      </ThemeProvider>
     </html>
   );
 }

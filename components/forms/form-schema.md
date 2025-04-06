@@ -1,0 +1,21 @@
+components/
+  forms/
+    ride-form/
+      schemas/
+        index.ts
+        mission-schema.ts
+        passenger-schema.ts
+        ride-schema.ts
+      steps/
+        index.ts
+        PassengerStep.tsx
+        RideDetailsStep.tsx
+        MilestonesStep.tsx
+        MissionStep.tsx
+        ReviewStep.tsx
+      types/
+        index.ts
+      utils/
+        index.ts
+      constants.ts
+      hooks.ts
