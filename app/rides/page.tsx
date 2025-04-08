@@ -39,7 +39,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { RideForm } from "../../components/forms/RideForm";
+import { RideForm } from "../../components/forms/ride-form/RideForm";
 
 // Mock data for rides
 const mockRides = [

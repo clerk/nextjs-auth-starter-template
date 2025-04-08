@@ -1,0 +1,3 @@
+export const EVENT_TYPES = ["CORPORATE", "INTERNAL", "MARKETING", "CLIENT"] as const;
+export const EVENT_STATUSES = ["PLANNED", "IN_PROGRESS", "COMPLETED", "CANCELLED"] as const;
+export const EVENT_PRICING_TYPES = ["MISSION_BASED", "FIXED_PRICE"] as const;

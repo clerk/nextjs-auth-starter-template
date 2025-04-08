@@ -20,14 +20,15 @@ model User {
   lastName      String
   phone         String?
   role          Role      @default(PASSENGER)
-  organizationId String?
-  organization  Organization? @relation(fields: [organizationId], references: [id])
+  clientId String?
+  client  Client? @relation(fields: [clientId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   chauffeurProfile Chauffeur?
   rides         Ride[]    @relation("PassengerRides")
   assignedRides Ride[]    @relation("AssignedRides")
   bookings      Booking[]
+  eventParticipations EventParticipant[]
 }
 
 enum Role {
@@ -42,8 +43,8 @@ enum Role {
   CHAUFFEUR
 }
 
-// Organization model for managing companies and clients
-model Organization {
+// Client model for managing client companies
+model Client {
   id            String    @id @default(cuid())
   clerkId       String?   @unique // Clerk organization ID
   name          String
@@ -64,13 +65,14 @@ model Organization {
   users         User[]
   bookings      Booking[]
   billingInfo   BillingInfo?
+  events        Event[]   // Client for events
 }
 
-// Billing information for organizations
+// Billing information for clients
 model BillingInfo {
   id              String       @id @default(cuid())
-  organizationId  String       @unique
-  organization    Organization @relation(fields: [organizationId], references: [id])
+  clientId  String       @unique
+  client    Client @relation(fields: [clientId], references: [id])
   billingAddress  String?
   billingCity     String?
   billingCountry  String?
@@ -118,6 +120,7 @@ model Vehicle {
   status        VehicleStatus @default(AVAILABLE)
   lastMaintenance DateTime?
   chauffeurs    Chauffeur[]
+  eventVehicles EventVehicle[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -143,8 +146,8 @@ model Booking {
   bookingNumber String    @unique @default(cuid())
   customerId    String
   customer      User      @relation(fields: [customerId], references: [id])
-  organizationId String?
-  organization  Organization? @relation(fields: [organizationId], references: [id])
+  clientId String?
+  client  Client? @relation(fields: [clientId], references: [id])
   status        BookingStatus @default(PENDING)
   totalAmount   Decimal?  @db.Decimal(10, 2)
   notes         String?
@@ -180,6 +183,8 @@ model Ride {
   distance      Decimal?  @db.Decimal(10, 2)
   duration      Int?      // in minutes
   notes         String?
+  missionId     String?   // Link to mission if part of one
+  mission       Mission?  @relation(fields: [missionId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -187,6 +192,117 @@ model Ride {
 enum RideStatus {
   SCHEDULED
   ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Event System
+model Event {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  clientId      String
+  client        Client @relation(fields: [clientId], references: [id])
+  startDate     DateTime
+  endDate       DateTime
+  status        EventStatus @default(PLANNED)
+  location      String?
+
+  // Pricing
+  pricingType   EventPricingType @default(MISSION_BASED)
+  fixedPrice    Decimal?  @db.Decimal(10, 2)
+  totalFare     Decimal?  @db.Decimal(10, 2)  // Calculated from missions if MISSION_BASED
+
+  notes         String?
+
+  // Relations
+  missions      Mission[]
+  participants  EventParticipant[]
+  eventVehicles EventVehicle[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum EventPricingType {
+  MISSION_BASED    // Price calculated from sum of missions
+  FIXED_PRICE      // Set price for entire event
+}
+
+model EventVehicle {
+  id            String    @id @default(cuid())
+  eventId       String
+  event         Event     @relation(fields: [eventId], references: [id])
+  vehicleId     String
+  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
+  assignedAt    DateTime  @default(now())
+  status        VehicleAssignmentStatus @default(ASSIGNED)
+  notes         String?
+
+  @@unique([eventId, vehicleId])
+}
+
+enum VehicleAssignmentStatus {
+  ASSIGNED
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum EventStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model EventParticipant {
+  id            String    @id @default(cuid())
+  eventId       String
+  event         Event     @relation(fields: [eventId], references: [id])
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  role          ParticipantRole
+  status        InvitationStatus @default(PENDING)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([eventId, userId])
+}
+
+enum ParticipantRole {
+  TEAM_MEMBER
+  CHAUFFEUR
+  PARTNER
+  CLIENT
+  PASSENGER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+model Mission {
+  id            String    @id @default(cuid())
+  title         String
+  description   String?
+  eventId       String
+  event         Event     @relation(fields: [eventId], references: [id])
+  startDate     DateTime
+  endDate       DateTime
+  status        MissionStatus @default(PLANNED)
+  location      String?
+  fare          Decimal?  @db.Decimal(10, 2)
+  notes         String?
+  rides         Ride[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum MissionStatus {
+  PLANNED
   IN_PROGRESS
   COMPLETED
   CANCELLED

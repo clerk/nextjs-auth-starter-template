@@ -3,6 +3,7 @@
 import * as React from "react"
 import {
   CameraIcon,
+  CalendarIcon,
   CarIcon,
   ClipboardListIcon,
   DatabaseIcon,
@@ -46,8 +47,13 @@ const data = {
       icon: CarIcon,
     },
     {
-      title: "Organizations",
-      url: "/organizations",
+      title: "Events",
+      url: "/events",
+      icon: CalendarIcon,
+    },
+    {
+      title: "Clients",
+      url: "/clients",
       icon: FolderIcon,
     },
     {
@@ -141,7 +147,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <OrganizationSwitcher />
+            <OrganizationSwitcher
+              organizationProfileUrl="/clients/:id"
+              createOrganizationUrl="/clients/new"
+              appearance={{
+                elements: {
+                  organizationSwitcherTrigger: {
+                    "&:focus": {
+                      boxShadow: "none"
+                    }
+                  }
+                }
+              }}
+              afterCreateOrganizationUrl="/clients/:id"
+              afterLeaveOrganizationUrl="/clients"
+              afterSelectOrganizationUrl="/clients/:id"
+            />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
