@@ -83,16 +83,32 @@ export function VehicleList({ partnerId }: VehicleListProps) {
   const fetchPartnerVehicles = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/partners/${partnerId}/vehicles`);
+      // Add error handling and timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(`/api/partners/${partnerId}/vehicles`, {
+        signal: controller.signal
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        throw new Error("Network error when fetching vehicles");
+      });
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch partner vehicles");
+        const errorText = await response.text();
+        console.error("API error:", errorText);
+        throw new Error(`Failed to fetch partner vehicles: ${response.status} ${response.statusText}`);
       }
 
       const data = await response.json();
       setVehicles(data);
     } catch (error) {
       console.error("Error fetching partner vehicles:", error);
-      toast.error("Failed to load partner vehicles");
+      // Set empty array to prevent continuous loading state
+      setVehicles([]);
+      toast.error(error instanceof Error ? error.message : "Failed to load partner vehicles");
     } finally {
       setIsLoading(false);
     }
@@ -130,13 +146,27 @@ export function VehicleList({ partnerId }: VehicleListProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`/api/partners/${partnerId}/vehicles/${vehicleId}`);
+      // Add error handling and timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(`/api/partners/${partnerId}/vehicles/${vehicleId}`, {
+        signal: controller.signal
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        throw new Error("Network error when fetching vehicle details");
+      });
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch vehicle details");
+        const errorText = await response.text();
+        console.error("API error:", errorText);
+        throw new Error(`Failed to fetch vehicle details: ${response.status} ${response.statusText}`);
       }
 
       const vehicleData = await response.json();
-      
+
       // Convert numeric values to strings for the form
       const formData = {
         ...vehicleData,
@@ -149,7 +179,7 @@ export function VehicleList({ partnerId }: VehicleListProps) {
       setShowVehicleDialog(true);
     } catch (error) {
       console.error("Error fetching vehicle details:", error);
-      toast.error("Failed to load vehicle details");
+      toast.error(error instanceof Error ? error.message : "Failed to load vehicle details");
     } finally {
       setIsSubmitting(false);
     }
@@ -160,13 +190,32 @@ export function VehicleList({ partnerId }: VehicleListProps) {
     if (!vehicleToDelete) return;
 
     try {
+      // Add error handling and timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const response = await fetch(`/api/partners/${partnerId}/vehicles/${vehicleToDelete.id}`, {
         method: "DELETE",
+        signal: controller.signal
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        throw new Error("Network error when deleting vehicle");
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete vehicle");
+        const errorText = await response.text();
+        let errorMessage = "Failed to delete vehicle";
+
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.error("Error parsing error response:", e);
+        }
+
+        throw new Error(errorMessage);
       }
 
       toast.success(`Vehicle ${vehicleToDelete.make} ${vehicleToDelete.model} deleted successfully`);
@@ -195,21 +244,40 @@ export function VehicleList({ partnerId }: VehicleListProps) {
 
       const method = isEditingVehicle ? "PUT" : "POST";
 
+      // Add error handling and timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
       const response = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        signal: controller.signal
+      }).catch(err => {
+        console.error("Fetch error:", err);
+        throw new Error("Network error when saving vehicle");
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save vehicle");
+        const errorText = await response.text();
+        let errorMessage = "Failed to save vehicle";
+
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          console.error("Error parsing error response:", e);
+        }
+
+        throw new Error(errorMessage);
       }
 
       const savedVehicle = await response.json();
-      
+
       toast.success(
         isEditingVehicle
           ? `Vehicle ${savedVehicle.make} ${savedVehicle.model} updated successfully`
@@ -265,7 +333,12 @@ export function VehicleList({ partnerId }: VehicleListProps) {
               ) : vehicles.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="h-24 text-center">
-                    No vehicles found for this partner.
+                    <div className="flex flex-col items-center justify-center gap-2">
+                      <p>No vehicles found for this partner.</p>
+                      <p className="text-sm text-muted-foreground">
+                        Click the "Add Vehicle" button to add a vehicle.
+                      </p>
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : (
