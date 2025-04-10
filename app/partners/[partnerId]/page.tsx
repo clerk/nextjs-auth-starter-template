@@ -51,8 +51,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PartnerDialog } from "../components/partner-dialog";
-
 import { PartnerVehicles } from "../components/partner-vehicles";
+import { PartnerChauffeurs } from "../components/partner-chauffeurs";
 import {
   ArrowLeft,
   Building2,
@@ -468,9 +468,12 @@ export default function PartnerDetailPage() {
                   {/* Tabs for related data */}
                   <div className="px-4 lg:px-6">
                     <Tabs defaultValue="events">
-                      <TabsList className="grid w-full grid-cols-4">
+                      <TabsList className="grid w-full grid-cols-5">
                         <TabsTrigger value="vehicles">
                           Vehicles
+                        </TabsTrigger>
+                        <TabsTrigger value="chauffeurs">
+                          Chauffeurs
                         </TabsTrigger>
                         <TabsTrigger value="events">
                           Events ({partner._count.eventParticipations})
@@ -485,6 +488,10 @@ export default function PartnerDetailPage() {
 
                       <TabsContent value="vehicles" className="mt-4">
                         <PartnerVehicles partnerId={partnerId as string} />
+                      </TabsContent>
+
+                      <TabsContent value="chauffeurs" className="mt-4">
+                        <PartnerChauffeurs partnerId={partnerId as string} />
                       </TabsContent>
 
                       <TabsContent value="events" className="mt-4">

@@ -1,0 +1,179 @@
+import { NextRequest, NextResponse } from "next/server";
+import { db } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { writeFile } from "fs/promises";
+import { join } from "path";
+import { mkdir } from "fs/promises";
+
+// POST /api/partners/[partnerId]/chauffeurs/[chauffeurId]/documents
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { partnerId: string; chauffeurId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { partnerId, chauffeurId } = params;
+
+    // Check if partner exists
+    const partner = await db.partner.findUnique({
+      where: { id: partnerId },
+    });
+
+    if (!partner) {
+      return NextResponse.json(
+        { error: "Partner not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if chauffeur exists
+    const chauffeur = await db.chauffeur.findUnique({
+      where: {
+        id: chauffeurId,
+        partnerId,
+      },
+    });
+
+    if (!chauffeur) {
+      return NextResponse.json(
+        { error: "Chauffeur not found" },
+        { status: 404 }
+      );
+    }
+
+    // Process the form data
+    const formData = await req.formData();
+    const file = formData.get("file") as File;
+    
+    if (!file) {
+      return NextResponse.json(
+        { error: "No file uploaded" },
+        { status: 400 }
+      );
+    }
+
+    // Get other form fields
+    const name = formData.get("name") as string;
+    const type = formData.get("type") as string;
+    const expiryDate = formData.get("expiryDate") as string;
+    const notes = formData.get("notes") as string;
+    const isVerified = formData.get("isVerified") === "true";
+
+    if (!name || !type) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    // Create directory if it doesn't exist
+    const uploadDir = join(process.cwd(), "public", "uploads", "documents", chauffeurId);
+    await mkdir(uploadDir, { recursive: true });
+
+    // Generate a unique filename
+    const timestamp = Date.now();
+    const fileExtension = file.name.split(".").pop();
+    const fileName = `${timestamp}-${file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9]/g, "_")}.${fileExtension}`;
+    const filePath = join(uploadDir, fileName);
+    
+    // Convert the file to a Buffer and save it
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    await writeFile(filePath, buffer);
+
+    // Create a URL for the file
+    const fileUrl = `/uploads/documents/${chauffeurId}/${fileName}`;
+
+    // Create the document in the database
+    const document = await db.document.create({
+      data: {
+        name,
+        type,
+        url: fileUrl,
+        fileSize: file.size,
+        mimeType: file.type,
+        expiryDate: expiryDate ? new Date(expiryDate) : undefined,
+        notes,
+        isVerified,
+        chauffeurId,
+      },
+    });
+
+    return NextResponse.json(document);
+  } catch (error) {
+    console.error("Error uploading document:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// GET /api/partners/[partnerId]/chauffeurs/[chauffeurId]/documents
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { partnerId: string; chauffeurId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const { partnerId, chauffeurId } = params;
+
+    // Check if partner exists
+    const partner = await db.partner.findUnique({
+      where: { id: partnerId },
+    });
+
+    if (!partner) {
+      return NextResponse.json(
+        { error: "Partner not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if chauffeur exists
+    const chauffeur = await db.chauffeur.findUnique({
+      where: {
+        id: chauffeurId,
+        partnerId,
+      },
+    });
+
+    if (!chauffeur) {
+      return NextResponse.json(
+        { error: "Chauffeur not found" },
+        { status: 404 }
+      );
+    }
+
+    // Get all documents for this chauffeur
+    const documents = await db.document.findMany({
+      where: { chauffeurId },
+      orderBy: { uploadedAt: "desc" },
+    });
+
+    return NextResponse.json(documents);
+  } catch (error) {
+    console.error("Error fetching documents:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
