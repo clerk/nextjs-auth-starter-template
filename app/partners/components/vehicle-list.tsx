@@ -236,6 +236,19 @@ export function VehicleList({ partnerId }: VehicleListProps) {
 
   // Handle vehicle form submission
   const handleSubmitVehicle = async (data: VehicleFormValues) => {
+    console.log('Vehicle list received form data:', data);
+
+    // Check if all required fields are present
+    const requiredFields = ['brand', 'model', 'year', 'licensePlate', 'capacity'];
+    const missingFields = requiredFields.filter(field => !data[field as keyof VehicleFormValues]);
+
+    if (missingFields.length > 0) {
+      console.error('Missing required fields in vehicle list:', missingFields);
+      toast.error(`Missing required fields: ${missingFields.join(', ')}`);
+      setIsSubmitting(false);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const url = isEditingVehicle && currentVehicleId

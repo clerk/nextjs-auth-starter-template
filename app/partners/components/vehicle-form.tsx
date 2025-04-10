@@ -240,39 +240,40 @@ export function VehicleForm({
     }
   };
 
-  const handleSubmit = (data: VehicleFormValues) => {
+  const handleSubmit = (values: VehicleFormValues) => {
+    // Create a copy of the data to avoid modifying the original
+    let data = { ...values };
+
+    // Ensure all form values are included, even if they weren't changed
+    const formState = form.getValues();
+
+    // Explicitly set all required fields from the form state
+    data = {
+      ...data,
+      brand: formState.brand,
+      model: formState.model,
+      year: formState.year,
+      licensePlate: formState.licensePlate,
+      capacity: formState.capacity,
+      vehicleType: formState.vehicleType,
+      status: formState.status,
+      isForeignPlate: formState.isForeignPlate,
+      // Include optional fields
+      color: formState.color,
+      fuelType: formState.fuelType,
+      registrationDate: formState.registrationDate
+    };
+
     // Check if all required fields are present
     const requiredFields = ['brand', 'model', 'year', 'licensePlate', 'capacity'];
     const missingFields = requiredFields.filter(field => !data[field as keyof VehicleFormValues]);
 
     if (missingFields.length > 0) {
       console.error('Missing required fields:', missingFields);
+      console.error('Form data:', data);
+      console.error('Form state:', formState);
       toast.error(`Missing required fields: ${missingFields.join(', ')}`);
       return;
-    }
-
-    // For French plates, ensure we have the data from the API
-    if (!isForeignPlate) {
-      // If any of these fields are empty, try to get them from the form state
-      if (!data.brand || !data.model || !data.year) {
-        const formValues = form.getValues();
-        data = {
-          ...data,
-          brand: data.brand || formValues.brand,
-          model: data.model || formValues.model,
-          year: data.year || formValues.year,
-          fuelType: data.fuelType || formValues.fuelType,
-          registrationDate: data.registrationDate || formValues.registrationDate
-        };
-      }
-
-      // Double-check after trying to fill in the values
-      const stillMissingFields = requiredFields.filter(field => !data[field as keyof VehicleFormValues]);
-      if (stillMissingFields.length > 0) {
-        console.error('Still missing required fields after fix attempt:', stillMissingFields);
-        toast.error(`Missing required fields: ${stillMissingFields.join(', ')}. Please fetch vehicle data first.`);
-        return;
-      }
     }
 
     // Log the data being submitted
