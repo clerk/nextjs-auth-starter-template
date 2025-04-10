@@ -241,6 +241,43 @@ export function VehicleForm({
   };
 
   const handleSubmit = (data: VehicleFormValues) => {
+    // Check if all required fields are present
+    const requiredFields = ['brand', 'model', 'year', 'licensePlate', 'capacity'];
+    const missingFields = requiredFields.filter(field => !data[field as keyof VehicleFormValues]);
+
+    if (missingFields.length > 0) {
+      console.error('Missing required fields:', missingFields);
+      toast.error(`Missing required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    // For French plates, ensure we have the data from the API
+    if (!isForeignPlate) {
+      // If any of these fields are empty, try to get them from the form state
+      if (!data.brand || !data.model || !data.year) {
+        const formValues = form.getValues();
+        data = {
+          ...data,
+          brand: data.brand || formValues.brand,
+          model: data.model || formValues.model,
+          year: data.year || formValues.year,
+          fuelType: data.fuelType || formValues.fuelType,
+          registrationDate: data.registrationDate || formValues.registrationDate
+        };
+      }
+
+      // Double-check after trying to fill in the values
+      const stillMissingFields = requiredFields.filter(field => !data[field as keyof VehicleFormValues]);
+      if (stillMissingFields.length > 0) {
+        console.error('Still missing required fields after fix attempt:', stillMissingFields);
+        toast.error(`Missing required fields: ${stillMissingFields.join(', ')}. Please fetch vehicle data first.`);
+        return;
+      }
+    }
+
+    // Log the data being submitted
+    console.log('Submitting vehicle data:', data);
+
     onSubmit(data);
   };
 
@@ -352,7 +389,8 @@ export function VehicleForm({
                   <Input
                     placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle brand"}
                     {...field}
-                    disabled={!isForeignPlate}
+                    readOnly={!isForeignPlate}
+                    className={!isForeignPlate ? "bg-muted" : ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -370,7 +408,8 @@ export function VehicleForm({
                   <Input
                     placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle model"}
                     {...field}
-                    disabled={!isForeignPlate}
+                    readOnly={!isForeignPlate}
+                    className={!isForeignPlate ? "bg-muted" : ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -391,7 +430,8 @@ export function VehicleForm({
                     min={1900}
                     max={new Date().getFullYear() + 1}
                     {...field}
-                    disabled={!isForeignPlate}
+                    readOnly={!isForeignPlate}
+                    className={!isForeignPlate ? "bg-muted" : ""}
                   />
                 </FormControl>
                 <FormMessage />
