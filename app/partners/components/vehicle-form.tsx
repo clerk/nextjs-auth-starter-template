@@ -104,6 +104,19 @@ export function VehicleForm({
     if (isForeignPlate) {
       setPlateSuccess(null);
       setPlateError(null);
+      // Clear auto-populated fields if switching to foreign plate
+      if (form.getValues("brand") && !form.formState.dirtyFields.brand) {
+        form.setValue("brand", "");
+      }
+      if (form.getValues("model") && !form.formState.dirtyFields.model) {
+        form.setValue("model", "");
+      }
+      if (form.getValues("year") && !form.formState.dirtyFields.year) {
+        form.setValue("year", new Date().getFullYear().toString());
+      }
+      // Clear API-specific fields
+      form.setValue("fuelType", "");
+      form.setValue("registrationDate", "");
       return;
     }
 
@@ -161,6 +174,61 @@ export function VehicleForm({
     fetchVehicleData();
   }, [debouncedLicensePlate, isForeignPlate, form]);
 
+  // Function to manually fetch vehicle data
+  const handleFetchVehicleData = async () => {
+    const licensePlate = form.getValues("licensePlate");
+
+    if (!licensePlate || licensePlate.length < 5) {
+      toast.error("Please enter a valid license plate");
+      return;
+    }
+
+    setIsFetchingPlate(true);
+    setPlateError(null);
+    setPlateSuccess(null);
+
+    try {
+      // Format the license plate by removing spaces and dashes
+      const formattedPlate = licensePlate.replace(/[\s-]/g, "");
+
+      const response = await fetch(
+        `https://api-immat.vercel.app/getDataImmatriculation?plaque=${formattedPlate}&region=`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch vehicle data");
+      }
+
+      const data: VehicleApiResponse = await response.json();
+
+      if (data.info && data.info.marque) {
+        // Update form fields with the fetched data
+        form.setValue("brand", data.info.marque);
+        form.setValue("model", data.info.modele);
+
+        // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
+        const year = data.info.dateMiseEnCirculation.split("-")[0];
+        form.setValue("year", year);
+
+        // Store additional data from the API
+        form.setValue("fuelType", data.info.energy);
+        form.setValue("registrationDate", data.info.dateMiseEnCirculation);
+
+        setPlateSuccess(`Vehicle data found: ${data.info.marque} ${data.info.modele} (${year})`);
+        toast.success("Vehicle data fetched successfully");
+      } else {
+        setPlateError("No vehicle data found for this license plate");
+        toast.error("No vehicle data found for this license plate");
+      }
+    } catch (error) {
+      console.error("Error fetching vehicle data:", error);
+      setPlateError("Failed to fetch vehicle data");
+      toast.error("Failed to fetch vehicle data");
+    } finally {
+      setIsFetchingPlate(false);
+    }
+  };
+
   const handleSubmit = (data: VehicleFormValues) => {
     onSubmit(data);
   };
@@ -200,29 +268,46 @@ export function VehicleForm({
             render={({ field }) => (
               <FormItem className="md:col-span-2">
                 <FormLabel>License Plate*</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      placeholder="Enter license plate"
-                      {...field}
-                      className={cn(
-                        isFetchingPlate && "pr-10",
-                        plateError && "border-destructive",
-                        plateSuccess && "border-green-500"
+                <div className="flex gap-2">
+                  <FormControl className="flex-1">
+                    <div className="relative">
+                      <Input
+                        placeholder="Enter license plate"
+                        {...field}
+                        className={cn(
+                          isFetchingPlate && "pr-10",
+                          plateError && "border-destructive",
+                          plateSuccess && "border-green-500"
+                        )}
+                      />
+                      {isFetchingPlate && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                        </div>
                       )}
-                    />
-                    {isFetchingPlate && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                      </div>
-                    )}
-                    {!isFetchingPlate && plateSuccess && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <Search className="h-4 w-4 text-green-500" />
-                      </div>
-                    )}
-                  </div>
-                </FormControl>
+                      {!isFetchingPlate && plateSuccess && (
+                        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                          <Search className="h-4 w-4 text-green-500" />
+                        </div>
+                      )}
+                    </div>
+                  </FormControl>
+                  {!isForeignPlate && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleFetchVehicleData}
+                      disabled={isFetchingPlate}
+                    >
+                      {isFetchingPlate ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Search className="h-4 w-4 mr-2" />
+                      )}
+                      Fetch Data
+                    </Button>
+                  )}
+                </div>
                 {plateError && (
                   <div className="text-sm font-medium text-destructive mt-1">{plateError}</div>
                 )}
@@ -248,7 +333,7 @@ export function VehicleForm({
                   <Input
                     placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle brand"}
                     {...field}
-                    disabled={!isForeignPlate && !field.value}
+                    disabled={!isForeignPlate}
                   />
                 </FormControl>
                 <FormMessage />
@@ -261,9 +346,13 @@ export function VehicleForm({
             name="model"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Model*</FormLabel>
+                <FormLabel>{!isForeignPlate ? "Model* (Auto-populated)" : "Model*"}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter vehicle model" {...field} />
+                  <Input
+                    placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle model"}
+                    {...field}
+                    disabled={!isForeignPlate}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -275,14 +364,15 @@ export function VehicleForm({
             name="year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year*</FormLabel>
+                <FormLabel>{!isForeignPlate ? "Year* (Auto-populated)" : "Year*"}</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
-                    placeholder="Enter year"
+                    placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter year"}
                     min={1900}
                     max={new Date().getFullYear() + 1}
                     {...field}
+                    disabled={!isForeignPlate}
                   />
                 </FormControl>
                 <FormMessage />
