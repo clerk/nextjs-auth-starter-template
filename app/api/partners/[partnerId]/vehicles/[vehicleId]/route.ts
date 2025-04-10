@@ -64,9 +64,17 @@ export async function PUT(
     }
 
     // Validate required fields
-    if (!data.make || !data.model || !data.year || !data.licensePlate) {
+    if (!data.brand || !data.model || !data.year || !data.licensePlate) {
+      const missingFields = [];
+      if (!data.brand) missingFields.push('brand');
+      if (!data.model) missingFields.push('model');
+      if (!data.year) missingFields.push('year');
+      if (!data.licensePlate) missingFields.push('licensePlate');
+
+      console.error(`Missing required fields in update: ${missingFields.join(', ')}`, data);
+
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: `Missing required fields: ${missingFields.join(', ')}` },
         { status: 400 }
       );
     }
