@@ -6,7 +6,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { partnerFormSchema, type PartnerFormValues } from "../schemas/partner-schema";
-import { vehicleFormSchema, type VehicleFormValues } from "../schemas/vehicle-schema";
+
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
@@ -51,7 +51,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { PartnerDialog } from "../components/partner-dialog";
-import { VehicleDialog } from "../components/vehicle-dialog";
+
+import { PartnerVehicles } from "../components/partner-vehicles";
 import {
   ArrowLeft,
   Building2,
@@ -64,35 +65,12 @@ import {
   Loader2,
   Mail,
   MapPin,
-  MoreHorizontalIcon,
   Phone,
-  PlusIcon,
   Receipt,
-  TrashIcon,
   Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
-
-// Vehicle type definition
-interface Vehicle {
-  id: string;
-  make: string;
-  model: string;
-  year: number;
-  licensePlate: string;
-  isForeignPlate: boolean;
-  color?: string;
-  capacity: number;
-  vehicleType: string;
-  status: string;
-  lastMaintenance?: string;
-  fuelType?: string;
-  registrationDate?: string;
-  createdAt: string;
-  updatedAt: string;
-  partnerId: string;
-}
 
 // Partner type definition
 interface Partner {
@@ -176,16 +154,9 @@ export default function PartnerDetailPage() {
   const router = useRouter();
   const { partnerId } = useParams();
   const [partner, setPartner] = useState<Partner | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingVehicles, setIsLoadingVehicles] = useState(true);
   const [showPartnerDialog, setShowPartnerDialog] = useState(false);
-  const [showVehicleDialog, setShowVehicleDialog] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentVehicleId, setCurrentVehicleId] = useState<string | null>(null);
-  const [isEditingVehicle, setIsEditingVehicle] = useState(false);
-  const [showDeleteVehicleDialog, setShowDeleteVehicleDialog] = useState(false);
-  const [vehicleToDelete, setVehicleToDelete] = useState<Vehicle | null>(null);
 
   // Initialize partner form with react-hook-form and zod validation
   const form = useForm<PartnerFormValues>({
@@ -235,101 +206,11 @@ export default function PartnerDetailPage() {
     }
   };
 
-  // Fetch partner vehicles
-  const fetchPartnerVehicles = async () => {
-    setIsLoadingVehicles(true);
-    try {
-      const response = await fetch(`/api/partners/${partnerId}/vehicles`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch partner vehicles");
-      }
-
-      const data = await response.json();
-      setVehicles(data);
-    } catch (error) {
-      console.error("Error fetching partner vehicles:", error);
-      toast.error("Failed to load partner vehicles");
-    } finally {
-      setIsLoadingVehicles(false);
-    }
-  };
-
   useEffect(() => {
     if (partnerId) {
       fetchPartnerDetails();
-      fetchPartnerVehicles();
     }
   }, [partnerId]);
-
-  // Handle add vehicle
-  const handleAddVehicle = () => {
-    setCurrentVehicleId(null);
-    setIsEditingVehicle(false);
-    setShowVehicleDialog(true);
-  };
-
-  // Handle edit vehicle
-  const handleEditVehicle = async (vehicleId: string) => {
-    setCurrentVehicleId(vehicleId);
-    setIsEditingVehicle(true);
-    setIsSubmitting(true);
-    setShowVehicleDialog(true);
-
-    try {
-      const response = await fetch(`/api/partners/${partnerId}/vehicles/${vehicleId}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch vehicle details");
-      }
-
-      const vehicleData = await response.json();
-
-      // Convert numeric values to strings for the form
-      const formData = {
-        ...vehicleData,
-        year: vehicleData.year.toString(),
-        capacity: vehicleData.capacity.toString(),
-        lastMaintenance: vehicleData.lastMaintenance || "",
-      };
-
-      vehicleForm.reset(formData);
-    } catch (error) {
-      console.error("Error fetching vehicle details:", error);
-      toast.error("Failed to load vehicle details");
-      setShowVehicleDialog(false);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  // Handle delete vehicle
-  const handleDeleteVehicle = async () => {
-    if (!vehicleToDelete) return;
-
-    try {
-      const response = await fetch(`/api/partners/${partnerId}/vehicles/${vehicleToDelete.id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to delete vehicle");
-      }
-
-      toast.success(`Vehicle ${vehicleToDelete.make} ${vehicleToDelete.model} deleted successfully`);
-      setShowDeleteVehicleDialog(false);
-      setVehicleToDelete(null);
-      fetchPartnerVehicles();
-    } catch (error) {
-      console.error("Error deleting vehicle:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to delete vehicle");
-    }
-  };
-
-  // Confirm delete vehicle
-  const confirmDeleteVehicle = (vehicle: Vehicle) => {
-    setVehicleToDelete(vehicle);
-    setShowDeleteVehicleDialog(true);
-  };
 
   // Handle edit partner
   const handleEditPartner = () => {
@@ -347,64 +228,6 @@ export default function PartnerDetailPage() {
 
     form.reset(formData);
     setShowPartnerDialog(true);
-  };
-
-  // Initialize vehicle form with react-hook-form and zod validation
-  const vehicleForm = useForm<VehicleFormValues>({
-    resolver: zodResolver(vehicleFormSchema),
-    defaultValues: {
-      make: "",
-      model: "",
-      year: new Date().getFullYear().toString(),
-      licensePlate: "",
-      isForeignPlate: false,
-      color: "",
-      capacity: "4",
-      vehicleType: "SEDAN",
-      status: "AVAILABLE",
-      lastMaintenance: "",
-    },
-  });
-
-  // Handle vehicle form submission
-  const handleSubmitVehicle = async (data: VehicleFormValues) => {
-    setIsSubmitting(true);
-    try {
-      const url = isEditingVehicle && currentVehicleId
-        ? `/api/partners/${partnerId}/vehicles/${currentVehicleId}`
-        : `/api/partners/${partnerId}/vehicles`;
-
-      const method = isEditingVehicle ? "PUT" : "POST";
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to save vehicle");
-      }
-
-      const savedVehicle = await response.json();
-
-      toast.success(
-        isEditingVehicle
-          ? `Vehicle ${savedVehicle.make} ${savedVehicle.model} updated successfully`
-          : `Vehicle ${savedVehicle.make} ${savedVehicle.model} added successfully`
-      );
-
-      setShowVehicleDialog(false);
-      fetchPartnerVehicles();
-    } catch (error) {
-      console.error("Error saving vehicle:", error);
-      toast.error(error instanceof Error ? error.message : "Failed to save vehicle");
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   // Handle partner form submission
@@ -647,7 +470,7 @@ export default function PartnerDetailPage() {
                     <Tabs defaultValue="events">
                       <TabsList className="grid w-full grid-cols-4">
                         <TabsTrigger value="vehicles">
-                          Vehicles ({vehicles.length})
+                          Vehicles
                         </TabsTrigger>
                         <TabsTrigger value="events">
                           Events ({partner._count.eventParticipations})
@@ -661,128 +484,7 @@ export default function PartnerDetailPage() {
                       </TabsList>
 
                       <TabsContent value="vehicles" className="mt-4">
-                        <Card>
-                          <CardHeader className="flex flex-row items-center justify-between">
-                            <div>
-                              <CardTitle>Vehicles</CardTitle>
-                              <CardDescription>
-                                Vehicles owned or operated by this partner
-                              </CardDescription>
-                            </div>
-                            <Button onClick={handleAddVehicle}>
-                              <PlusIcon className="mr-2 h-4 w-4" />
-                              Add Vehicle
-                            </Button>
-                          </CardHeader>
-                          <CardContent className="p-0">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Vehicle</TableHead>
-                                  <TableHead>License Plate</TableHead>
-                                  <TableHead>Type</TableHead>
-                                  <TableHead>Status</TableHead>
-                                  <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {isLoadingVehicles ? (
-                                  <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center">
-                                      <div className="flex items-center justify-center">
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Loading vehicles...
-                                      </div>
-                                    </TableCell>
-                                  </TableRow>
-                                ) : vehicles.length === 0 ? (
-                                  <TableRow>
-                                    <TableCell colSpan={5} className="h-24 text-center">
-                                      No vehicles found for this partner.
-                                    </TableCell>
-                                  </TableRow>
-                                ) : (
-                                  vehicles.map((vehicle) => (
-                                    <TableRow key={vehicle.id}>
-                                      <TableCell>
-                                        <div className="flex items-center gap-3">
-                                          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
-                                            <Car className="h-5 w-5" />
-                                          </div>
-                                          <div>
-                                            <div className="font-medium">
-                                              {vehicle.make} {vehicle.model}
-                                            </div>
-                                            <div className="text-sm text-muted-foreground">
-                                              {vehicle.year} • {vehicle.color || "No color"}
-                                              {vehicle.fuelType && ` • ${vehicle.fuelType}`}
-                                            </div>
-                                            {vehicle.registrationDate && (
-                                              <div className="text-xs text-muted-foreground">
-                                                Registered: {new Date(vehicle.registrationDate).toLocaleDateString()}
-                                              </div>
-                                            )}
-                                          </div>
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>
-                                        <div className="font-medium">
-                                          {vehicle.licensePlate}
-                                        </div>
-                                        <div className="text-sm text-muted-foreground">
-                                          {vehicle.isForeignPlate ? "Non-French plate" : "French plate"}
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Badge variant="outline">
-                                          {vehicle.vehicleType.charAt(0) + vehicle.vehicleType.slice(1).toLowerCase()}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell>
-                                        {vehicle.status === "AVAILABLE" ? (
-                                          <Badge variant="success">Available</Badge>
-                                        ) : vehicle.status === "IN_USE" ? (
-                                          <Badge variant="default">In Use</Badge>
-                                        ) : vehicle.status === "MAINTENANCE" ? (
-                                          <Badge variant="warning">Maintenance</Badge>
-                                        ) : (
-                                          <Badge variant="destructive">Out of Service</Badge>
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        <DropdownMenu>
-                                          <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon">
-                                              <MoreHorizontalIcon className="h-4 w-4" />
-                                              <span className="sr-only">Actions</span>
-                                            </Button>
-                                          </DropdownMenuTrigger>
-                                          <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem
-                                              onClick={() => handleEditVehicle(vehicle.id)}
-                                            >
-                                              <Edit className="mr-2 h-4 w-4" />
-                                              Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator />
-                                            <DropdownMenuItem
-                                              className="text-destructive focus:text-destructive"
-                                              onClick={() => confirmDeleteVehicle(vehicle)}
-                                            >
-                                              <TrashIcon className="mr-2 h-4 w-4" />
-                                              Delete
-                                            </DropdownMenuItem>
-                                          </DropdownMenuContent>
-                                        </DropdownMenu>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))
-                                )}
-                              </TableBody>
-                            </Table>
-                          </CardContent>
-                        </Card>
+                        <PartnerVehicles partnerId={partnerId as string} />
                       </TabsContent>
 
                       <TabsContent value="events" className="mt-4">
@@ -1141,38 +843,6 @@ export default function PartnerDetailPage() {
         isSubmitting={isSubmitting}
         isEditMode={true}
       />
-
-      {/* Vehicle Dialog */}
-      <VehicleDialog
-        open={showVehicleDialog}
-        onOpenChange={setShowVehicleDialog}
-        onSubmit={handleSubmitVehicle}
-        defaultValues={vehicleForm.getValues()}
-        isSubmitting={isSubmitting}
-        isEditMode={isEditingVehicle}
-        partnerId={partnerId as string}
-      />
-
-      {/* Delete Vehicle Confirmation Dialog */}
-      <AlertDialog open={showDeleteVehicleDialog} onOpenChange={setShowDeleteVehicleDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the vehicle from the system.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteVehicle}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </SidebarProvider>
   );
 }
