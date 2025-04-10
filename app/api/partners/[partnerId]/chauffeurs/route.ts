@@ -121,7 +121,7 @@ export async function POST(
         nextIsChauffeurId: data.nextIsChauffeurId,
         notes: data.notes,
         status: data.status || "AVAILABLE",
-        vehicleId: data.vehicleId,
+        vehicleId: data.vehicleId === "none" ? null : data.vehicleId,
         partnerId,
       },
     });

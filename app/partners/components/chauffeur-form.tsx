@@ -117,16 +117,16 @@ export function ChauffeurForm({
     // Check if all required fields are present
     const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'licenseNumber', 'licenseExpiry'];
     const missingFields = requiredFields.filter(field => !data[field as keyof ChauffeurFormValues]);
-    
+
     if (missingFields.length > 0) {
       console.error('Missing required fields:', missingFields);
       toast.error(`Missing required fields: ${missingFields.join(', ')}`);
       return;
     }
-    
+
     // Log the data being submitted
     console.log('Submitting chauffeur data:', data);
-    
+
     onSubmit(data);
   };
 
@@ -314,13 +314,13 @@ export function ChauffeurForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="none">None</SelectItem>
                     {isLoadingVehicles ? (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="loading" disabled>
                         Loading vehicles...
                       </SelectItem>
                     ) : vehicles.length === 0 ? (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="no-vehicles" disabled>
                         No vehicles available
                       </SelectItem>
                     ) : (
