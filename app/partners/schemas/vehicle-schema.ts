@@ -1,6 +1,9 @@
 import * as z from "zod";
 
 export const vehicleFormSchema = z.object({
+  // Additional fields from the API
+  fuelType: z.string().optional(),
+  registrationDate: z.string().optional(),
   make: z.string().min(1, "Make is required"),
   model: z.string().min(1, "Model is required"),
   year: z.string().min(1, "Year is required").refine(

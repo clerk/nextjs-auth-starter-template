@@ -142,6 +142,9 @@ model Vehicle {
   vehicleType     VehicleType    @default(SEDAN)
   status          VehicleStatus  @default(AVAILABLE)
   lastMaintenance DateTime?
+  // Additional fields from the French vehicle API
+  fuelType        String?
+  registrationDate String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   chauffeurs      Chauffeur[]

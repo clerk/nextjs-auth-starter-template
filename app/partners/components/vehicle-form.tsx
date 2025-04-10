@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { vehicleFormSchema, type VehicleFormValues } from "../schemas/vehicle-schema";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2, Search } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -32,6 +32,23 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useDebounce } from "@/lib/hooks/use-debounce";
+
+// Interface for the vehicle API response
+interface VehicleApiResponse {
+  info: {
+    immatriculation: string;
+    marque: string;
+    modele: string;
+    dateMiseEnCirculation: string;
+    energy: string;
+  };
+  data: {
+    date1erCir_fr: string;
+  };
+}
 
 interface VehicleFormProps {
   defaultValues?: Partial<VehicleFormValues>;
@@ -48,6 +65,10 @@ export function VehicleForm({
   buttonText = "Save Vehicle",
   partnerId,
 }: VehicleFormProps) {
+  const [isFetchingPlate, setIsFetchingPlate] = useState(false);
+  const [plateError, setPlateError] = useState<string | null>(null);
+  const [plateSuccess, setPlateSuccess] = useState<string | null>(null);
+
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
     defaultValues: {
@@ -64,6 +85,74 @@ export function VehicleForm({
       ...defaultValues,
     },
   });
+
+  // Watch for changes to the license plate and isForeignPlate fields
+  const licensePlate = useWatch({
+    control: form.control,
+    name: "licensePlate",
+  });
+
+  const isForeignPlate = useWatch({
+    control: form.control,
+    name: "isForeignPlate",
+  });
+
+  const debouncedLicensePlate = useDebounce(licensePlate, 500);
+
+  // Fetch vehicle data when license plate changes and it's a French plate
+  useEffect(() => {
+    if (!debouncedLicensePlate || isForeignPlate || debouncedLicensePlate.length < 5) {
+      setPlateSuccess(null);
+      setPlateError(null);
+      return;
+    }
+
+    const fetchVehicleData = async () => {
+      setIsFetchingPlate(true);
+      setPlateError(null);
+      setPlateSuccess(null);
+
+      try {
+        // Format the license plate by removing spaces and dashes
+        const formattedPlate = debouncedLicensePlate.replace(/[\s-]/g, "");
+
+        const response = await fetch(
+          `https://api-immat.vercel.app/getDataImmatriculation?plaque=${formattedPlate}&region=`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch vehicle data");
+        }
+
+        const data: VehicleApiResponse = await response.json();
+
+        if (data.info && data.info.marque) {
+          // Update form fields with the fetched data
+          form.setValue("make", data.info.marque);
+          form.setValue("model", data.info.modele);
+
+          // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
+          const year = data.info.dateMiseEnCirculation.split("-")[0];
+          form.setValue("year", year);
+
+          // Store additional data from the API
+          form.setValue("fuelType", data.info.energy);
+          form.setValue("registrationDate", data.info.dateMiseEnCirculation);
+
+          setPlateSuccess(`Vehicle data found: ${data.info.marque} ${data.info.modele} (${year})`);
+        } else {
+          setPlateError("No vehicle data found for this license plate");
+        }
+      } catch (error) {
+        console.error("Error fetching vehicle data:", error);
+        setPlateError("Failed to fetch vehicle data");
+      } finally {
+        setIsFetchingPlate(false);
+      }
+    };
+
+    fetchVehicleData();
+  }, [debouncedLicensePlate, isForeignPlate, form]);
 
   const handleSubmit = (data: VehicleFormValues) => {
     onSubmit(data);
@@ -142,8 +231,34 @@ export function VehicleForm({
               <FormItem>
                 <FormLabel>License Plate*</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter license plate" {...field} />
+                  <div className="relative">
+                    <Input
+                      placeholder="Enter license plate"
+                      {...field}
+                      className={cn(
+                        isFetchingPlate && "pr-10",
+                        plateError && "border-destructive",
+                        plateSuccess && "border-green-500"
+                      )}
+                    />
+                    {isFetchingPlate && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                    {!isFetchingPlate && plateSuccess && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <Search className="h-4 w-4 text-green-500" />
+                      </div>
+                    )}
+                  </div>
                 </FormControl>
+                {plateError && (
+                  <div className="text-sm font-medium text-destructive mt-1">{plateError}</div>
+                )}
+                {plateSuccess && (
+                  <div className="text-sm font-medium text-green-500 mt-1">{plateSuccess}</div>
+                )}
                 <FormMessage />
               </FormItem>
             )}

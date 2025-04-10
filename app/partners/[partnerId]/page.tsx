@@ -87,6 +87,8 @@ interface Vehicle {
   vehicleType: string;
   status: string;
   lastMaintenance?: string;
+  fuelType?: string;
+  registrationDate?: string;
   createdAt: string;
   updatedAt: string;
   partnerId: string;
@@ -713,7 +715,13 @@ export default function PartnerDetailPage() {
                                             </div>
                                             <div className="text-sm text-muted-foreground">
                                               {vehicle.year} • {vehicle.color || "No color"}
+                                              {vehicle.fuelType && ` • ${vehicle.fuelType}`}
                                             </div>
+                                            {vehicle.registrationDate && (
+                                              <div className="text-xs text-muted-foreground">
+                                                Registered: {new Date(vehicle.registrationDate).toLocaleDateString()}
+                                              </div>
+                                            )}
                                           </div>
                                         </div>
                                       </TableCell>

@@ -100,6 +100,9 @@ export async function PUT(
         vehicleType: data.vehicleType,
         status: data.status,
         lastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
+        // Update additional data from the API if available
+        fuelType: data.fuelType,
+        registrationDate: data.registrationDate,
       },
     });
 

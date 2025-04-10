@@ -101,6 +101,9 @@ export async function POST(
         status: data.status || "AVAILABLE",
         lastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
         partnerId,
+        // Store additional data from the API if available
+        fuelType: data.fuelType,
+        registrationDate: data.registrationDate,
       },
     });
 
