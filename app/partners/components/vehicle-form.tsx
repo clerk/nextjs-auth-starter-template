@@ -98,6 +98,17 @@ export function VehicleForm({
 
   const debouncedLicensePlate = useDebounce(licensePlate, 500);
 
+  // Check if a license plate matches the French format (XX-111-XX or XX111XX)
+  const isFrenchPlateFormat = (plate: string) => {
+    // Remove spaces and dashes for the check
+    const cleanPlate = plate.replace(/[\s-]/g, "");
+
+    // French plate format: 2 letters + 3 digits + 2 letters (e.g., AB123CD)
+    const frenchPlateRegex = /^[A-Za-z]{2}\d{3}[A-Za-z]{2}$/;
+
+    return frenchPlateRegex.test(cleanPlate);
+  };
+
   // Fetch vehicle data when license plate changes and it's a French plate
   useEffect(() => {
     // Clear any previous success/error messages when the foreign plate toggle changes
@@ -120,8 +131,8 @@ export function VehicleForm({
       return;
     }
 
-    // Only proceed if we have a license plate with at least 5 characters
-    if (!debouncedLicensePlate || debouncedLicensePlate.length < 5) {
+    // Only proceed if the license plate matches the French format
+    if (!debouncedLicensePlate || !isFrenchPlateFormat(debouncedLicensePlate)) {
       setPlateSuccess(null);
       setPlateError(null);
       return;
@@ -178,8 +189,8 @@ export function VehicleForm({
   const handleFetchVehicleData = async () => {
     const licensePlate = form.getValues("licensePlate");
 
-    if (!licensePlate || licensePlate.length < 5) {
-      toast.error("Please enter a valid license plate");
+    if (!licensePlate || !isFrenchPlateFormat(licensePlate)) {
+      toast.error("Please enter a valid French license plate (format: XX-111-XX)");
       return;
     }
 
@@ -295,16 +306,17 @@ export function VehicleForm({
                   {!isForeignPlate && (
                     <Button
                       type="button"
-                      variant="secondary"
+                      variant={isFrenchPlateFormat(form.getValues("licensePlate") || "") ? "default" : "secondary"}
                       onClick={handleFetchVehicleData}
                       disabled={isFetchingPlate}
+                      className={isFrenchPlateFormat(form.getValues("licensePlate") || "") ? "bg-green-600 hover:bg-green-700" : ""}
                     >
                       {isFetchingPlate ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       ) : (
                         <Search className="h-4 w-4 mr-2" />
                       )}
-                      Fetch Data
+                      {isFrenchPlateFormat(form.getValues("licensePlate") || "") ? "Get Vehicle Data" : "Fetch Data"}
                     </Button>
                   )}
                 </div>
@@ -315,7 +327,14 @@ export function VehicleForm({
                   <div className="text-sm font-medium text-green-500 mt-1">{plateSuccess}</div>
                 )}
                 <FormDescription>
-                  {!isForeignPlate && "For French plates, vehicle data will be automatically fetched when you enter a valid plate number."}
+                  {!isForeignPlate && (
+                    <>
+                      For French plates (format: XX-111-XX), vehicle data will be automatically fetched when you enter a valid plate number.
+                      {!isFrenchPlateFormat(form.getValues("licensePlate") || "") && (
+                        <span className="block mt-1 text-amber-500">Current format doesn't match French plate pattern</span>
+                      )}
+                    </>
+                  )}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
