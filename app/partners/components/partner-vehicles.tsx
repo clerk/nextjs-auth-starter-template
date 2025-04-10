@@ -40,35 +40,18 @@ export function PartnerVehicles({ partnerId }: PartnerVehiclesProps) {
           <TabsList className="mb-4">
             <TabsTrigger value="all">All Vehicles</TabsTrigger>
             <TabsTrigger value="available">Available</TabsTrigger>
-            <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="all">
             <VehicleList partnerId={partnerId} />
           </TabsContent>
-          
+
           <TabsContent value="available">
             <Card>
               <CardHeader>
                 <CardTitle>Available Vehicles</CardTitle>
                 <CardDescription>
                   Vehicles that are currently available for assignments
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  This feature is coming soon. You can view and filter all vehicles in the "All Vehicles" tab.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="maintenance">
-            <Card>
-              <CardHeader>
-                <CardTitle>Vehicles in Maintenance</CardTitle>
-                <CardDescription>
-                  Vehicles that are currently undergoing maintenance
                 </CardDescription>
               </CardHeader>
               <CardContent>
