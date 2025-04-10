@@ -4,7 +4,7 @@ export const vehicleFormSchema = z.object({
   // Additional fields from the API
   fuelType: z.string().optional(),
   registrationDate: z.string().optional(),
-  make: z.string().min(1, "Make is required"),
+  make: z.string().optional(),
   model: z.string().min(1, "Model is required"),
   year: z.string().min(1, "Year is required").refine(
     (val) => {
@@ -25,7 +25,7 @@ export const vehicleFormSchema = z.object({
   ),
   vehicleType: z.enum(["SEDAN", "SUV", "VAN", "LUXURY", "LIMOUSINE"]).default("SEDAN"),
   status: z.enum(["AVAILABLE", "IN_USE", "MAINTENANCE", "OUT_OF_SERVICE"]).default("AVAILABLE"),
-  lastMaintenance: z.string().optional(),
+
 });
 
 export type VehicleFormValues = z.infer<typeof vehicleFormSchema>;

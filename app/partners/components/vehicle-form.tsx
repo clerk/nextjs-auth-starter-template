@@ -72,16 +72,15 @@ export function VehicleForm({
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleFormSchema),
     defaultValues: {
+      isForeignPlate: false,
+      licensePlate: "",
       make: "",
       model: "",
       year: new Date().getFullYear().toString(),
-      licensePlate: "",
-      isForeignPlate: false,
       color: "",
       capacity: "4",
       vehicleType: "SEDAN",
       status: "AVAILABLE",
-      lastMaintenance: "",
       ...defaultValues,
     },
   });
@@ -101,7 +100,15 @@ export function VehicleForm({
 
   // Fetch vehicle data when license plate changes and it's a French plate
   useEffect(() => {
-    if (!debouncedLicensePlate || isForeignPlate || debouncedLicensePlate.length < 5) {
+    // Clear any previous success/error messages when the foreign plate toggle changes
+    if (isForeignPlate) {
+      setPlateSuccess(null);
+      setPlateError(null);
+      return;
+    }
+
+    // Only proceed if we have a license plate with at least 5 characters
+    if (!debouncedLicensePlate || debouncedLicensePlate.length < 5) {
       setPlateSuccess(null);
       setPlateError(null);
       return;
@@ -161,15 +168,88 @@ export function VehicleForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        {/* French Plate Toggle */}
+        <div className="mb-6">
+          <FormField
+            control={form.control}
+            name="isForeignPlate"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">Non-French License Plate</FormLabel>
+                  <FormDescription>
+                    Toggle ON if this vehicle has a non-French license plate. Toggle OFF for French plates to auto-fetch vehicle data.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {/* License Plate - Always at the top */}
+          <FormField
+            control={form.control}
+            name="licensePlate"
+            render={({ field }) => (
+              <FormItem className="md:col-span-2">
+                <FormLabel>License Plate*</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <Input
+                      placeholder="Enter license plate"
+                      {...field}
+                      className={cn(
+                        isFetchingPlate && "pr-10",
+                        plateError && "border-destructive",
+                        plateSuccess && "border-green-500"
+                      )}
+                    />
+                    {isFetchingPlate && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+                      </div>
+                    )}
+                    {!isFetchingPlate && plateSuccess && (
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                        <Search className="h-4 w-4 text-green-500" />
+                      </div>
+                    )}
+                  </div>
+                </FormControl>
+                {plateError && (
+                  <div className="text-sm font-medium text-destructive mt-1">{plateError}</div>
+                )}
+                {plateSuccess && (
+                  <div className="text-sm font-medium text-green-500 mt-1">{plateSuccess}</div>
+                )}
+                <FormDescription>
+                  {!isForeignPlate && "For French plates, vehicle data will be automatically fetched when you enter a valid plate number."}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Make - Optional, auto-populated for French plates */}
           <FormField
             control={form.control}
             name="make"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Make*</FormLabel>
+                <FormLabel>{!isForeignPlate ? "Make (Auto-populated)" : "Make"}</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter vehicle make" {...field} />
+                  <Input
+                    placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle make"}
+                    {...field}
+                    disabled={!isForeignPlate && !field.value}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -220,67 +300,6 @@ export function VehicleForm({
                   <Input placeholder="Enter vehicle color" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="licensePlate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>License Plate*</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <Input
-                      placeholder="Enter license plate"
-                      {...field}
-                      className={cn(
-                        isFetchingPlate && "pr-10",
-                        plateError && "border-destructive",
-                        plateSuccess && "border-green-500"
-                      )}
-                    />
-                    {isFetchingPlate && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                      </div>
-                    )}
-                    {!isFetchingPlate && plateSuccess && (
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                        <Search className="h-4 w-4 text-green-500" />
-                      </div>
-                    )}
-                  </div>
-                </FormControl>
-                {plateError && (
-                  <div className="text-sm font-medium text-destructive mt-1">{plateError}</div>
-                )}
-                {plateSuccess && (
-                  <div className="text-sm font-medium text-green-500 mt-1">{plateSuccess}</div>
-                )}
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="isForeignPlate"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>Non-French License Plate</FormLabel>
-                  <FormDescription>
-                    Toggle if this vehicle has a non-French license plate
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                </FormControl>
               </FormItem>
             )}
           />
@@ -354,46 +373,6 @@ export function VehicleForm({
                     <SelectItem value="OUT_OF_SERVICE">Out of Service</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="lastMaintenance"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Last Maintenance</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(new Date(field.value), "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value ? new Date(field.value) : undefined}
-                      onSelect={(date) =>
-                        field.onChange(date ? date.toISOString() : "")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
                 <FormMessage />
               </FormItem>
             )}
