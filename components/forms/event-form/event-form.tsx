@@ -70,6 +70,7 @@ export function EventForm({ onSubmit, defaultValues }: EventFormProps) {
     defaultValues: {
       status: "PLANNED",
       pricingType: "MISSION_BASED",
+      fixedPrice: 0,
       ...defaultValues,
     },
   });
@@ -284,13 +285,12 @@ export function EventForm({ onSubmit, defaultValues }: EventFormProps) {
                   <Input
                     type="number"
                     step="0.01"
-                    {...field}
-                    value={field.value || ''}
+                    placeholder="Enter fixed price"
+                    value={field.value === undefined ? '' : field.value}
                     onChange={(e) => {
                       const value = e.target.value;
-                      field.onChange(value === '' ? undefined : parseFloat(value));
+                      field.onChange(value === '' ? 0 : parseFloat(value));
                     }}
-                    placeholder="Enter fixed price"
                   />
                 </FormControl>
                 <FormMessage />

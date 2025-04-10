@@ -10,6 +10,7 @@ import {
   FileIcon,
   FileTextIcon,
   FolderIcon,
+  HandshakeIcon,
   HelpCircleIcon,
   LayoutDashboardIcon,
   MoonIcon,
@@ -70,6 +71,11 @@ const data = {
       title: "Vehicles",
       url: "/vehicles",
       icon: DatabaseIcon,
+    },
+    {
+      title: "Partners",
+      url: "/partners",
+      icon: HandshakeIcon,
     },
   ],
   navClouds: [

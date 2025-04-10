@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,24 +8,253 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// User model with role-based access control
 model User {
-  id            String    @id @default(cuid())
-  clerkId       String    @unique
-  email         String    @unique
-  firstName     String
-  lastName      String
-  phone         String?
-  role          Role      @default(PASSENGER)
-  clientId String?
-  client  Client? @relation(fields: [clientId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  chauffeurProfile Chauffeur?
-  rides         Ride[]    @relation("PassengerRides")
-  assignedRides Ride[]    @relation("AssignedRides")
-  bookings      Booking[]
+  id                  String             @id @default(cuid())
+  clerkId             String             @unique
+  email               String             @unique
+  firstName           String
+  lastName            String
+  phone               String?
+  role                Role               @default(PASSENGER)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  clientId            String?
+  bookings            Booking[]
+  chauffeurProfile    Chauffeur?
   eventParticipations EventParticipant[]
+  assignedRides       Ride[]             @relation("AssignedRides")
+  rides               Ride[]             @relation("PassengerRides")
+  client              Client?            @relation(fields: [clientId], references: [id])
+}
+
+model Client {
+  id            String       @id @default(cuid())
+  clerkId       String?      @unique
+  name          String
+  slug          String?      @unique
+  address       String?
+  city          String?
+  country       String?
+  postalCode    String?
+  phone         String?
+  email         String?
+  website       String?
+  logoUrl       String?
+  active        Boolean      @default(true)
+  contractStart DateTime?
+  contractEnd   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  billingInfo   BillingInfo?
+  bookings      Booking[]
+  events        Event[]
+  users         User[]
+}
+
+model BillingInfo {
+  id                String   @id @default(cuid())
+  billingAddress    String?
+  billingCity       String?
+  billingCountry    String?
+  billingPostalCode String?
+  taxId             String?
+  paymentTerms      String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  clientId          String   @unique
+  client            Client   @relation(fields: [clientId], references: [id])
+}
+
+model Chauffeur {
+  id            String          @id @default(cuid())
+  userId        String          @unique
+  licenseNumber String
+  licenseExpiry DateTime
+  vehicleId     String?
+  status        ChauffeurStatus @default(AVAILABLE)
+  rating        Float?
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  user          User            @relation(fields: [userId], references: [id])
+  vehicle       Vehicle?        @relation(fields: [vehicleId], references: [id])
+}
+
+model Partner {
+  id                String          @id @default(cuid())
+  name              String
+  email             String          @unique
+  phone             String?
+  address           String?
+  city              String?
+  country           String?
+  postalCode        String?
+  website           String?
+  logoUrl           String?
+  type              PartnerType     @default(EXTERNAL)
+  status            PartnerStatus   @default(ACTIVE)
+  notes             String?
+
+  // Billing and financial information
+  balance           Decimal         @default(0) @db.Decimal(10, 2)
+  ratePerKm         Decimal?        @db.Decimal(10, 2)
+  ratePerHour       Decimal?        @db.Decimal(10, 2)
+  minimumFare       Decimal?        @db.Decimal(10, 2)
+  commissionRate    Decimal?        @db.Decimal(5, 2) // Percentage
+  paymentTerms      String?
+  bankName          String?
+  bankAccountNumber String?
+  bankRoutingNumber String?
+  taxId             String?
+
+  // Relationships
+  eventParticipations EventPartner[]
+  missionPartners     MissionPartner[]
+  ridePartners        RidePartner[]
+  vehicles           Vehicle[]
+
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+}
+
+enum PartnerType {
+  INTERNAL // Partners that are part of our organization
+  EXTERNAL // Third-party partners
+  AFFILIATE // Affiliated companies
+}
+
+enum PartnerStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+model Vehicle {
+  id              String         @id @default(cuid())
+  make            String
+  model           String
+  year            Int
+  licensePlate    String         @unique
+  isForeignPlate  Boolean        @default(false)
+  color           String?
+  capacity        Int            @default(4)
+  vehicleType     VehicleType    @default(SEDAN)
+  status          VehicleStatus  @default(AVAILABLE)
+  lastMaintenance DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  chauffeurs      Chauffeur[]
+  eventVehicles   EventVehicle[]
+  partnerId       String?
+  partner         Partner?       @relation(fields: [partnerId], references: [id])
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  bookingNumber String        @unique @default(cuid())
+  customerId    String
+  status        BookingStatus @default(PENDING)
+  totalAmount   Decimal?      @db.Decimal(10, 2)
+  notes         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  clientId      String?
+  client        Client?       @relation(fields: [clientId], references: [id])
+  customer      User          @relation(fields: [customerId], references: [id])
+  rides         Ride[]
+}
+
+model Ride {
+  id             String     @id @default(cuid())
+  rideNumber     String     @unique @default(cuid())
+  bookingId      String
+  passengerId    String
+  chauffeurId    String?
+  pickupAddress  String
+  dropoffAddress String
+  pickupTime     DateTime
+  dropoffTime    DateTime?
+  status         RideStatus @default(SCHEDULED)
+  fare           Decimal?   @db.Decimal(10, 2)
+  distance       Decimal?   @db.Decimal(10, 2)
+  duration       Int?
+  notes          String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  missionId      String?
+  booking        Booking    @relation(fields: [bookingId], references: [id])
+  chauffeur      User?      @relation("AssignedRides", fields: [chauffeurId], references: [id])
+  mission        Mission?   @relation(fields: [missionId], references: [id])
+  passenger      User       @relation("PassengerRides", fields: [passengerId], references: [id])
+  partners       RidePartner[]
+}
+
+model Event {
+  id            String             @id @default(cuid())
+  title         String
+  description   String?
+  clientId      String
+  startDate     DateTime
+  endDate       DateTime
+  status        EventStatus        @default(PLANNED)
+  location      String?
+  pricingType   EventPricingType   @default(MISSION_BASED)
+  fixedPrice    Decimal?           @db.Decimal(10, 2)
+  totalFare     Decimal?           @db.Decimal(10, 2)
+  notes         String?
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  client        Client             @relation(fields: [clientId], references: [id])
+  participants  EventParticipant[]
+  eventVehicles EventVehicle[]
+  missions      Mission[]
+  partners      EventPartner[]
+}
+
+model EventVehicle {
+  id         String                  @id @default(cuid())
+  eventId    String
+  vehicleId  String
+  assignedAt DateTime                @default(now())
+  status     VehicleAssignmentStatus @default(ASSIGNED)
+  notes      String?
+  event      Event                   @relation(fields: [eventId], references: [id])
+  vehicle    Vehicle                 @relation(fields: [vehicleId], references: [id])
+
+  @@unique([eventId, vehicleId])
+}
+
+model EventParticipant {
+  id        String           @id @default(cuid())
+  eventId   String
+  userId    String
+  role      ParticipantRole
+  status    InvitationStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  event     Event            @relation(fields: [eventId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@unique([eventId, userId])
+}
+
+model Mission {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  eventId     String
+  startDate   DateTime
+  endDate     DateTime
+  status      MissionStatus @default(PLANNED)
+  location    String?
+  fare        Decimal?      @db.Decimal(10, 2)
+  notes       String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  event       Event         @relation(fields: [eventId], references: [id])
+  rides       Ride[]
+  partners    MissionPartner[]
 }
 
 enum Role {
@@ -41,62 +267,7 @@ enum Role {
   FIELD_MANAGER
   FIELD_ASSISTANT
   CHAUFFEUR
-}
-
-// Client model for managing client companies
-model Client {
-  id            String    @id @default(cuid())
-  clerkId       String?   @unique // Clerk organization ID
-  name          String
-  slug          String?   @unique // Clerk organization slug
-  address       String?
-  city          String?
-  country       String?
-  postalCode    String?
-  phone         String?
-  email         String?
-  website       String?
-  logoUrl       String?
-  active        Boolean   @default(true)
-  contractStart DateTime?
-  contractEnd   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  users         User[]
-  bookings      Booking[]
-  billingInfo   BillingInfo?
-  events        Event[]   // Client for events
-}
-
-// Billing information for clients
-model BillingInfo {
-  id              String       @id @default(cuid())
-  clientId  String       @unique
-  client    Client @relation(fields: [clientId], references: [id])
-  billingAddress  String?
-  billingCity     String?
-  billingCountry  String?
-  billingPostalCode String?
-  taxId           String?
-  paymentTerms    String?
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-}
-
-// Chauffeur profile for users with CHAUFFEUR role
-model Chauffeur {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id])
-  licenseNumber String
-  licenseExpiry DateTime
-  vehicleId     String?
-  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id])
-  status        ChauffeurStatus @default(AVAILABLE)
-  rating        Float?
-  notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  PARTNER
 }
 
 enum ChauffeurStatus {
@@ -105,24 +276,6 @@ enum ChauffeurStatus {
   ON_BREAK
   OFF_DUTY
   ON_LEAVE
-}
-
-// Vehicle management
-model Vehicle {
-  id            String    @id @default(cuid())
-  make          String
-  model         String
-  year          Int
-  licensePlate  String    @unique
-  color         String?
-  capacity      Int       @default(4)
-  vehicleType   VehicleType @default(SEDAN)
-  status        VehicleStatus @default(AVAILABLE)
-  lastMaintenance DateTime?
-  chauffeurs    Chauffeur[]
-  eventVehicles EventVehicle[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 enum VehicleType {
@@ -140,53 +293,12 @@ enum VehicleStatus {
   OUT_OF_SERVICE
 }
 
-// Booking system
-model Booking {
-  id            String    @id @default(cuid())
-  bookingNumber String    @unique @default(cuid())
-  customerId    String
-  customer      User      @relation(fields: [customerId], references: [id])
-  clientId String?
-  client  Client? @relation(fields: [clientId], references: [id])
-  status        BookingStatus @default(PENDING)
-  totalAmount   Decimal?  @db.Decimal(10, 2)
-  notes         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  rides         Ride[]
-}
-
 enum BookingStatus {
   PENDING
   CONFIRMED
   IN_PROGRESS
   COMPLETED
   CANCELLED
-}
-
-// Individual rides within a booking
-model Ride {
-  id            String    @id @default(cuid())
-  rideNumber    String    @unique @default(cuid())
-  bookingId     String
-  booking       Booking   @relation(fields: [bookingId], references: [id])
-  passengerId   String
-  passenger     User      @relation("PassengerRides", fields: [passengerId], references: [id])
-  chauffeurId   String?
-  chauffeur     User?     @relation("AssignedRides", fields: [chauffeurId], references: [id])
-  pickupAddress String
-  dropoffAddress String
-  pickupTime    DateTime
-  dropoffTime   DateTime?
-  status        RideStatus @default(SCHEDULED)
-  fare          Decimal?  @db.Decimal(10, 2)
-  distance      Decimal?  @db.Decimal(10, 2)
-  duration      Int?      // in minutes
-  notes         String?
-  missionId     String?   // Link to mission if part of one
-  mission       Mission?  @relation(fields: [missionId], references: [id])
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 enum RideStatus {
@@ -197,49 +309,9 @@ enum RideStatus {
   CANCELLED
 }
 
-// Event System
-model Event {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  clientId      String
-  client        Client @relation(fields: [clientId], references: [id])
-  startDate     DateTime
-  endDate       DateTime
-  status        EventStatus @default(PLANNED)
-  location      String?
-
-  // Pricing
-  pricingType   EventPricingType @default(MISSION_BASED)
-  fixedPrice    Decimal?  @db.Decimal(10, 2)
-  totalFare     Decimal?  @db.Decimal(10, 2)  // Calculated from missions if MISSION_BASED
-
-  notes         String?
-
-  // Relations
-  missions      Mission[]
-  participants  EventParticipant[]
-  eventVehicles EventVehicle[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
 enum EventPricingType {
-  MISSION_BASED    // Price calculated from sum of missions
-  FIXED_PRICE      // Set price for entire event
-}
-
-model EventVehicle {
-  id            String    @id @default(cuid())
-  eventId       String
-  event         Event     @relation(fields: [eventId], references: [id])
-  vehicleId     String
-  vehicle       Vehicle   @relation(fields: [vehicleId], references: [id])
-  assignedAt    DateTime  @default(now())
-  status        VehicleAssignmentStatus @default(ASSIGNED)
-  notes         String?
-
-  @@unique([eventId, vehicleId])
+  MISSION_BASED
+  FIXED_PRICE
 }
 
 enum VehicleAssignmentStatus {
@@ -256,20 +328,6 @@ enum EventStatus {
   CANCELLED
 }
 
-model EventParticipant {
-  id            String    @id @default(cuid())
-  eventId       String
-  event         Event     @relation(fields: [eventId], references: [id])
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  role          ParticipantRole
-  status        InvitationStatus @default(PENDING)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@unique([eventId, userId])
-}
-
 enum ParticipantRole {
   TEAM_MEMBER
   CHAUFFEUR
@@ -284,25 +342,80 @@ enum InvitationStatus {
   DECLINED
 }
 
-model Mission {
-  id            String    @id @default(cuid())
-  title         String
-  description   String?
-  eventId       String
-  event         Event     @relation(fields: [eventId], references: [id])
-  startDate     DateTime
-  endDate       DateTime
-  status        MissionStatus @default(PLANNED)
-  location      String?
-  fare          Decimal?  @db.Decimal(10, 2)
-  notes         String?
-  rides         Ride[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
 enum MissionStatus {
   PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+// Partner relationship models
+model EventPartner {
+  id            String    @id @default(cuid())
+  eventId       String
+  partnerId     String
+  role          PartnerRole @default(SERVICE_PROVIDER)
+  status        InvitationStatus @default(PENDING)
+  notes         String?
+  fee           Decimal?  @db.Decimal(10, 2)
+  commissionRate Decimal? @db.Decimal(5, 2) // Can override partner's default commission
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  event         Event     @relation(fields: [eventId], references: [id])
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+
+  @@unique([eventId, partnerId])
+}
+
+model MissionPartner {
+  id            String    @id @default(cuid())
+  missionId     String
+  partnerId     String
+  role          PartnerRole @default(SERVICE_PROVIDER)
+  status        InvitationStatus @default(PENDING)
+  notes         String?
+  fee           Decimal?  @db.Decimal(10, 2)
+  commissionRate Decimal? @db.Decimal(5, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  mission       Mission   @relation(fields: [missionId], references: [id])
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+
+  @@unique([missionId, partnerId])
+}
+
+model RidePartner {
+  id            String    @id @default(cuid())
+  rideId        String
+  partnerId     String
+  role          PartnerRole @default(SERVICE_PROVIDER)
+  status        PartnerRideStatus @default(ASSIGNED)
+  notes         String?
+  fee           Decimal?  @db.Decimal(10, 2)
+  commissionRate Decimal? @db.Decimal(5, 2)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  ride          Ride      @relation(fields: [rideId], references: [id])
+  partner       Partner   @relation(fields: [partnerId], references: [id])
+
+  @@unique([rideId, partnerId])
+}
+
+enum PartnerRole {
+  SERVICE_PROVIDER // General service provider
+  CHAUFFEUR_SERVICE // Provides chauffeurs
+  VEHICLE_PROVIDER // Provides vehicles
+  LOGISTICS_PARTNER // Handles logistics
+  COORDINATOR // Coordinates activities
+}
+
+enum PartnerRideStatus {
+  ASSIGNED
+  ACCEPTED
+  REJECTED
   IN_PROGRESS
   COMPLETED
   CANCELLED
