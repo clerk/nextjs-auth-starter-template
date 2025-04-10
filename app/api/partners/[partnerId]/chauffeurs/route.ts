@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 
 // GET /api/partners/[partnerId]/chauffeurs
 export async function GET(
@@ -9,13 +8,9 @@ export async function GET(
   { params }: { params: { partnerId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { partnerId } = params;
@@ -75,13 +70,9 @@ export async function POST(
   { params }: { params: { partnerId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { partnerId } = params;
@@ -96,9 +87,9 @@ export async function POST(
       if (!data.phone) missingFields.push('phone');
       if (!data.licenseNumber) missingFields.push('licenseNumber');
       if (!data.licenseExpiry) missingFields.push('licenseExpiry');
-      
+
       console.error(`Missing required fields: ${missingFields.join(', ')}`, data);
-      
+
       return NextResponse.json(
         { error: `Missing required fields: ${missingFields.join(', ')}` },
         { status: 400 }

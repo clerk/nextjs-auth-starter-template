@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { writeFile } from "fs/promises";
 import { join } from "path";
 import { mkdir } from "fs/promises";
@@ -12,13 +11,9 @@ export async function POST(
   { params }: { params: { partnerId: string; vehicleId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { partnerId, vehicleId } = params;
@@ -53,7 +48,7 @@ export async function POST(
     // Process the form data
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    
+
     if (!file) {
       return NextResponse.json(
         { error: "No file uploaded" },
@@ -84,7 +79,7 @@ export async function POST(
     const fileExtension = file.name.split(".").pop();
     const fileName = `${timestamp}-${file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9]/g, "_")}.${fileExtension}`;
     const filePath = join(uploadDir, fileName);
-    
+
     // Convert the file to a Buffer and save it
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
@@ -124,13 +119,9 @@ export async function GET(
   { params }: { params: { partnerId: string; vehicleId: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { partnerId, vehicleId } = params;
