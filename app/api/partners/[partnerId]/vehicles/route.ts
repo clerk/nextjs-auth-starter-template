@@ -90,7 +90,7 @@ export async function POST(
     // Create the vehicle
     const vehicle = await db.vehicle.create({
       data: {
-        make: data.make,
+        make: data.brand, // Using brand field but mapping to make in the database
         model: data.model,
         year,
         licensePlate: data.licensePlate,

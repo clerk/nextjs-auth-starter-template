@@ -351,7 +351,7 @@ export function VehicleList({ partnerId }: VehicleListProps) {
                         </div>
                         <div>
                           <div className="font-medium">
-                            {vehicle.make} {vehicle.model}
+                            {vehicle.make} {vehicle.model} {/* Database field is still 'make' */}
                           </div>
                           <div className="text-sm text-muted-foreground">
                             {vehicle.year} • {vehicle.color || "No color"}

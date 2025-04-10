@@ -90,7 +90,7 @@ export async function PUT(
     const updatedVehicle = await db.vehicle.update({
       where: { id: vehicleId },
       data: {
-        make: data.make,
+        make: data.brand, // Using brand field but mapping to make in the database
         model: data.model,
         year,
         licensePlate: data.licensePlate,

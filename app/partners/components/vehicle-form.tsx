@@ -74,7 +74,7 @@ export function VehicleForm({
     defaultValues: {
       isForeignPlate: false,
       licensePlate: "",
-      make: "",
+      brand: "",
       model: "",
       year: new Date().getFullYear().toString(),
       color: "",
@@ -135,7 +135,7 @@ export function VehicleForm({
 
         if (data.info && data.info.marque) {
           // Update form fields with the fetched data
-          form.setValue("make", data.info.marque);
+          form.setValue("brand", data.info.marque);
           form.setValue("model", data.info.modele);
 
           // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
@@ -237,16 +237,16 @@ export function VehicleForm({
             )}
           />
 
-          {/* Make - Optional, auto-populated for French plates */}
+          {/* Brand - Required, auto-populated for French plates */}
           <FormField
             control={form.control}
-            name="make"
+            name="brand"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>{!isForeignPlate ? "Make (Auto-populated)" : "Make"}</FormLabel>
+                <FormLabel>{!isForeignPlate ? "Brand* (Auto-populated)" : "Brand*"}</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle make"}
+                    placeholder={!isForeignPlate ? "Will be auto-populated" : "Enter vehicle brand"}
                     {...field}
                     disabled={!isForeignPlate && !field.value}
                   />
