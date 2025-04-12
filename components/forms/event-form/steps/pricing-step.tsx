@@ -90,8 +90,8 @@ export function EventPricingStep({ form }: EventPricingStepProps) {
               </SelectContent>
             </Select>
             <FormDescription>
-              {field.value === 'MISSION_BASED' 
-                ? 'Price will be calculated based on individual missions' 
+              {field.value === 'MISSION_BASED'
+                ? 'Price will be calculated based on individual missions'
                 : 'Set a fixed price for the entire event'}
             </FormDescription>
             <FormMessage />
@@ -105,15 +105,21 @@ export function EventPricingStep({ form }: EventPricingStepProps) {
           name="fixedPrice"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Fixed Price (€)</FormLabel>
+              <FormLabel>
+                Fixed Price (€) <span className="text-destructive">*</span>
+              </FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  {...field} 
+                <Input
+                  type="number"
+                  {...field}
                   onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                   value={field.value}
+                  className={field.value <= 0 ? "border-destructive" : ""}
                 />
               </FormControl>
+              <FormDescription>
+                Please enter a valid price amount greater than zero
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -127,9 +133,9 @@ export function EventPricingStep({ form }: EventPricingStepProps) {
           <FormItem>
             <FormLabel>Notes</FormLabel>
             <FormControl>
-              <Textarea 
-                placeholder="Additional notes about pricing, billing, or special requirements" 
-                {...field} 
+              <Textarea
+                placeholder="Additional notes about pricing, billing, or special requirements"
+                {...field}
               />
             </FormControl>
             <FormMessage />

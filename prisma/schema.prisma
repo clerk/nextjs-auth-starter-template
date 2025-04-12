@@ -66,27 +66,18 @@ model BillingInfo {
 }
 
 model Chauffeur {
-  id                 String          @id @default(cuid())
-  userId             String?         @unique
-  nextIsChauffeurId  String?         @unique
-  firstName          String
-  lastName           String
-  email              String
-  phone              String
-  licenseNumber      String
-  licenseExpiry      DateTime
-  vehicleId          String?
-  status             ChauffeurStatus @default(AVAILABLE)
-  rating             Float?
-  notes              String?
-  isExternalChauffeur Boolean         @default(false)
-  partnerId          String?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
-  user               User?           @relation(fields: [userId], references: [id])
-  vehicle            Vehicle?        @relation(fields: [vehicleId], references: [id])
-  partner            Partner?        @relation(fields: [partnerId], references: [id])
-  documents          Document[]
+  id            String          @id @default(cuid())
+  userId        String          @unique
+  licenseNumber String
+  licenseExpiry DateTime
+  vehicleId     String?
+  status        ChauffeurStatus @default(AVAILABLE)
+  rating        Float?
+  notes         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  user          User            @relation(fields: [userId], references: [id])
+  vehicle       Vehicle?        @relation(fields: [vehicleId], references: [id])
 }
 
 model Partner {
@@ -120,8 +111,6 @@ model Partner {
   eventParticipations EventPartner[]
   missionPartners     MissionPartner[]
   ridePartners        RidePartner[]
-  vehicles            Vehicle[]
-  chauffeurs          Chauffeur[]
 
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -146,22 +135,15 @@ model Vehicle {
   model           String
   year            Int
   licensePlate    String         @unique
-  isForeignPlate  Boolean        @default(false)
   color           String?
   capacity        Int            @default(4)
   vehicleType     VehicleType    @default(SEDAN)
   status          VehicleStatus  @default(AVAILABLE)
   lastMaintenance DateTime?
-  // Additional fields from the French vehicle API
-  fuelType        String?
-  registrationDate String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   chauffeurs      Chauffeur[]
   eventVehicles   EventVehicle[]
-  partnerId       String?
-  partner         Partner?       @relation(fields: [partnerId], references: [id])
-  documents       Document[]
 }
 
 model Booking {
@@ -354,37 +336,6 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   DECLINED
-}
-
-model Document {
-  id          String       @id @default(cuid())
-  name        String
-  type        DocumentType
-  url         String
-  fileSize    Int
-  mimeType    String
-  uploadedAt  DateTime    @default(now())
-  expiryDate  DateTime?
-  isVerified  Boolean     @default(false)
-  notes       String?
-  chauffeurId String?
-  vehicleId   String?
-  chauffeur   Chauffeur?  @relation(fields: [chauffeurId], references: [id])
-  vehicle     Vehicle?    @relation(fields: [vehicleId], references: [id])
-}
-
-enum DocumentType {
-  // Chauffeur documents
-  DRIVER_LICENSE
-  IDENTITY_CARD
-  VTC_CARD
-
-  // Vehicle documents
-  REGISTRATION_CARD
-  INSURANCE_CERTIFICATE
-  TECHNICAL_INSPECTION
-  VTC_REGISTRY
-  EXPLOITATION_CERTIFICATE
 }
 
 enum MissionStatus {

@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import type { Event, EventFormValues } from "@/components/forms/event-form/types";
 import { EventDialog } from "@/components/forms/event-form/event-dialog";
-import { PlusIcon, Loader2, Eye, LayoutGrid, List, Calendar, MapPin, Building2, SearchIcon } from "lucide-react";
-import Link from "next/link";
+import { PlusIcon, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -28,17 +27,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
 export default function EventsPage() {
@@ -47,8 +35,6 @@ export default function EventsPage() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
-  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch events from the API
   useEffect(() => {
@@ -79,19 +65,6 @@ export default function EventsPage() {
 
     fetchEvents();
   }, [filterStatus]);
-
-  // Filter events based on search query
-  const filteredEvents = events.filter(event => {
-    if (!searchQuery) return true;
-
-    const query = searchQuery.toLowerCase();
-    return (
-      event.title?.toLowerCase().includes(query) ||
-      event.description?.toLowerCase().includes(query) ||
-      event.location?.toLowerCase().includes(query) ||
-      event.client?.name?.toLowerCase().includes(query)
-    );
-  });
 
   // Handle event creation/update
   const handleEventSubmit = async (data: EventFormValues) => {
@@ -129,22 +102,6 @@ export default function EventsPage() {
     } catch (error) {
       console.error('Error saving event:', error);
       toast.error(error instanceof Error ? error.message : 'An error occurred');
-    }
-  };
-
-  // Get status badge color
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PLANNED":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300";
-      case "IN_PROGRESS":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300";
-      case "COMPLETED":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300";
-      case "CANCELLED":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300";
     }
   };
 
@@ -191,14 +148,6 @@ export default function EventsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "grid" | "table")}>
-                      <ToggleGroupItem value="grid" aria-label="Grid View">
-                        <LayoutGrid className="h-4 w-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="table" aria-label="Table View">
-                        <List className="h-4 w-4" />
-                      </ToggleGroupItem>
-                    </ToggleGroup>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
@@ -241,17 +190,6 @@ export default function EventsPage() {
                         </DropdownMenuCheckboxItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="relative w-64">
-                      <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        type="search"
-                        placeholder="Search events..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-8"
-                        aria-label="Search events"
-                      />
-                    </div>
                     <Button onClick={() => {
                       setSelectedEvent(null);
                       setEventDialogOpen(true);
@@ -276,121 +214,17 @@ export default function EventsPage() {
                     <TabsTrigger value="completed">Completed</TabsTrigger>
                   </TabsList>
                   <TabsContent value="all" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Event</TableHead>
-                              <TableHead>Client</TableHead>
-                              <TableHead>Dates</TableHead>
-                              <TableHead>Location</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {isLoading ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-                                </TableCell>
-                              </TableRow>
-                            ) : filteredEvents.length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <p className="text-muted-foreground">No events found</p>
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredEvents.map((event) => (
-                                <TableRow key={event.id}>
-                                  <TableCell>
-                                    <Link
-                                      href={`/events/${event.id}`}
-                                      className="font-medium hover:underline hover:text-primary"
-                                    >
-                                      {event.title}
-                                    </Link>
-                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                      {event.description}
-                                    </p>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.client?.name || "—"}
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center">
-                                      <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                      <span className="text-xs">
-                                        {format(new Date(event.startDate), "MMM d, yyyy")}
-                                      </span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.location ? (
-                                      <div className="flex items-center">
-                                        <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                        <span className="text-xs line-clamp-1">{event.location}</span>
-                                      </div>
-                                    ) : (
-                                      "—"
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={cn("px-2 py-1", getStatusColor(event.status))}>
-                                      {event.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        asChild
-                                      >
-                                        <Link href={`/events/${event.id}`}>
-                                          <Eye className="h-4 w-4 mr-1" />
-                                          View
-                                        </Link>
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedEvent(event);
-                                          setEventDialogOpen(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDeleteEvent(event.id)}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : filteredEvents.length === 0 ? (
+                      ) : events.length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No events found</p>
                         </div>
                       ) : (
-                        filteredEvents.map((event) => (
+                        events.map((event) => (
                           <Card key={event.id}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                               <CardTitle className="text-sm font-medium">
@@ -398,7 +232,10 @@ export default function EventsPage() {
                               </CardTitle>
                               <div className={cn(
                                 "px-2 py-1 rounded-full text-xs font-medium",
-                                getStatusColor(event.status)
+                                event.status === "PLANNED" && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
+                                event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+                                event.status === "COMPLETED" && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+                                event.status === "CANCELLED" && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                               )}>
                                 {event.status}
                               </div>
@@ -438,137 +275,25 @@ export default function EventsPage() {
                         ))
                       )}
                     </div>
-                    )}
                   </TabsContent>
                   <TabsContent value="upcoming" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Event</TableHead>
-                              <TableHead>Client</TableHead>
-                              <TableHead>Dates</TableHead>
-                              <TableHead>Location</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {isLoading ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-                                </TableCell>
-                              </TableRow>
-                            ) : filteredEvents.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <p className="text-muted-foreground">No in-progress events found</p>
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredEvents
-                                .filter((event) => event.status === "IN_PROGRESS")
-                                .map((event) => (
-                                <TableRow key={event.id}>
-                                  <TableCell>
-                                    <Link
-                                      href={`/events/${event.id}`}
-                                      className="font-medium hover:underline hover:text-primary"
-                                    >
-                                      {event.title}
-                                    </Link>
-                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                      {event.description}
-                                    </p>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.client?.name || "—"}
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center">
-                                      <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                      <span className="text-xs">
-                                        {format(new Date(event.startDate), "MMM d, yyyy")}
-                                      </span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.location ? (
-                                      <div className="flex items-center">
-                                        <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                        <span className="text-xs line-clamp-1">{event.location}</span>
-                                      </div>
-                                    ) : (
-                                      "—"
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={cn("px-2 py-1", getStatusColor(event.status))}>
-                                      {event.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        asChild
-                                      >
-                                        <Link href={`/events/${event.id}`}>
-                                          <Eye className="h-4 w-4 mr-1" />
-                                          View
-                                        </Link>
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedEvent(event);
-                                          setEventDialogOpen(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDeleteEvent(event.id)}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : filteredEvents.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
+                      ) : events.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No in-progress events found</p>
                         </div>
                       ) : (
-                        filteredEvents
+                        events
                           .filter((event) => event.status === "IN_PROGRESS")
                           .map((event) => (
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  <Link
-                                    href={`/events/${event.id}`}
-                                    className="hover:underline hover:text-primary flex items-center gap-1"
-                                  >
-                                    {event.title}
-                                  </Link>
+                                  {event.title}
                                 </CardTitle>
                                 <div className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
@@ -589,16 +314,6 @@ export default function EventsPage() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    asChild
-                                  >
-                                    <Link href={`/events/${event.id}`}>
-                                      <Eye className="h-4 w-4 mr-1" />
-                                      View
-                                    </Link>
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
                                     onClick={() => {
                                       setSelectedEvent(event);
                                       setEventDialogOpen(true);
@@ -619,139 +334,27 @@ export default function EventsPage() {
                           ))
                       )}
                     </div>
-                    )}
                   </TabsContent>
                   <TabsContent value="planning" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Event</TableHead>
-                              <TableHead>Client</TableHead>
-                              <TableHead>Dates</TableHead>
-                              <TableHead>Location</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {isLoading ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-                                </TableCell>
-                              </TableRow>
-                            ) : filteredEvents.filter((event) => event.status === "PLANNED").length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <p className="text-muted-foreground">No planned events found</p>
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredEvents
-                                .filter((event) => event.status === "PLANNED")
-                                .map((event) => (
-                                <TableRow key={event.id}>
-                                  <TableCell>
-                                    <Link
-                                      href={`/events/${event.id}`}
-                                      className="font-medium hover:underline hover:text-primary"
-                                    >
-                                      {event.title}
-                                    </Link>
-                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                      {event.description}
-                                    </p>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.client?.name || "—"}
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center">
-                                      <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                      <span className="text-xs">
-                                        {format(new Date(event.startDate), "MMM d, yyyy")}
-                                      </span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.location ? (
-                                      <div className="flex items-center">
-                                        <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                        <span className="text-xs line-clamp-1">{event.location}</span>
-                                      </div>
-                                    ) : (
-                                      "—"
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={cn("px-2 py-1", getStatusColor(event.status))}>
-                                      {event.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        asChild
-                                      >
-                                        <Link href={`/events/${event.id}`}>
-                                          <Eye className="h-4 w-4 mr-1" />
-                                          View
-                                        </Link>
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedEvent(event);
-                                          setEventDialogOpen(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDeleteEvent(event.id)}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : filteredEvents.filter((event) => event.status === "PLANNED").length === 0 ? (
+                      ) : events.filter((event) => event.status === "PLANNED").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No planned events found</p>
                         </div>
                       ) : (
-                        filteredEvents
+                        events
                           .filter((event) => event.status === "PLANNED")
                           .map((event) => (
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  <Link
-                                    href={`/events/${event.id}`}
-                                    className="hover:underline hover:text-primary flex items-center gap-1"
-                                  >
-                                    {event.title}
-                                  </Link>
+                                  {event.title}
                                 </CardTitle>
-                                <div className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(event.status))}>
+                                <div className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
                                 </div>
                               </CardHeader>
@@ -767,16 +370,6 @@ export default function EventsPage() {
                               <CardFooter className="flex justify-between">
                                 <div className="text-xs font-medium">{event.client?.name}</div>
                                 <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    asChild
-                                  >
-                                    <Link href={`/events/${event.id}`}>
-                                      <Eye className="h-4 w-4 mr-1" />
-                                      View
-                                    </Link>
-                                  </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -800,139 +393,27 @@ export default function EventsPage() {
                           ))
                       )}
                     </div>
-                    )}
                   </TabsContent>
                   <TabsContent value="completed" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Event</TableHead>
-                              <TableHead>Client</TableHead>
-                              <TableHead>Dates</TableHead>
-                              <TableHead>Location</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead className="text-right">Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {isLoading ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-                                </TableCell>
-                              </TableRow>
-                            ) : filteredEvents.filter((event) => event.status === "COMPLETED").length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={6} className="h-24 text-center">
-                                  <p className="text-muted-foreground">No completed events found</p>
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredEvents
-                                .filter((event) => event.status === "COMPLETED")
-                                .map((event) => (
-                                <TableRow key={event.id}>
-                                  <TableCell>
-                                    <Link
-                                      href={`/events/${event.id}`}
-                                      className="font-medium hover:underline hover:text-primary"
-                                    >
-                                      {event.title}
-                                    </Link>
-                                    <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
-                                      {event.description}
-                                    </p>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.client?.name || "—"}
-                                  </TableCell>
-                                  <TableCell>
-                                    <div className="flex items-center">
-                                      <Calendar className="h-4 w-4 mr-1 text-muted-foreground" />
-                                      <span className="text-xs">
-                                        {format(new Date(event.startDate), "MMM d, yyyy")}
-                                      </span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell>
-                                    {event.location ? (
-                                      <div className="flex items-center">
-                                        <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
-                                        <span className="text-xs line-clamp-1">{event.location}</span>
-                                      </div>
-                                    ) : (
-                                      "—"
-                                    )}
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={cn("px-2 py-1", getStatusColor(event.status))}>
-                                      {event.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <div className="flex justify-end gap-2">
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        asChild
-                                      >
-                                        <Link href={`/events/${event.id}`}>
-                                          <Eye className="h-4 w-4 mr-1" />
-                                          View
-                                        </Link>
-                                      </Button>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedEvent(event);
-                                          setEventDialogOpen(true);
-                                        }}
-                                      >
-                                        Edit
-                                      </Button>
-                                      <Button
-                                        variant="destructive"
-                                        size="sm"
-                                        onClick={() => handleDeleteEvent(event.id)}
-                                      >
-                                        Delete
-                                      </Button>
-                                    </div>
-                                  </TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    ) : (
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : filteredEvents.filter((event) => event.status === "COMPLETED").length === 0 ? (
+                      ) : events.filter((event) => event.status === "COMPLETED").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No completed events found</p>
                         </div>
                       ) : (
-                        filteredEvents
+                        events
                           .filter((event) => event.status === "COMPLETED")
                           .map((event) => (
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  <Link
-                                    href={`/events/${event.id}`}
-                                    className="hover:underline hover:text-primary flex items-center gap-1"
-                                  >
-                                    {event.title}
-                                  </Link>
+                                  {event.title}
                                 </CardTitle>
-                                <div className={cn("px-2 py-1 rounded-full text-xs font-medium", getStatusColor(event.status))}>
+                                <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
                                 </div>
                               </CardHeader>
@@ -948,16 +429,6 @@ export default function EventsPage() {
                               <CardFooter className="flex justify-between">
                                 <div className="text-xs font-medium">{event.client?.name}</div>
                                 <div className="flex gap-2">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    asChild
-                                  >
-                                    <Link href={`/events/${event.id}`}>
-                                      <Eye className="h-4 w-4 mr-1" />
-                                      View
-                                    </Link>
-                                  </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -981,7 +452,6 @@ export default function EventsPage() {
                           ))
                       )}
                     </div>
-                    )}
                   </TabsContent>
                 </Tabs>
               </div>

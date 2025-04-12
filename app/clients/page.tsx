@@ -1,10 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { ClientFormSteps } from "@/components/client-form-steps"
-
+import { useForm } from "react-hook-form"
 import { clientFormSchema, type ClientFormValues } from "./schemas/client-schema"
 import { useDebounce } from "@/lib/hooks/use-debounce"
 import { AppSidebar } from "@/components/app-sidebar"
@@ -38,16 +36,22 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Form } from "@/components/ui/form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-
-import { PlusIcon, SearchIcon, Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, MoreHorizontal, Eye, LayoutGrid, List } from "lucide-react"
+import { Checkbox } from "@/components/ui/checkbox"
+import { PlusIcon, SearchIcon, Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, MoreHorizontal, Eye } from "lucide-react"
 import { toast } from "sonner"
 import {
   DropdownMenu,
@@ -56,7 +60,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 
 interface Client {
@@ -95,10 +98,8 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 500) // 500ms debounce delay
   const [showClientDialog, setShowClientDialog] = useState(false)
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table")
   const [isEditMode, setIsEditMode] = useState(false)
   const [currentClientId, setCurrentClientId] = useState<string | null>(null)
-  const [selectedClient, setSelectedClient] = useState<ClientFormValues | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Initialize form with react-hook-form and zod validation
@@ -130,7 +131,8 @@ export default function ClientsPage() {
     const fetchClients = async () => {
       try {
         setIsLoading(true)
-        const response = await fetch('/api/clients')
+        const response = await fetch(`/api/clients${debouncedSearchQuery ? `?search=${encodeURIComponent(debouncedSearchQuery)}` : ""}`)
+        // Using encodeURIComponent to properly encode search parameters
         if (response.ok) {
           const data = await response.json()
           setClients(data)
@@ -146,27 +148,7 @@ export default function ClientsPage() {
     }
 
     fetchClients()
-  }, [])
-
-  // Filter clients based on search query
-  const filteredClients = clients.filter(client => {
-    if (!searchQuery) return true;
-
-    // Handle special search queries
-    if (searchQuery === "active:true") return client.active;
-    if (searchQuery === "active:false") return !client.active;
-
-    const query = searchQuery.toLowerCase();
-    return (
-      client.name?.toLowerCase().includes(query) ||
-      client.email?.toLowerCase().includes(query) ||
-      client.phone?.toLowerCase().includes(query) ||
-      client.address?.toLowerCase().includes(query) ||
-      client.city?.toLowerCase().includes(query) ||
-      client.country?.toLowerCase().includes(query) ||
-      client.website?.toLowerCase().includes(query)
-    );
-  }); // Only fetch when the debounced search query changes
+  }, [debouncedSearchQuery]) // Only fetch when the debounced search query changes
 
   // Handle search form submission
   const handleSearch = (e: React.FormEvent) => {
@@ -187,7 +169,7 @@ export default function ClientsPage() {
 
   // Open dialog for creating a new client
   const handleAddClient = () => {
-    const emptyClient = {
+    form.reset({
       name: "",
       email: "",
       phone: "",
@@ -197,26 +179,15 @@ export default function ClientsPage() {
       postalCode: "",
       website: "",
       active: true,
-      isForeign: false,
-      contractStart: "",
-      contractEnd: "",
-      logoUrl: "",
       contactFirstName: "",
       contactLastName: "",
       contactEmail: "",
       contactPhone: "",
       sendInvitation: true
-    };
-
-    // Reset the form
-    form.reset(emptyClient);
-
-    // Reset the selected client
-    setSelectedClient(null);
-
-    setIsEditMode(false);
-    setCurrentClientId(null);
-    setShowClientDialog(true);
+    })
+    setIsEditMode(false)
+    setCurrentClientId(null)
+    setShowClientDialog(true)
   }
 
   // Open dialog for editing an existing client
@@ -235,7 +206,7 @@ export default function ClientsPage() {
         // Get the primary contact if available
         const primaryContact = client.users && client.users.length > 0 ? client.users[0] : null
 
-        const clientData = {
+        form.reset({
           name: client.name,
           email: client.email || "",
           phone: client.phone || "",
@@ -245,7 +216,6 @@ export default function ClientsPage() {
           postalCode: client.postalCode || "",
           website: client.website || "",
           active: client.active,
-          isForeign: client.isForeign || false,
           contractStart: client.contractStart ? new Date(client.contractStart).toISOString().split('T')[0] : "",
           contractEnd: client.contractEnd ? new Date(client.contractEnd).toISOString().split('T')[0] : "",
           logoUrl: client.logoUrl || "",
@@ -254,13 +224,7 @@ export default function ClientsPage() {
           contactEmail: primaryContact?.email || "",
           contactPhone: primaryContact?.phone || "",
           sendInvitation: false
-        };
-
-        // Set the form values
-        form.reset(clientData);
-
-        // Set the selected client for the multi-step form
-        setSelectedClient(clientData);
+        })
       } else {
         const error = await response.json()
         toast.error(error.error || "Failed to fetch client details")
@@ -348,46 +312,18 @@ export default function ClientsPage() {
                       Manage your client organizations and their details
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "grid" | "table")}>
-                      <ToggleGroupItem value="grid" aria-label="Grid View">
-                        <LayoutGrid className="h-4 w-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="table" aria-label="Table View">
-                        <List className="h-4 w-4" />
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline">
-                          Filter
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[200px]">
-                        <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Status</DropdownMenuLabel>
-                        <DropdownMenuCheckboxItem
-                          checked={searchQuery === ""}
-                          onClick={() => setSearchQuery("")}
-                        >
-                          All
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={searchQuery === "active:true"}
-                          onClick={() => setSearchQuery("active:true")}
-                        >
-                          Active
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={searchQuery === "active:false"}
-                          onClick={() => setSearchQuery("active:false")}
-                        >
-                          Inactive
-                        </DropdownMenuCheckboxItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <div className="relative w-64">
+                  <Button onClick={handleAddClient}>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    Add Client
+                  </Button>
+                </div>
+              </div>
+
+              {/* Search and Filters */}
+              <div className="px-4 lg:px-6">
+                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                  <form onSubmit={handleSearch} className="flex w-full max-w-sm items-center space-x-2">
+                    <div className="relative w-full">
                       {isLoading && searchQuery !== debouncedSearchQuery ? (
                         <Loader2 className="absolute left-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
                       ) : (
@@ -402,25 +338,51 @@ export default function ClientsPage() {
                         aria-label="Search clients"
                       />
                     </div>
-                    <Button onClick={handleAddClient}>
-                      <PlusIcon className="mr-2 h-4 w-4" />
-                      Add Client
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      disabled={isLoading && searchQuery !== debouncedSearchQuery}
+                    >
+                      {isLoading && searchQuery !== debouncedSearchQuery ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Searching...
+                        </>
+                      ) : (
+                        "Search"
+                      )}
                     </Button>
+                  </form>
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto">
+                          Filter
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[200px]">
+                        <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Status</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => setSearchQuery("")}>All</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSearchQuery("active:true")}>Active</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSearchQuery("active:false")}>Inactive</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
 
-              {/* Tabs */}
+              {/* Main Content */}
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="all" className="space-y-4">
+                <Tabs defaultValue="table" className="space-y-4">
                   <TabsList>
-                    <TabsTrigger value="all">All Clients</TabsTrigger>
-                    <TabsTrigger value="active">Active</TabsTrigger>
-                    <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                    <TabsTrigger value="table">Table View</TabsTrigger>
+                    <TabsTrigger value="grid">Grid View</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="all" className="space-y-4">
-                    {/* Content based on view mode */}
-                    {viewMode === "table" ? (
+
+                  {/* Table View */}
+                  <TabsContent value="table" className="space-y-4">
                     <Card>
                       <CardContent className="p-0">
                         <ScrollArea className="h-[calc(100vh-280px)]">
@@ -428,7 +390,7 @@ export default function ClientsPage() {
                             <div className="flex justify-center items-center py-8">
                               <Loader2 className="h-8 w-8 animate-spin text-primary" />
                             </div>
-                          ) : filteredClients.length === 0 ? (
+                          ) : clients.length === 0 ? (
                             <div className="text-center py-8 text-muted-foreground">
                               No clients found. Add a new client to get started.
                             </div>
@@ -447,7 +409,7 @@ export default function ClientsPage() {
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {filteredClients.map((client) => (
+                                {clients.map((client) => (
                                   <TableRow key={client.id}>
                                     <TableCell>
                                       <div className="flex items-center gap-3">
@@ -559,19 +521,21 @@ export default function ClientsPage() {
                         </ScrollArea>
                       </CardContent>
                     </Card>
-                ) : (
-                  <div className="space-y-4">
+                  </TabsContent>
+
+                  {/* Grid View */}
+                  <TabsContent value="grid" className="space-y-4">
                     {isLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                       </div>
-                    ) : filteredClients.length === 0 ? (
+                    ) : clients.length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         No clients found. Add a new client to get started.
                       </div>
                     ) : (
                       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredClients.map((client) => (
+                        {clients.map((client) => (
                           <Card key={client.id} className="overflow-hidden">
                             <CardHeader className="p-4 pb-2">
                               <div className="flex items-start justify-between">
@@ -689,496 +653,6 @@ export default function ClientsPage() {
                         ))}
                       </div>
                     )}
-                  </div>
-                    )}
-                  </TabsContent>
-
-                  <TabsContent value="active" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <Card>
-                        <CardContent className="p-0">
-                          <ScrollArea className="h-[calc(100vh-280px)]">
-                            {isLoading ? (
-                              <div className="flex justify-center items-center py-8">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                              </div>
-                            ) : filteredClients.filter(client => client.active).length === 0 ? (
-                              <div className="text-center py-8 text-muted-foreground">
-                                No active clients found.
-                              </div>
-                            ) : (
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Client</TableHead>
-                                    <TableHead>Contact</TableHead>
-                                    <TableHead>Location</TableHead>
-                                    <TableHead className="text-center">Users</TableHead>
-                                    <TableHead className="text-center">Bookings</TableHead>
-                                    <TableHead className="text-center">Events</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {filteredClients.filter(client => client.active).map((client) => (
-                                    <TableRow key={client.id}>
-                                      <TableCell>
-                                        <div className="flex items-center gap-3">
-                                          <Avatar className="h-9 w-9">
-                                            {client.logoUrl ? (
-                                              <AvatarImage src={client.logoUrl} alt={client.name} />
-                                            ) : null}
-                                            <AvatarFallback className="bg-primary/10 text-primary">
-                                              {client.name.substring(0, 2).toUpperCase()}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          <a
-                                            href={`/clients/${client.id}`}
-                                            className="font-medium hover:underline hover:text-primary transition-colors"
-                                          >
-                                            {client.name}
-                                          </a>
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>
-                                        {client.email && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <Mail className="mr-1 h-3 w-3" />
-                                            <span>{client.email}</span>
-                                          </div>
-                                        )}
-                                        {client.phone && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <Phone className="mr-1 h-3 w-3" />
-                                            <span>{client.phone}</span>
-                                          </div>
-                                        )}
-                                      </TableCell>
-                                      <TableCell>
-                                        {(client.city || client.country) && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <MapPin className="mr-1 h-3 w-3" />
-                                            <span>
-                                              {client.city && client.country
-                                                ? `${client.city}, ${client.country}`
-                                                : client.city || client.country}
-                                            </span>
-                                          </div>
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-950">
-                                          {client._count?.users || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-purple-50 text-purple-700 hover:bg-purple-50 dark:bg-purple-950 dark:text-purple-300 dark:hover:bg-purple-950">
-                                          {client._count?.bookings || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-950">
-                                          {client._count?.events || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Badge
-                                          variant={client.active ? "success" : "destructive"}
-                                          className={client.active
-                                            ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-900"
-                                            : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-900"}
-                                        >
-                                          {client.active ? "Active" : "Inactive"}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        <div className="flex justify-end items-center space-x-2">
-                                          <Button variant="ghost" size="icon" asChild>
-                                            <a href={`/clients/${client.id}`} title="View client details">
-                                              <Eye className="h-4 w-4" />
-                                              <span className="sr-only">View client</span>
-                                            </a>
-                                          </Button>
-                                          <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                              <Button variant="ghost" size="icon">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Open menu</span>
-                                              </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                              <DropdownMenuItem onClick={() => handleEditClient(client.id)}>Edit</DropdownMenuItem>
-                                              <DropdownMenuItem onClick={() => handleDeleteClient(client.id)}>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                          </DropdownMenu>
-                                        </div>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            )}
-                          </ScrollArea>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <div className="space-y-4">
-                        {isLoading ? (
-                          <div className="flex justify-center items-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                          </div>
-                        ) : filteredClients.filter(client => client.active).length === 0 ? (
-                          <div className="text-center py-8 text-muted-foreground">
-                            No active clients found.
-                          </div>
-                        ) : (
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {filteredClients.filter(client => client.active).map((client) => (
-                              <Card key={client.id} className="overflow-hidden">
-                                <CardHeader className="p-4 pb-2">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <Avatar className="h-9 w-9">
-                                        {client.logoUrl ? (
-                                          <AvatarImage src={client.logoUrl} alt={client.name} />
-                                        ) : null}
-                                        <AvatarFallback className="bg-primary/10 text-primary">
-                                          {client.name.substring(0, 2).toUpperCase()}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <div>
-                                        <CardTitle className="text-base">
-                                          <a
-                                            href={`/clients/${client.id}`}
-                                            className="hover:underline hover:text-primary transition-colors"
-                                          >
-                                            {client.name}
-                                          </a>
-                                        </CardTitle>
-                                        {client.website && (
-                                          <a
-                                            href={client.website.startsWith('http') ? client.website : `https://${client.website}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs text-muted-foreground flex items-center hover:underline"
-                                          >
-                                            {client.website}
-                                            <ExternalLink className="ml-1 h-3 w-3" />
-                                          </a>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <Badge
-                                      variant={client.active ? "success" : "destructive"}
-                                      className={client.active
-                                        ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-900"
-                                        : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-900"}
-                                    >
-                                      {client.active ? "Active" : "Inactive"}
-                                    </Badge>
-                                  </div>
-                                </CardHeader>
-                                <CardContent className="p-4 pt-2">
-                                  <div className="flex flex-col gap-2">
-                                    {(client.city || client.country) && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <MapPin className="mr-2 h-4 w-4" />
-                                        <span>
-                                          {client.city && client.country
-                                            ? `${client.city}, ${client.country}`
-                                            : client.city || client.country}
-                                        </span>
-                                      </div>
-                                    )}
-                                    {client.email && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <Mail className="mr-2 h-4 w-4" />
-                                        <span>{client.email}</span>
-                                      </div>
-                                    )}
-                                    {client.phone && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <Phone className="mr-2 h-4 w-4" />
-                                        <span>{client.phone}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </CardContent>
-                                <CardFooter className="p-4 pt-0 flex justify-between">
-                                  <div className="flex space-x-2">
-                                    <Button variant="outline" size="sm" asChild>
-                                      <a href={`/clients/${client.id}`}>
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        View Details
-                                      </a>
-                                    </Button>
-                                  </div>
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="icon">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Open menu</span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      <DropdownMenuItem onClick={() => handleEditClient(client.id)}>Edit</DropdownMenuItem>
-                                      <DropdownMenuItem onClick={() => handleDeleteClient(client.id)}>Delete</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </CardFooter>
-                              </Card>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </TabsContent>
-
-                  <TabsContent value="inactive" className="space-y-4">
-                    {viewMode === "table" ? (
-                      <Card>
-                        <CardContent className="p-0">
-                          <ScrollArea className="h-[calc(100vh-280px)]">
-                            {isLoading ? (
-                              <div className="flex justify-center items-center py-8">
-                                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                              </div>
-                            ) : filteredClients.filter(client => !client.active).length === 0 ? (
-                              <div className="text-center py-8 text-muted-foreground">
-                                No inactive clients found.
-                              </div>
-                            ) : (
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead>Client</TableHead>
-                                    <TableHead>Contact</TableHead>
-                                    <TableHead>Location</TableHead>
-                                    <TableHead className="text-center">Users</TableHead>
-                                    <TableHead className="text-center">Bookings</TableHead>
-                                    <TableHead className="text-center">Events</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {filteredClients.filter(client => !client.active).map((client) => (
-                                    <TableRow key={client.id}>
-                                      <TableCell>
-                                        <div className="flex items-center gap-3">
-                                          <Avatar className="h-9 w-9">
-                                            {client.logoUrl ? (
-                                              <AvatarImage src={client.logoUrl} alt={client.name} />
-                                            ) : null}
-                                            <AvatarFallback className="bg-primary/10 text-primary">
-                                              {client.name.substring(0, 2).toUpperCase()}
-                                            </AvatarFallback>
-                                          </Avatar>
-                                          <a
-                                            href={`/clients/${client.id}`}
-                                            className="font-medium hover:underline hover:text-primary transition-colors"
-                                          >
-                                            {client.name}
-                                          </a>
-                                        </div>
-                                      </TableCell>
-                                      <TableCell>
-                                        {client.email && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <Mail className="mr-1 h-3 w-3" />
-                                            <span>{client.email}</span>
-                                          </div>
-                                        )}
-                                        {client.phone && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <Phone className="mr-1 h-3 w-3" />
-                                            <span>{client.phone}</span>
-                                          </div>
-                                        )}
-                                      </TableCell>
-                                      <TableCell>
-                                        {(client.city || client.country) && (
-                                          <div className="flex items-center text-sm text-muted-foreground">
-                                            <MapPin className="mr-1 h-3 w-3" />
-                                            <span>
-                                              {client.city && client.country
-                                                ? `${client.city}, ${client.country}`
-                                                : client.city || client.country}
-                                            </span>
-                                          </div>
-                                        )}
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-blue-50 text-blue-700 hover:bg-blue-50 dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-950">
-                                          {client._count?.users || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-purple-50 text-purple-700 hover:bg-purple-50 dark:bg-purple-950 dark:text-purple-300 dark:hover:bg-purple-950">
-                                          {client._count?.bookings || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-center">
-                                        <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-50 dark:bg-amber-950 dark:text-amber-300 dark:hover:bg-amber-950">
-                                          {client._count?.events || 0}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Badge
-                                          variant={client.active ? "success" : "destructive"}
-                                          className={client.active
-                                            ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-900"
-                                            : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-900"}
-                                        >
-                                          {client.active ? "Active" : "Inactive"}
-                                        </Badge>
-                                      </TableCell>
-                                      <TableCell className="text-right">
-                                        <div className="flex justify-end items-center space-x-2">
-                                          <Button variant="ghost" size="icon" asChild>
-                                            <a href={`/clients/${client.id}`} title="View client details">
-                                              <Eye className="h-4 w-4" />
-                                              <span className="sr-only">View client</span>
-                                            </a>
-                                          </Button>
-                                          <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                              <Button variant="ghost" size="icon">
-                                                <MoreHorizontal className="h-4 w-4" />
-                                                <span className="sr-only">Open menu</span>
-                                              </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                              <DropdownMenuItem onClick={() => handleEditClient(client.id)}>Edit</DropdownMenuItem>
-                                              <DropdownMenuItem onClick={() => handleDeleteClient(client.id)}>Delete</DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                          </DropdownMenu>
-                                        </div>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            )}
-                          </ScrollArea>
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <div className="space-y-4">
-                        {isLoading ? (
-                          <div className="flex justify-center items-center py-8">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                          </div>
-                        ) : filteredClients.filter(client => !client.active).length === 0 ? (
-                          <div className="text-center py-8 text-muted-foreground">
-                            No inactive clients found.
-                          </div>
-                        ) : (
-                          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {filteredClients.filter(client => !client.active).map((client) => (
-                              <Card key={client.id} className="overflow-hidden">
-                                <CardHeader className="p-4 pb-2">
-                                  <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <Avatar className="h-9 w-9">
-                                        {client.logoUrl ? (
-                                          <AvatarImage src={client.logoUrl} alt={client.name} />
-                                        ) : null}
-                                        <AvatarFallback className="bg-primary/10 text-primary">
-                                          {client.name.substring(0, 2).toUpperCase()}
-                                        </AvatarFallback>
-                                      </Avatar>
-                                      <div>
-                                        <CardTitle className="text-base">
-                                          <a
-                                            href={`/clients/${client.id}`}
-                                            className="hover:underline hover:text-primary transition-colors"
-                                          >
-                                            {client.name}
-                                          </a>
-                                        </CardTitle>
-                                        {client.website && (
-                                          <a
-                                            href={client.website.startsWith('http') ? client.website : `https://${client.website}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="text-xs text-muted-foreground flex items-center hover:underline"
-                                          >
-                                            {client.website}
-                                            <ExternalLink className="ml-1 h-3 w-3" />
-                                          </a>
-                                        )}
-                                      </div>
-                                    </div>
-                                    <Badge
-                                      variant={client.active ? "success" : "destructive"}
-                                      className={client.active
-                                        ? "bg-green-100 text-green-800 hover:bg-green-100 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-900"
-                                        : "bg-red-100 text-red-800 hover:bg-red-100 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-900"}
-                                    >
-                                      {client.active ? "Active" : "Inactive"}
-                                    </Badge>
-                                  </div>
-                                </CardHeader>
-                                <CardContent className="p-4 pt-2">
-                                  <div className="flex flex-col gap-2">
-                                    {(client.city || client.country) && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <MapPin className="mr-2 h-4 w-4" />
-                                        <span>
-                                          {client.city && client.country
-                                            ? `${client.city}, ${client.country}`
-                                            : client.city || client.country}
-                                        </span>
-                                      </div>
-                                    )}
-                                    {client.email && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <Mail className="mr-2 h-4 w-4" />
-                                        <span>{client.email}</span>
-                                      </div>
-                                    )}
-                                    {client.phone && (
-                                      <div className="flex items-center text-sm text-muted-foreground">
-                                        <Phone className="mr-2 h-4 w-4" />
-                                        <span>{client.phone}</span>
-                                      </div>
-                                    )}
-                                  </div>
-                                </CardContent>
-                                <CardFooter className="p-4 pt-0 flex justify-between">
-                                  <div className="flex space-x-2">
-                                    <Button variant="outline" size="sm" asChild>
-                                      <a href={`/clients/${client.id}`}>
-                                        <Eye className="mr-2 h-4 w-4" />
-                                        View Details
-                                      </a>
-                                    </Button>
-                                  </div>
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button variant="ghost" size="icon">
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">Open menu</span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                      <DropdownMenuItem onClick={() => handleEditClient(client.id)}>Edit</DropdownMenuItem>
-                                      <DropdownMenuItem onClick={() => handleDeleteClient(client.id)}>Delete</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </CardFooter>
-                              </Card>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </TabsContent>
                 </Tabs>
               </div>
@@ -1189,13 +663,13 @@ export default function ClientsPage() {
 
       {/* Client Dialog (Add/Edit) */}
       <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-        <DialogContent className="sm:max-w-[650px]">
+        <DialogContent className="sm:max-w-[550px]">
           <DialogHeader>
             <DialogTitle>{isEditMode ? "Edit Client" : "Add New Client"}</DialogTitle>
             <DialogDescription>
               {isEditMode
                 ? "Update the details for this client organization."
-                : "Enter the details for the new client organization."}
+                : "Enter the details for the new client organization."} Click save when you're done.
             </DialogDescription>
           </DialogHeader>
           {isSubmitting && isEditMode ? (
@@ -1204,12 +678,344 @@ export default function ClientsPage() {
               <p className="text-muted-foreground">Loading client details...</p>
             </div>
           ) : (
-            <ClientFormSteps
-              defaultValues={selectedClient || undefined}
-              onSubmit={onSubmit}
-              onCancel={() => setShowClientDialog(false)}
-              isEditMode={isEditMode}
-            />
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid gap-6 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organization Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Acme Inc." {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="website"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Website</FormLabel>
+                        <FormControl>
+                          <Input placeholder="www.example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Separator />
+                <h3 className="text-sm font-medium">Organization Contact Information</h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organization Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="info@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Organization Phone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+1 (555) 123-4567" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Separator />
+                <h3 className="text-sm font-medium">Primary Contact Person</h3>
+                <p className="text-xs text-muted-foreground mb-2">
+                  {isEditMode
+                    ? "Update the primary contact information"
+                    : "This person will receive an invitation to create an account"}
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="contactFirstName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="John" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactLastName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Doe" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="contactEmail"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="john.doe@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contactPhone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+1 (555) 123-4567" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {!isEditMode && (
+                  <FormField
+                    control={form.control}
+                    name="sendInvitation"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-sm font-normal cursor-pointer">
+                            Send invitation email to create an account
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <Separator />
+                <h3 className="text-sm font-medium">Contract Information</h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="contractStart"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contract Start Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contractEnd"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contract End Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Active client
+                        </FormLabel>
+                        <FormDescription>
+                          Inactive clients won't appear in dropdown menus for new bookings
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+
+                <Separator />
+                <h3 className="text-sm font-medium">Address</h3>
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Street Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Business St." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>City</FormLabel>
+                        <FormControl>
+                          <Input placeholder="New York" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="postalCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Postal Code</FormLabel>
+                        <FormControl>
+                          <Input placeholder="10001" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="country"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Country</FormLabel>
+                        <FormControl>
+                          <Input placeholder="United States" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <Separator />
+                <h3 className="text-sm font-medium">Contract Information</h3>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="contractStart"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contract Start Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="contractEnd"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contract End Date</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="active"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Active client
+                        </FormLabel>
+                        <FormDescription>
+                          Inactive clients won't appear in dropdown menus for new bookings
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowClientDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {isEditMode ? "Updating..." : "Creating..."}
+                    </>
+                  ) : (
+                    isEditMode ? "Update Client" : "Create Client"
+                  )}
+                </Button>
+              </DialogFooter>
+              </form>
+            </Form>
           )}
         </DialogContent>
       </Dialog>

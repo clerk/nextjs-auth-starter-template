@@ -14,6 +14,24 @@ export const eventFormSchema = z.object({
   location: z.string().min(1, "Location is required"),
   status: z.enum(EVENT_STATUSES),
   pricingType: z.enum(EVENT_PRICING_TYPES),
-  fixedPrice: z.number().optional(),
+  fixedPrice: z.number()
+    .refine(val => val > 0, {
+      message: "Fixed price must be greater than zero",
+      path: ["fixedPrice"],
+    })
+    .optional()
+    .or(z.literal(0)),
   notes: z.string().optional(),
-});
+}).refine(
+  (data) => {
+    // If pricing type is FIXED_PRICE, fixedPrice must be greater than 0
+    if (data.pricingType === "FIXED_PRICE" && (!data.fixedPrice || data.fixedPrice <= 0)) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: "Fixed price is required and must be greater than zero when pricing type is Fixed Price",
+    path: ["fixedPrice"],
+  }
+);

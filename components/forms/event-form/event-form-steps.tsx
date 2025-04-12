@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -18,9 +18,18 @@ import { EventPricingStep } from "./steps/pricing-step"
 
 import type { EventFormValues } from "./types"
 import { Dialog } from "@/components/ui/dialog"
-import { ClientFormSteps } from "@/components/client-form-steps"
-import { ClientFormValues } from "@/app/clients/schemas/client-schema"
+import { ClientFormSteps } from "./client-form-steps"
 import { toast } from "sonner"
+
+// Define ClientFormValues type based on the simplified schema in client-form-steps.tsx
+type ClientFormValues = {
+  name: string;
+  email?: string;
+  phone?: string;
+  contactFirstName: string;
+  contactLastName: string;
+  contactEmail: string;
+}
 
 interface EventFormStepsProps {
   defaultValues?: Partial<EventFormValues>
@@ -78,9 +87,9 @@ export function EventFormSteps({
   }
 
   // Fetch clients on component mount
-  useState(() => {
+  useEffect(() => {
     fetchClients()
-  })
+  }, [])
 
   const steps = [
     { title: "Basic Info", icon: <Calendar className="h-4 w-4" /> },
@@ -94,24 +103,41 @@ export function EventFormSteps({
 
   const validateCurrentStep = async () => {
     let isValid = false
-    
+
     switch (step) {
       case 0: // Basic Info
-        isValid = await form.trigger(["title", "description", "startDate", "endDate"])
+        isValid = await form.trigger(["title", "startDate", "endDate"])
         break
       case 1: // Client
         isValid = await form.trigger(["clientId"])
         break
       case 2: // Location
         isValid = await form.trigger(["location"])
+        // Also validate pricing fields before allowing to proceed to pricing step
+        if (isValid) {
+          isValid = await form.trigger(["status", "pricingType"])
+          // Only validate fixedPrice if pricingType is FIXED_PRICE
+          if (form.getValues("pricingType") === "FIXED_PRICE") {
+            isValid = await form.trigger(["fixedPrice"])
+          }
+        }
         break
       case 3: // Pricing
-        isValid = await form.trigger(["status", "pricingType", "fixedPrice", "notes"])
+        isValid = await form.trigger(["status", "pricingType", "notes"])
+        // Only validate fixedPrice if pricingType is FIXED_PRICE
+        if (isValid && form.getValues("pricingType") === "FIXED_PRICE") {
+          isValid = await form.trigger(["fixedPrice"])
+        }
         break
       default:
         isValid = false
     }
-    
+
+    if (!isValid) {
+      // Show a toast message to inform the user about validation errors
+      toast.error("Please fill in all required fields before proceeding")
+    }
+
     return isValid
   }
 
@@ -129,11 +155,25 @@ export function EventFormSteps({
   }
 
   const handleSubmit = async (values: EventFormValues) => {
+    // Validate all fields before submitting
+    const isValid = await form.trigger()
+
+    if (!isValid) {
+      toast.error("Please fill in all required fields before submitting")
+      return
+    }
+
     setIsSubmitting(true)
     try {
+      // If pricing type is not FIXED_PRICE, ensure fixedPrice is 0
+      if (values.pricingType !== "FIXED_PRICE") {
+        values.fixedPrice = 0
+      }
+
       await onSubmit(values)
     } catch (error) {
       console.error("Error submitting form:", error)
+      toast.error("An error occurred while submitting the form")
     } finally {
       setIsSubmitting(false)
     }
@@ -151,13 +191,13 @@ export function EventFormSteps({
 
       if (response.ok) {
         const newClient = await response.json()
-        
+
         // Update clients list
         await fetchClients()
-        
+
         // Set the new client as selected
         form.setValue('clientId', newClient.id)
-        
+
         toast.success("Client created successfully")
         setShowClientDialog(false)
       } else {
@@ -176,13 +216,13 @@ export function EventFormSteps({
       <div className="space-y-2">
         <div className="flex justify-between">
           {steps.map((s, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`flex items-center ${i <= step ? "text-primary" : "text-muted-foreground"}`}
             >
-              <div 
-                className={`flex items-center justify-center w-8 h-8 rounded-full mr-2 
-                  ${i < step ? "bg-primary text-primary-foreground" : 
+              <div
+                className={`flex items-center justify-center w-8 h-8 rounded-full mr-2
+                  ${i < step ? "bg-primary text-primary-foreground" :
                     i === step ? "border-2 border-primary" : "border-2 border-muted"}`}
               >
                 {i < step ? <Check className="h-4 w-4" /> : s.icon}
@@ -198,11 +238,11 @@ export function EventFormSteps({
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           {step === 0 && <EventBasicInfoStep form={form} />}
           {step === 1 && (
-            <EventClientStep 
-              form={form} 
-              clients={clients} 
-              isLoading={isLoadingClients} 
-              onAddClient={() => setShowClientDialog(true)} 
+            <EventClientStep
+              form={form}
+              clients={clients}
+              isLoading={isLoadingClients}
+              onAddClient={() => setShowClientDialog(true)}
             />
           )}
           {step === 2 && <EventLocationStep form={form} />}
@@ -224,7 +264,7 @@ export function EventFormSteps({
                 </>
               )}
             </Button>
-            
+
             {step < totalSteps - 1 ? (
               <Button type="button" onClick={handleNext}>
                 Next
@@ -246,14 +286,16 @@ export function EventFormSteps({
         </form>
       </Form>
 
-      {/* Client Dialog */}
-      <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-        <ClientFormSteps
-          onSubmit={handleAddClient}
-          onCancel={() => setShowClientDialog(false)}
-          isEditMode={false}
-        />
-      </Dialog>
+      {/* Client Dialog - Only shown when the user clicks the "+" button */}
+      {showClientDialog && (
+        <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
+          <ClientFormSteps
+            onSubmit={handleAddClient}
+            onCancel={() => setShowClientDialog(false)}
+            isEditMode={false}
+          />
+        </Dialog>
+      )}
     </div>
   )
 }
