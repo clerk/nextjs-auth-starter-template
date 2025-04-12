@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import type { Event, EventFormValues } from "@/components/forms/event-form/types";
 import { EventDialog } from "@/components/forms/event-form/event-dialog";
-import { PlusIcon, Loader2 } from "lucide-react";
+import { PlusIcon, Loader2, Eye } from "lucide-react";
+import Link from "next/link";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -293,7 +294,12 @@ export default function EventsPage() {
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  {event.title}
+                                  <Link
+                                    href={`/events/${event.id}`}
+                                    className="hover:underline hover:text-primary flex items-center gap-1"
+                                  >
+                                    {event.title}
+                                  </Link>
                                 </CardTitle>
                                 <div className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
@@ -311,6 +317,16 @@ export default function EventsPage() {
                               <CardFooter className="flex justify-between">
                                 <div className="text-xs font-medium">{event.client?.name}</div>
                                 <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    asChild
+                                  >
+                                    <Link href={`/events/${event.id}`}>
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      View
+                                    </Link>
+                                  </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -352,7 +368,12 @@ export default function EventsPage() {
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  {event.title}
+                                  <Link
+                                    href={`/events/${event.id}`}
+                                    className="hover:underline hover:text-primary flex items-center gap-1"
+                                  >
+                                    {event.title}
+                                  </Link>
                                 </CardTitle>
                                 <div className="bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
@@ -370,6 +391,16 @@ export default function EventsPage() {
                               <CardFooter className="flex justify-between">
                                 <div className="text-xs font-medium">{event.client?.name}</div>
                                 <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    asChild
+                                  >
+                                    <Link href={`/events/${event.id}`}>
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      View
+                                    </Link>
+                                  </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
@@ -411,7 +442,12 @@ export default function EventsPage() {
                             <Card key={event.id}>
                               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
-                                  {event.title}
+                                  <Link
+                                    href={`/events/${event.id}`}
+                                    className="hover:underline hover:text-primary flex items-center gap-1"
+                                  >
+                                    {event.title}
+                                  </Link>
                                 </CardTitle>
                                 <div className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300 px-2 py-1 rounded-full text-xs font-medium">
                                   {event.status}
@@ -429,6 +465,16 @@ export default function EventsPage() {
                               <CardFooter className="flex justify-between">
                                 <div className="text-xs font-medium">{event.client?.name}</div>
                                 <div className="flex gap-2">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    asChild
+                                  >
+                                    <Link href={`/events/${event.id}`}>
+                                      <Eye className="h-4 w-4 mr-1" />
+                                      View
+                                    </Link>
+                                  </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
