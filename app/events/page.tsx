@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import type { Event, EventFormValues } from "@/components/forms/event-form/types";
 import { EventDialog } from "@/components/forms/event-form/event-dialog";
-import { PlusIcon, Loader2, Eye, LayoutGrid, List, Calendar, MapPin, Building2 } from "lucide-react";
+import { PlusIcon, Loader2, Eye, LayoutGrid, List, Calendar, MapPin, Building2, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 
@@ -47,6 +48,7 @@ export default function EventsPage() {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Fetch events from the API
   useEffect(() => {
@@ -77,6 +79,19 @@ export default function EventsPage() {
 
     fetchEvents();
   }, [filterStatus]);
+
+  // Filter events based on search query
+  const filteredEvents = events.filter(event => {
+    if (!searchQuery) return true;
+
+    const query = searchQuery.toLowerCase();
+    return (
+      event.title?.toLowerCase().includes(query) ||
+      event.description?.toLowerCase().includes(query) ||
+      event.location?.toLowerCase().includes(query) ||
+      event.client?.name?.toLowerCase().includes(query)
+    );
+  });
 
   // Handle event creation/update
   const handleEventSubmit = async (data: EventFormValues) => {
@@ -226,6 +241,17 @@ export default function EventsPage() {
                         </DropdownMenuCheckboxItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    <div className="relative w-64">
+                      <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="search"
+                        placeholder="Search events..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="w-full pl-8"
+                        aria-label="Search events"
+                      />
+                    </div>
                     <Button onClick={() => {
                       setSelectedEvent(null);
                       setEventDialogOpen(true);
@@ -270,14 +296,14 @@ export default function EventsPage() {
                                   <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
                                 </TableCell>
                               </TableRow>
-                            ) : events.length === 0 ? (
+                            ) : filteredEvents.length === 0 ? (
                               <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center">
                                   <p className="text-muted-foreground">No events found</p>
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              events.map((event) => (
+                              filteredEvents.map((event) => (
                                 <TableRow key={event.id}>
                                   <TableCell>
                                     <Link
@@ -359,12 +385,12 @@ export default function EventsPage() {
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : events.length === 0 ? (
+                      ) : filteredEvents.length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No events found</p>
                         </div>
                       ) : (
-                        events.map((event) => (
+                        filteredEvents.map((event) => (
                           <Card key={event.id}>
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                               <CardTitle className="text-sm font-medium">
@@ -435,14 +461,14 @@ export default function EventsPage() {
                                   <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
                                 </TableCell>
                               </TableRow>
-                            ) : events.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
+                            ) : filteredEvents.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
                               <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center">
                                   <p className="text-muted-foreground">No in-progress events found</p>
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              events
+                              filteredEvents
                                 .filter((event) => event.status === "IN_PROGRESS")
                                 .map((event) => (
                                 <TableRow key={event.id}>
@@ -526,12 +552,12 @@ export default function EventsPage() {
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : events.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
+                      ) : filteredEvents.filter((event) => event.status === "IN_PROGRESS").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No in-progress events found</p>
                         </div>
                       ) : (
-                        events
+                        filteredEvents
                           .filter((event) => event.status === "IN_PROGRESS")
                           .map((event) => (
                             <Card key={event.id}>
@@ -616,14 +642,14 @@ export default function EventsPage() {
                                   <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
                                 </TableCell>
                               </TableRow>
-                            ) : events.filter((event) => event.status === "PLANNED").length === 0 ? (
+                            ) : filteredEvents.filter((event) => event.status === "PLANNED").length === 0 ? (
                               <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center">
                                   <p className="text-muted-foreground">No planned events found</p>
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              events
+                              filteredEvents
                                 .filter((event) => event.status === "PLANNED")
                                 .map((event) => (
                                 <TableRow key={event.id}>
@@ -707,12 +733,12 @@ export default function EventsPage() {
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : events.filter((event) => event.status === "PLANNED").length === 0 ? (
+                      ) : filteredEvents.filter((event) => event.status === "PLANNED").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No planned events found</p>
                         </div>
                       ) : (
-                        events
+                        filteredEvents
                           .filter((event) => event.status === "PLANNED")
                           .map((event) => (
                             <Card key={event.id}>
@@ -797,14 +823,14 @@ export default function EventsPage() {
                                   <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
                                 </TableCell>
                               </TableRow>
-                            ) : events.filter((event) => event.status === "COMPLETED").length === 0 ? (
+                            ) : filteredEvents.filter((event) => event.status === "COMPLETED").length === 0 ? (
                               <TableRow>
                                 <TableCell colSpan={6} className="h-24 text-center">
                                   <p className="text-muted-foreground">No completed events found</p>
                                 </TableCell>
                               </TableRow>
                             ) : (
-                              events
+                              filteredEvents
                                 .filter((event) => event.status === "COMPLETED")
                                 .map((event) => (
                                 <TableRow key={event.id}>
@@ -888,12 +914,12 @@ export default function EventsPage() {
                         <div className="flex justify-center items-center h-40">
                           <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
-                      ) : events.filter((event) => event.status === "COMPLETED").length === 0 ? (
+                      ) : filteredEvents.filter((event) => event.status === "COMPLETED").length === 0 ? (
                         <div className="flex justify-center items-center h-40">
                           <p className="text-muted-foreground">No completed events found</p>
                         </div>
                       ) : (
-                        events
+                        filteredEvents
                           .filter((event) => event.status === "COMPLETED")
                           .map((event) => (
                             <Card key={event.id}>
