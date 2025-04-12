@@ -52,6 +52,7 @@ export function ClientFormSteps({
       contractStart: "",
       contractEnd: "",
       active: true,
+      isForeign: false,
       sendInvitation: true,
     },
     mode: "onChange",
@@ -69,7 +70,7 @@ export function ClientFormSteps({
 
   const validateCurrentStep = async () => {
     let isValid = false
-    
+
     switch (step) {
       case 0: // Basic Info
         isValid = await form.trigger(["name", "email", "phone", "website"])
@@ -78,7 +79,7 @@ export function ClientFormSteps({
         isValid = await form.trigger(["contactFirstName", "contactLastName", "contactEmail", "contactPhone", "sendInvitation"])
         break
       case 2: // Address
-        isValid = await form.trigger(["address", "city", "postalCode", "country"])
+        isValid = await form.trigger(["address", "city", "postalCode", "country", "isForeign"])
         break
       case 3: // Contract
         isValid = await form.trigger(["contractStart", "contractEnd", "active"])
@@ -86,7 +87,7 @@ export function ClientFormSteps({
       default:
         isValid = false
     }
-    
+
     return isValid
   }
 
@@ -120,13 +121,13 @@ export function ClientFormSteps({
       <div className="space-y-2">
         <div className="flex justify-between">
           {steps.map((s, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className={`flex items-center ${i <= step ? "text-primary" : "text-muted-foreground"}`}
             >
-              <div 
-                className={`flex items-center justify-center w-8 h-8 rounded-full mr-2 
-                  ${i < step ? "bg-primary text-primary-foreground" : 
+              <div
+                className={`flex items-center justify-center w-8 h-8 rounded-full mr-2
+                  ${i < step ? "bg-primary text-primary-foreground" :
                     i === step ? "border-2 border-primary" : "border-2 border-muted"}`}
               >
                 {i < step ? <Check className="h-4 w-4" /> : s.icon}
@@ -161,7 +162,7 @@ export function ClientFormSteps({
                 </>
               )}
             </Button>
-            
+
             {step < totalSteps - 1 ? (
               <Button type="button" onClick={handleNext}>
                 Next

@@ -2,7 +2,7 @@
 
 import { UseFormReturn } from "react-hook-form"
 import { z } from "zod"
-import { clientSchema } from "@/app/clients/schemas/client-schema"
+import { clientFormSchema } from "@/app/clients/schemas/client-schema"
 import {
   FormControl,
   FormField,
@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { Checkbox } from "@/components/ui/checkbox"
 
-type ClientFormValues = z.infer<typeof clientSchema>
+type ClientFormValues = z.infer<typeof clientFormSchema>
 
 interface ClientContactStepProps {
   form: UseFormReturn<ClientFormValues>

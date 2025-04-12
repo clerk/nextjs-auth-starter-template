@@ -11,6 +11,7 @@ export const clientFormSchema = z.object({
   postalCode: z.string().optional().or(z.literal("")),
   website: z.string().optional().or(z.literal("")),
   active: z.boolean().default(true),
+  isForeign: z.boolean().default(false),
   contractStart: z.string().optional().or(z.literal("")),
   contractEnd: z.string().optional().or(z.literal("")),
   logoUrl: z.string().optional().or(z.literal("")),
