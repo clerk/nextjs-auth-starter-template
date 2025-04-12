@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { EventForm } from "./event-form";
+import { EventFormSteps } from "./event-form-steps";
 import type { EventFormValues } from "./types";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -81,7 +81,7 @@ export function EventDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>
             {defaultValues ? "Edit Event" : "Create New Event"}
@@ -92,7 +92,12 @@ export function EventDialog({
               : "Fill in the details to create a new event."}
           </DialogDescription>
         </DialogHeader>
-        <EventForm onSubmit={handleSubmit} defaultValues={defaultValues} />
+        <EventFormSteps
+          onSubmit={handleSubmit}
+          defaultValues={defaultValues}
+          onCancel={() => onOpenChange(false)}
+          isEditMode={!!defaultValues}
+        />
       </DialogContent>
     </Dialog>
   );
