@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo, useRef } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -50,34 +50,36 @@ export function EventFormSteps({
   const [clients, setClients] = useState<{ id: string; name: string }[]>([])
   const [isLoadingClients, setIsLoadingClients] = useState(true)
 
-  // Process default values to ensure dates are Date objects
-  const processedDefaultValues = defaultValues
-    ? {
-        ...defaultValues,
-        // Convert string dates to Date objects if they exist
-        startDate: defaultValues.startDate instanceof Date
-          ? defaultValues.startDate
-          : typeof defaultValues.startDate === 'string'
-            ? new Date(defaultValues.startDate)
-            : new Date(),
-        endDate: defaultValues.endDate instanceof Date
-          ? defaultValues.endDate
-          : typeof defaultValues.endDate === 'string'
-            ? new Date(defaultValues.endDate)
-            : new Date(),
-      }
-    : {
-        title: "",
-        description: "",
-        clientId: "",
-        startDate: new Date(),
-        endDate: new Date(),
-        location: "",
-        status: "PLANNED",
-        pricingType: "MISSION_BASED",
-        fixedPrice: 0,
-        notes: "",
-      }
+  // Process default values to ensure dates are Date objects using useMemo to prevent recalculation on every render
+  const processedDefaultValues = useMemo(() => {
+    return defaultValues
+      ? {
+          ...defaultValues,
+          // Convert string dates to Date objects if they exist
+          startDate: defaultValues.startDate instanceof Date
+            ? defaultValues.startDate
+            : typeof defaultValues.startDate === 'string'
+              ? new Date(defaultValues.startDate)
+              : new Date(),
+          endDate: defaultValues.endDate instanceof Date
+            ? defaultValues.endDate
+            : typeof defaultValues.endDate === 'string'
+              ? new Date(defaultValues.endDate)
+              : new Date(),
+        }
+      : {
+          title: "",
+          description: "",
+          clientId: "",
+          startDate: new Date(),
+          endDate: new Date(),
+          location: "",
+          status: "PLANNED",
+          pricingType: "MISSION_BASED",
+          fixedPrice: 0,
+          notes: "",
+        };
+  }, [defaultValues])
 
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -85,14 +87,23 @@ export function EventFormSteps({
     mode: "onChange",
   })
 
-  // Log the processed default values for debugging and reset form when defaultValues change
+  // Only reset the form when defaultValues or isEditMode changes
+  // We use a ref to track if this is the initial render
+  const initialRenderRef = useRef(true)
+
   useEffect(() => {
+    // Skip the first render to avoid resetting the form unnecessarily
+    if (initialRenderRef.current) {
+      initialRenderRef.current = false
+      return
+    }
+
     if (isEditMode && defaultValues) {
       console.log("Editing event with data:", processedDefaultValues)
       // Reset the form with the processed default values
       form.reset(processedDefaultValues)
     }
-  }, [isEditMode, defaultValues, processedDefaultValues, form])
+  }, [isEditMode, defaultValues, form])
 
   // Fetch clients for the dropdown
   const fetchClients = async () => {
