@@ -50,22 +50,49 @@ export function EventFormSteps({
   const [clients, setClients] = useState<{ id: string; name: string }[]>([])
   const [isLoadingClients, setIsLoadingClients] = useState(true)
 
+  // Process default values to ensure dates are Date objects
+  const processedDefaultValues = defaultValues
+    ? {
+        ...defaultValues,
+        // Convert string dates to Date objects if they exist
+        startDate: defaultValues.startDate instanceof Date
+          ? defaultValues.startDate
+          : typeof defaultValues.startDate === 'string'
+            ? new Date(defaultValues.startDate)
+            : new Date(),
+        endDate: defaultValues.endDate instanceof Date
+          ? defaultValues.endDate
+          : typeof defaultValues.endDate === 'string'
+            ? new Date(defaultValues.endDate)
+            : new Date(),
+      }
+    : {
+        title: "",
+        description: "",
+        clientId: "",
+        startDate: new Date(),
+        endDate: new Date(),
+        location: "",
+        status: "PLANNED",
+        pricingType: "MISSION_BASED",
+        fixedPrice: 0,
+        notes: "",
+      }
+
   const form = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues: defaultValues || {
-      title: "",
-      description: "",
-      clientId: "",
-      startDate: new Date(),
-      endDate: new Date(),
-      location: "",
-      status: "PLANNED",
-      pricingType: "MISSION_BASED",
-      fixedPrice: 0,
-      notes: "",
-    },
+    defaultValues: processedDefaultValues,
     mode: "onChange",
   })
+
+  // Log the processed default values for debugging and reset form when defaultValues change
+  useEffect(() => {
+    if (isEditMode && defaultValues) {
+      console.log("Editing event with data:", processedDefaultValues)
+      // Reset the form with the processed default values
+      form.reset(processedDefaultValues)
+    }
+  }, [isEditMode, defaultValues, processedDefaultValues, form])
 
   // Fetch clients for the dropdown
   const fetchClients = async () => {

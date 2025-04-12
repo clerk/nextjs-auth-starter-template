@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { EventFormSteps } from "./event-form-steps";
 import type { EventFormValues } from "./types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 interface EventDialogProps {
@@ -78,6 +78,13 @@ export function EventDialog({
       setIsSubmitting(false);
     }
   };
+
+  // Log the default values for debugging
+  useEffect(() => {
+    if (defaultValues) {
+      console.log("Event dialog received defaultValues:", defaultValues);
+    }
+  }, [defaultValues]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

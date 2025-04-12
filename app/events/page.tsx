@@ -66,6 +66,13 @@ export default function EventsPage() {
     fetchEvents();
   }, [filterStatus]);
 
+  // Log selected event when it changes
+  useEffect(() => {
+    if (selectedEvent) {
+      console.log("Selected event for editing:", selectedEvent);
+    }
+  }, [selectedEvent]);
+
   // Handle event creation/update
   const handleEventSubmit = async (data: EventFormValues) => {
     try {
@@ -201,6 +208,7 @@ export default function EventsPage() {
                       open={eventDialogOpen}
                       onOpenChange={setEventDialogOpen}
                       onSubmit={handleEventSubmit}
+                      defaultValues={selectedEvent || undefined}
                     />
                   </div>
                 </div>
