@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Form,
   FormControl,
@@ -51,7 +51,7 @@ import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Checkbox } from "@/components/ui/checkbox"
-import { PlusIcon, SearchIcon, Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, MoreHorizontal, Eye } from "lucide-react"
+import { PlusIcon, SearchIcon, Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, MoreHorizontal, Eye, LayoutGrid, List } from "lucide-react"
 import { toast } from "sonner"
 import {
   DropdownMenu,
@@ -98,6 +98,7 @@ export default function ClientsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const debouncedSearchQuery = useDebounce(searchQuery, 500) // 500ms debounce delay
   const [showClientDialog, setShowClientDialog] = useState(false)
+  const [viewMode, setViewMode] = useState<"table" | "grid">("table")
   const [isEditMode, setIsEditMode] = useState(false)
   const [currentClientId, setCurrentClientId] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -375,14 +376,20 @@ export default function ClientsPage() {
 
               {/* Main Content */}
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="table" className="space-y-4">
-                  <TabsList>
-                    <TabsTrigger value="table">Table View</TabsTrigger>
-                    <TabsTrigger value="grid">Grid View</TabsTrigger>
-                  </TabsList>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold">Clients</h2>
+                  <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "table" | "grid")}>
+                    <ToggleGroupItem value="table" aria-label="Table View">
+                      <List className="h-4 w-4" />
+                    </ToggleGroupItem>
+                    <ToggleGroupItem value="grid" aria-label="Grid View">
+                      <LayoutGrid className="h-4 w-4" />
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
 
-                  {/* Table View */}
-                  <TabsContent value="table" className="space-y-4">
+                {/* Content based on view mode */}
+                {viewMode === "table" ? (
                     <Card>
                       <CardContent className="p-0">
                         <ScrollArea className="h-[calc(100vh-280px)]">
@@ -521,10 +528,8 @@ export default function ClientsPage() {
                         </ScrollArea>
                       </CardContent>
                     </Card>
-                  </TabsContent>
-
-                  {/* Grid View */}
-                  <TabsContent value="grid" className="space-y-4">
+                ) : (
+                  <div className="space-y-4">
                     {isLoading ? (
                       <div className="flex justify-center items-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -653,8 +658,8 @@ export default function ClientsPage() {
                         ))}
                       </div>
                     )}
-                  </TabsContent>
-                </Tabs>
+                  </div>
+                )}
               </div>
             </div>
           </div>
