@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { ClientFormSteps } from "@/components/client-form-steps"
 
 import { clientFormSchema, type ClientFormValues } from "./schemas/client-schema"
@@ -36,6 +38,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Form } from "@/components/ui/form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 
@@ -95,6 +98,7 @@ export default function ClientsPage() {
   const [viewMode, setViewMode] = useState<"table" | "grid">("table")
   const [isEditMode, setIsEditMode] = useState(false)
   const [currentClientId, setCurrentClientId] = useState<string | null>(null)
+  const [selectedClient, setSelectedClient] = useState<ClientFormValues | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Initialize form with react-hook-form and zod validation
@@ -183,7 +187,7 @@ export default function ClientsPage() {
 
   // Open dialog for creating a new client
   const handleAddClient = () => {
-    form.reset({
+    const emptyClient = {
       name: "",
       email: "",
       phone: "",
@@ -193,15 +197,25 @@ export default function ClientsPage() {
       postalCode: "",
       website: "",
       active: true,
+      contractStart: "",
+      contractEnd: "",
+      logoUrl: "",
       contactFirstName: "",
       contactLastName: "",
       contactEmail: "",
       contactPhone: "",
       sendInvitation: true
-    })
-    setIsEditMode(false)
-    setCurrentClientId(null)
-    setShowClientDialog(true)
+    };
+
+    // Reset the form
+    form.reset(emptyClient);
+
+    // Reset the selected client
+    setSelectedClient(null);
+
+    setIsEditMode(false);
+    setCurrentClientId(null);
+    setShowClientDialog(true);
   }
 
   // Open dialog for editing an existing client
@@ -220,7 +234,7 @@ export default function ClientsPage() {
         // Get the primary contact if available
         const primaryContact = client.users && client.users.length > 0 ? client.users[0] : null
 
-        form.reset({
+        const clientData = {
           name: client.name,
           email: client.email || "",
           phone: client.phone || "",
@@ -238,7 +252,13 @@ export default function ClientsPage() {
           contactEmail: primaryContact?.email || "",
           contactPhone: primaryContact?.phone || "",
           sendInvitation: false
-        })
+        };
+
+        // Set the form values
+        form.reset(clientData);
+
+        // Set the selected client for the multi-step form
+        setSelectedClient(clientData);
       } else {
         const error = await response.json()
         toast.error(error.error || "Failed to fetch client details")
