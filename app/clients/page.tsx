@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Form,
@@ -60,6 +61,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 
 interface Client {
@@ -313,48 +315,15 @@ export default function ClientsPage() {
                       Manage your client organizations and their details
                     </p>
                   </div>
-                  <Button onClick={handleAddClient}>
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    Add Client
-                  </Button>
-                </div>
-              </div>
-
-              {/* Search and Filters */}
-              <div className="px-4 lg:px-6">
-                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                  <form onSubmit={handleSearch} className="flex w-full max-w-sm items-center space-x-2">
-                    <div className="relative w-full">
-                      {isLoading && searchQuery !== debouncedSearchQuery ? (
-                        <Loader2 className="absolute left-2.5 top-2.5 h-4 w-4 animate-spin text-muted-foreground" />
-                      ) : (
-                        <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                      )}
-                      <Input
-                        type="search"
-                        placeholder="Search clients..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-8"
-                        aria-label="Search clients"
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      variant="secondary"
-                      disabled={isLoading && searchQuery !== debouncedSearchQuery}
-                    >
-                      {isLoading && searchQuery !== debouncedSearchQuery ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Searching...
-                        </>
-                      ) : (
-                        "Search"
-                      )}
-                    </Button>
-                  </form>
                   <div className="flex items-center gap-2">
+                    <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "grid" | "table")}>
+                      <ToggleGroupItem value="grid" aria-label="Grid View">
+                        <LayoutGrid className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="table" aria-label="Table View">
+                        <List className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
@@ -365,31 +334,45 @@ export default function ClientsPage() {
                         <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Status</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => setSearchQuery("")}>All</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setSearchQuery("active:true")}>Active</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setSearchQuery("active:false")}>Inactive</DropdownMenuItem>
+                        <DropdownMenuCheckboxItem
+                          checked={searchQuery === ""}
+                          onClick={() => setSearchQuery("")}
+                        >
+                          All
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                          checked={searchQuery === "active:true"}
+                          onClick={() => setSearchQuery("active:true")}
+                        >
+                          Active
+                        </DropdownMenuCheckboxItem>
+                        <DropdownMenuCheckboxItem
+                          checked={searchQuery === "active:false"}
+                          onClick={() => setSearchQuery("active:false")}
+                        >
+                          Inactive
+                        </DropdownMenuCheckboxItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
+                    <Button onClick={handleAddClient}>
+                      <PlusIcon className="mr-2 h-4 w-4" />
+                      Add Client
+                    </Button>
                   </div>
                 </div>
               </div>
 
-              {/* Main Content */}
+              {/* Tabs */}
               <div className="px-4 lg:px-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg font-semibold">Clients</h2>
-                  <ToggleGroup type="single" value={viewMode} onValueChange={(value) => value && setViewMode(value as "table" | "grid")}>
-                    <ToggleGroupItem value="table" aria-label="Table View">
-                      <List className="h-4 w-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="grid" aria-label="Grid View">
-                      <LayoutGrid className="h-4 w-4" />
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
-
-                {/* Content based on view mode */}
-                {viewMode === "table" ? (
+                <Tabs defaultValue="all" className="space-y-4">
+                  <TabsList>
+                    <TabsTrigger value="all">All Clients</TabsTrigger>
+                    <TabsTrigger value="active">Active</TabsTrigger>
+                    <TabsTrigger value="inactive">Inactive</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="space-y-4">
+                    {/* Content based on view mode */}
+                    {viewMode === "table" ? (
                     <Card>
                       <CardContent className="p-0">
                         <ScrollArea className="h-[calc(100vh-280px)]">
@@ -659,7 +642,17 @@ export default function ClientsPage() {
                       </div>
                     )}
                   </div>
-                )}
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="active" className="space-y-4">
+                    {/* Active clients content */}
+                  </TabsContent>
+
+                  <TabsContent value="inactive" className="space-y-4">
+                    {/* Inactive clients content */}
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </div>
