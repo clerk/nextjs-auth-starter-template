@@ -42,7 +42,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, Edit, ArrowLeft, FileText, Receipt, DollarSign } from "lucide-react"
+import { Loader2, Building2, Users, Calendar, MapPin, Phone, Mail, ExternalLink, Edit, ArrowLeft, FileText, Receipt, DollarSign, Search, Clock, Car } from "lucide-react"
 import { toast } from "sonner"
 import Link from "next/link"
 
@@ -106,6 +106,7 @@ export default function ClientDetailPage() {
   const [client, setClient] = useState<Client | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [activeTab, setActiveTab] = useState("overview")
+  const [historySearchQuery, setHistorySearchQuery] = useState("")
   const [showClientDialog, setShowClientDialog] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -358,16 +359,16 @@ export default function ClientDetailPage() {
 
                     <div className="flex justify-between items-center mt-6">
                       <div className="flex items-center gap-2">
-                        <Users className="h-5 w-5 text-blue-600" />
-                        <span className="text-sm font-medium">{client._count?.users || 0} users</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Building2 className="h-5 w-5 text-purple-600" />
-                        <span className="text-sm font-medium">{client._count?.bookings || 0} bookings</span>
-                      </div>
-                      <div className="flex items-center gap-2">
                         <Calendar className="h-5 w-5 text-amber-600" />
                         <span className="text-sm font-medium">{client._count?.events || 0} events</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Car className="h-5 w-5 text-blue-600" />
+                        <span className="text-sm font-medium">{client._count?.bookings || 0} rides</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-purple-600" />
+                        <span className="text-sm font-medium">{(client._count?.events || 0) + (client._count?.bookings || 0)} total history</span>
                       </div>
                     </div>
                   </CardContent>
@@ -377,11 +378,10 @@ export default function ClientDetailPage() {
               {/* Tabs for different sections */}
               <div className="px-4 lg:px-6">
                 <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
-                  <TabsList className="grid grid-cols-4 w-full md:w-auto">
+                  <TabsList className="grid grid-cols-3 w-full md:w-auto">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="events">Events</TabsTrigger>
-                    <TabsTrigger value="bookings">Bookings</TabsTrigger>
-                    <TabsTrigger value="users">Users</TabsTrigger>
+                    <TabsTrigger value="history">History</TabsTrigger>
                     {/* Add these tabs when the schema is updated */}
                     {/* <TabsTrigger value="bills">Bills</TabsTrigger> */}
                     {/* <TabsTrigger value="estimates">Estimates</TabsTrigger> */}
@@ -419,7 +419,7 @@ export default function ClientDetailPage() {
                               <p className="text-muted-foreground">No events found for this client.</p>
                             )}
                             {client._count?.events > 0 && (
-                              <Button variant="link" size="sm" className="mt-2 p-0" onClick={() => setActiveTab("events")}>
+                              <Button variant="link" size="sm" className="mt-2 p-0" onClick={() => setActiveTab("history")}>
                                 View all events
                               </Button>
                             )}
@@ -427,16 +427,16 @@ export default function ClientDetailPage() {
 
                           <Separator />
 
-                          {/* Recent Bookings */}
+                          {/* Recent Rides */}
                           <div>
-                            <h3 className="text-lg font-medium mb-2">Recent Bookings</h3>
+                            <h3 className="text-lg font-medium mb-2">Recent Rides</h3>
                             {client.bookings && client.bookings.length > 0 ? (
                               <div className="space-y-2">
                                 {client.bookings.slice(0, 3).map((booking) => (
                                   <Card key={booking.id} className="p-3">
                                     <div className="flex justify-between items-center">
                                       <div>
-                                        <h4 className="font-medium">{booking.title || `Booking #${booking.id.substring(0, 8)}`}</h4>
+                                        <h4 className="font-medium">{booking.title || `Ride #${booking.id.substring(0, 8)}`}</h4>
                                         <p className="text-sm text-muted-foreground">{booking.date}</p>
                                       </div>
                                       <Badge>{booking.status}</Badge>
@@ -445,11 +445,11 @@ export default function ClientDetailPage() {
                                 ))}
                               </div>
                             ) : (
-                              <p className="text-muted-foreground">No bookings found for this client.</p>
+                              <p className="text-muted-foreground">No rides found for this client.</p>
                             )}
                             {client._count?.bookings > 0 && (
-                              <Button variant="link" size="sm" className="mt-2 p-0" onClick={() => setActiveTab("bookings")}>
-                                View all bookings
+                              <Button variant="link" size="sm" className="mt-2 p-0" onClick={() => setActiveTab("history")}>
+                                View all rides
                               </Button>
                             )}
                           </div>
@@ -626,110 +626,220 @@ export default function ClientDetailPage() {
                     </Card>
                   </TabsContent>
 
-                  {/* Bookings Tab */}
-                  <TabsContent value="bookings" className="space-y-4">
+                  {/* History Tab */}
+                  <TabsContent value="history" className="space-y-4">
                     <Card>
                       <CardHeader className="flex flex-row items-center justify-between">
                         <div>
-                          <CardTitle>Client Bookings</CardTitle>
+                          <CardTitle>Client History</CardTitle>
                           <CardDescription>
-                            All bookings for {client.name}
+                            Previous events and rides for {client.name}
                           </CardDescription>
                         </div>
-                        <Button>
-                          <Calendar className="mr-2 h-4 w-4" />
-                          Create Booking
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              type="search"
+                              placeholder="Search history..."
+                              value={historySearchQuery}
+                              onChange={(e) => setHistorySearchQuery(e.target.value)}
+                              className="w-[200px] pl-8"
+                            />
+                          </div>
+                        </div>
                       </CardHeader>
                       <CardContent>
-                        {client.bookings && client.bookings.length > 0 ? (
-                          <div className="space-y-4">
-                            {client.bookings.map((booking) => (
-                              <Card key={booking.id} className="p-4">
-                                <div className="flex justify-between items-start">
-                                  <div>
-                                    <h3 className="font-medium text-lg">{booking.title || `Booking #${booking.id.substring(0, 8)}`}</h3>
-                                    <p className="text-sm text-muted-foreground">{booking.date}</p>
-                                    {booking.pickupAddress && booking.dropoffAddress && (
-                                      <p className="text-sm flex items-center mt-1">
-                                        <MapPin className="h-3 w-3 mr-1" />
-                                        {booking.pickupAddress} to {booking.dropoffAddress}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <Badge>{booking.status}</Badge>
-                                </div>
-                                <div className="flex justify-end mt-4">
-                                  <Button variant="outline" size="sm" asChild>
-                                    <Link href={`/bookings/${booking.id}`}>View Details</Link>
-                                  </Button>
-                                </div>
-                              </Card>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-8">
-                            <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <h3 className="font-medium text-lg mb-2">No Bookings Yet</h3>
-                            <p className="text-muted-foreground mb-4">This client doesn't have any bookings yet.</p>
-                            <Button>Create First Booking</Button>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
+                        <Tabs defaultValue="all" className="space-y-4">
+                          <TabsList>
+                            <TabsTrigger value="all">All</TabsTrigger>
+                            <TabsTrigger value="events">Events</TabsTrigger>
+                            <TabsTrigger value="rides">Rides</TabsTrigger>
+                          </TabsList>
 
-                  {/* Users Tab */}
-                  <TabsContent value="users" className="space-y-4">
-                    <Card>
-                      <CardHeader className="flex flex-row items-center justify-between">
-                        <div>
-                          <CardTitle>Client Users</CardTitle>
-                          <CardDescription>
-                            All users associated with {client.name}
-                          </CardDescription>
-                        </div>
-                        <Button>
-                          <Users className="mr-2 h-4 w-4" />
-                          Add User
-                        </Button>
-                      </CardHeader>
-                      <CardContent>
-                        {client.users && client.users.length > 0 ? (
-                          <div className="space-y-4">
-                            {client.users.map((user) => (
-                              <Card key={user.id} className="p-4">
-                                <div className="flex justify-between items-center">
-                                  <div className="flex items-center gap-3">
-                                    <Avatar className="h-10 w-10">
-                                      <AvatarFallback className="bg-primary/10 text-primary">
-                                        {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                                      </AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                      <h3 className="font-medium">{user.firstName} {user.lastName}</h3>
-                                      <p className="text-sm text-muted-foreground">{user.email}</p>
-                                    </div>
-                                  </div>
-                                  <Badge variant="outline">{user.role}</Badge>
-                                </div>
-                                {user.phone && (
-                                  <div className="mt-2 text-sm flex items-center text-muted-foreground">
-                                    <Phone className="h-3 w-3 mr-1" />
-                                    {user.phone}
-                                  </div>
-                                )}
-                              </Card>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-center py-8">
-                            <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                            <h3 className="font-medium text-lg mb-2">No Users Yet</h3>
-                            <p className="text-muted-foreground mb-4">This client doesn't have any users yet.</p>
-                            <Button>Add First User</Button>
-                          </div>
-                        )}
+                          <TabsContent value="all" className="space-y-4">
+                            {/* Combined Events and Rides */}
+                            {(client.events?.length > 0 || client.bookings?.length > 0) ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Events */}
+                                {client.events?.filter(event =>
+                                  !historySearchQuery ||
+                                  event.title?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  event.description?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  event.location?.toLowerCase().includes(historySearchQuery.toLowerCase())
+                                ).map((event) => (
+                                  <Card key={`event-${event.id}`} className="overflow-hidden">
+                                    <CardHeader className="p-4 pb-2 bg-amber-50 dark:bg-amber-950/20">
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                          <Calendar className="h-4 w-4 text-amber-600" />
+                                          <span className="text-sm font-medium">Event</span>
+                                        </div>
+                                        <Badge>{event.status}</Badge>
+                                      </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                      <h3 className="font-medium">{event.title}</h3>
+                                      <p className="text-sm text-muted-foreground">{event.startDate}</p>
+                                      {event.location && (
+                                        <p className="text-sm flex items-center mt-1 text-muted-foreground">
+                                          <MapPin className="h-3 w-3 mr-1" />
+                                          {event.location}
+                                        </p>
+                                      )}
+                                      {event.description && (
+                                        <p className="text-sm mt-2 line-clamp-2">{event.description}</p>
+                                      )}
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0 flex justify-end">
+                                      <Button variant="outline" size="sm" asChild>
+                                        <Link href={`/events/${event.id}`}>View Details</Link>
+                                      </Button>
+                                    </CardFooter>
+                                  </Card>
+                                ))}
+
+                                {/* Rides/Bookings */}
+                                {client.bookings?.filter(booking =>
+                                  !historySearchQuery ||
+                                  booking.title?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  booking.pickupAddress?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  booking.dropoffAddress?.toLowerCase().includes(historySearchQuery.toLowerCase())
+                                ).map((booking) => (
+                                  <Card key={`booking-${booking.id}`} className="overflow-hidden">
+                                    <CardHeader className="p-4 pb-2 bg-blue-50 dark:bg-blue-950/20">
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                          <Car className="h-4 w-4 text-blue-600" />
+                                          <span className="text-sm font-medium">Ride</span>
+                                        </div>
+                                        <Badge>{booking.status}</Badge>
+                                      </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                      <h3 className="font-medium">{booking.title || `Ride #${booking.id.substring(0, 8)}`}</h3>
+                                      <p className="text-sm text-muted-foreground">{booking.date}</p>
+                                      {booking.pickupAddress && booking.dropoffAddress && (
+                                        <p className="text-sm flex items-center mt-1 text-muted-foreground">
+                                          <MapPin className="h-3 w-3 mr-1" />
+                                          {booking.pickupAddress} to {booking.dropoffAddress}
+                                        </p>
+                                      )}
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0 flex justify-end">
+                                      <Button variant="outline" size="sm" asChild>
+                                        <Link href={`/rides/${booking.id}`}>View Details</Link>
+                                      </Button>
+                                    </CardFooter>
+                                  </Card>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-8">
+                                <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                <h3 className="font-medium text-lg mb-2">No History Yet</h3>
+                                <p className="text-muted-foreground mb-4">This client doesn't have any events or rides yet.</p>
+                              </div>
+                            )}
+                          </TabsContent>
+
+                          <TabsContent value="events" className="space-y-4">
+                            {/* Events Only */}
+                            {client.events && client.events.length > 0 ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {client.events.filter(event =>
+                                  !historySearchQuery ||
+                                  event.title?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  event.description?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  event.location?.toLowerCase().includes(historySearchQuery.toLowerCase())
+                                ).map((event) => (
+                                  <Card key={`event-tab-${event.id}`} className="overflow-hidden">
+                                    <CardHeader className="p-4 pb-2 bg-amber-50 dark:bg-amber-950/20">
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                          <Calendar className="h-4 w-4 text-amber-600" />
+                                          <span className="text-sm font-medium">Event</span>
+                                        </div>
+                                        <Badge>{event.status}</Badge>
+                                      </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                      <h3 className="font-medium">{event.title}</h3>
+                                      <p className="text-sm text-muted-foreground">{event.startDate}</p>
+                                      {event.location && (
+                                        <p className="text-sm flex items-center mt-1 text-muted-foreground">
+                                          <MapPin className="h-3 w-3 mr-1" />
+                                          {event.location}
+                                        </p>
+                                      )}
+                                      {event.description && (
+                                        <p className="text-sm mt-2 line-clamp-2">{event.description}</p>
+                                      )}
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0 flex justify-end">
+                                      <Button variant="outline" size="sm" asChild>
+                                        <Link href={`/events/${event.id}`}>View Details</Link>
+                                      </Button>
+                                    </CardFooter>
+                                  </Card>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-8">
+                                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                <h3 className="font-medium text-lg mb-2">No Events Yet</h3>
+                                <p className="text-muted-foreground mb-4">This client doesn't have any events yet.</p>
+                              </div>
+                            )}
+                          </TabsContent>
+
+                          <TabsContent value="rides" className="space-y-4">
+                            {/* Rides/Bookings Only */}
+                            {client.bookings && client.bookings.length > 0 ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {client.bookings.filter(booking =>
+                                  !historySearchQuery ||
+                                  booking.title?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  booking.pickupAddress?.toLowerCase().includes(historySearchQuery.toLowerCase()) ||
+                                  booking.dropoffAddress?.toLowerCase().includes(historySearchQuery.toLowerCase())
+                                ).map((booking) => (
+                                  <Card key={`booking-tab-${booking.id}`} className="overflow-hidden">
+                                    <CardHeader className="p-4 pb-2 bg-blue-50 dark:bg-blue-950/20">
+                                      <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-2">
+                                          <Car className="h-4 w-4 text-blue-600" />
+                                          <span className="text-sm font-medium">Ride</span>
+                                        </div>
+                                        <Badge>{booking.status}</Badge>
+                                      </div>
+                                    </CardHeader>
+                                    <CardContent className="p-4">
+                                      <h3 className="font-medium">{booking.title || `Ride #${booking.id.substring(0, 8)}`}</h3>
+                                      <p className="text-sm text-muted-foreground">{booking.date}</p>
+                                      {booking.pickupAddress && booking.dropoffAddress && (
+                                        <p className="text-sm flex items-center mt-1 text-muted-foreground">
+                                          <MapPin className="h-3 w-3 mr-1" />
+                                          {booking.pickupAddress} to {booking.dropoffAddress}
+                                        </p>
+                                      )}
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0 flex justify-end">
+                                      <Button variant="outline" size="sm" asChild>
+                                        <Link href={`/rides/${booking.id}`}>View Details</Link>
+                                      </Button>
+                                    </CardFooter>
+                                  </Card>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-center py-8">
+                                <Car className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                <h3 className="font-medium text-lg mb-2">No Rides Yet</h3>
+                                <p className="text-muted-foreground mb-4">This client doesn't have any rides yet.</p>
+                              </div>
+                            )}
+                          </TabsContent>
+                        </Tabs>
                       </CardContent>
                     </Card>
                   </TabsContent>
