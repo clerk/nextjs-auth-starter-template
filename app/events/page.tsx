@@ -3,30 +3,45 @@
 import { useState, useEffect } from "react";
 import type { Event, EventFormValues } from "@/components/forms/event-form/types";
 import { EventDialog } from "@/components/forms/event-form/event-dialog";
-import { PlusIcon, Loader2 } from "lucide-react";
+import { PlusIcon, Loader2, SearchIcon, Calendar, MapPin, Users, Building2, Clock, MoreHorizontal, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
+  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 
 export default function EventsPage() {
@@ -35,6 +50,8 @@ export default function EventsPage() {
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 500); // 500ms debounce delay
 
   // Fetch events from the API
   useEffect(() => {
@@ -54,7 +71,19 @@ export default function EventsPage() {
         }
 
         const data = await response.json();
-        setEvents(data);
+
+        // Filter events based on search query if provided
+        let filteredData = data;
+        if (debouncedSearchQuery) {
+          const query = debouncedSearchQuery.toLowerCase();
+          filteredData = data.filter((event: Event) =>
+            event.title.toLowerCase().includes(query) ||
+            event.location.toLowerCase().includes(query) ||
+            (event.client?.name && event.client.name.toLowerCase().includes(query))
+          );
+        }
+
+        setEvents(filteredData);
       } catch (error) {
         console.error('Error fetching events:', error);
         toast.error('Failed to load events');
@@ -64,7 +93,7 @@ export default function EventsPage() {
     };
 
     fetchEvents();
-  }, [filterStatus]);
+  }, [filterStatus, debouncedSearchQuery]);
 
   // Log selected event when it changes
   useEffect(() => {
@@ -155,48 +184,6 @@ export default function EventsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
-                          Filter
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-[200px]">
-                        <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuLabel>Status</DropdownMenuLabel>
-                        <DropdownMenuCheckboxItem
-                          checked={filterStatus === null}
-                          onClick={() => setFilterStatus(null)}
-                        >
-                          All
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={filterStatus === "PLANNED"}
-                          onClick={() => setFilterStatus("PLANNED")}
-                        >
-                          Planned
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={filterStatus === "IN_PROGRESS"}
-                          onClick={() => setFilterStatus("IN_PROGRESS")}
-                        >
-                          In Progress
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={filterStatus === "COMPLETED"}
-                          onClick={() => setFilterStatus("COMPLETED")}
-                        >
-                          Completed
-                        </DropdownMenuCheckboxItem>
-                        <DropdownMenuCheckboxItem
-                          checked={filterStatus === "CANCELLED"}
-                          onClick={() => setFilterStatus("CANCELLED")}
-                        >
-                          Cancelled
-                        </DropdownMenuCheckboxItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
                     <Button onClick={() => {
                       setSelectedEvent(null);
                       setEventDialogOpen(true);
@@ -213,15 +200,66 @@ export default function EventsPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Search and Filters */}
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="all" className="space-y-4">
-                  <TabsList>
-                    <TabsTrigger value="all">All Events</TabsTrigger>
-                    <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-                    <TabsTrigger value="planning">Planning</TabsTrigger>
-                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="all" className="space-y-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex w-full max-w-sm items-center space-x-2">
+                    <form className="flex w-full max-w-sm items-center space-x-2" onSubmit={(e) => e.preventDefault()}>
+                      <Input
+                        placeholder="Search events..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="h-9"
+                      />
+                      <Button type="submit" variant="ghost" size="sm" className="h-9 px-2">
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <SearchIcon className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">Search</span>
+                      </Button>
+                    </form>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto">
+                          Filter
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-[200px]">
+                        <DropdownMenuLabel>Filter by</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Status</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => setFilterStatus(null)}>All</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFilterStatus("PLANNED")}>Planned</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFilterStatus("IN_PROGRESS")}>In Progress</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFilterStatus("COMPLETED")}>Completed</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFilterStatus("CANCELLED")}>Cancelled</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </div>
+              </div>
+              <div className="px-4 lg:px-6">
+                <Tabs defaultValue="grid" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <TabsList>
+                      <TabsTrigger value="grid">Grid View</TabsTrigger>
+                      <TabsTrigger value="table">Table View</TabsTrigger>
+                    </TabsList>
+                    <div className="text-sm text-muted-foreground">
+                      {events.length} events found
+                    </div>
+                  </div>
+
+                  {/* Grid View */}
+                  <TabsContent value="grid" className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (
                         <div className="flex justify-center items-center h-40">
@@ -233,55 +271,205 @@ export default function EventsPage() {
                         </div>
                       ) : (
                         events.map((event) => (
-                          <Card key={event.id}>
-                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                              <CardTitle className="text-sm font-medium">
-                                {event.title}
-                              </CardTitle>
-                              <div className={cn(
-                                "px-2 py-1 rounded-full text-xs font-medium",
-                                event.status === "PLANNED" && "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-                                event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
-                                event.status === "COMPLETED" && "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-                                event.status === "CANCELLED" && "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                              )}>
-                                {event.status}
+                          <Card key={event.id} className="overflow-hidden">
+                            <CardHeader className="p-4 pb-0">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <CardTitle className="text-lg font-semibold">
+                                    {event.title}
+                                  </CardTitle>
+                                  <CardDescription className="line-clamp-1">
+                                    {event.client?.name || "No client assigned"}
+                                  </CardDescription>
+                                </div>
+                                <Badge className={cn(
+                                  event.status === "PLANNED" && "bg-yellow-100 text-yellow-800",
+                                  event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800",
+                                  event.status === "COMPLETED" && "bg-green-100 text-green-800",
+                                  event.status === "CANCELLED" && "bg-red-100 text-red-800"
+                                )}>
+                                  {event.status.replace("_", " ")}
+                                </Badge>
                               </div>
                             </CardHeader>
-                            <CardContent>
-                              <div className="text-xs text-muted-foreground">
-                                {format(new Date(event.startDate), "PPP")} - {format(new Date(event.endDate), "PPP")}
+                            <CardContent className="p-4 pt-2 space-y-3">
+                              <div className="flex items-start gap-2">
+                                <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <div>
+                                  <p className="text-sm">
+                                    {format(new Date(event.startDate), "PPP")} - {format(new Date(event.endDate), "PPP")}
+                                  </p>
+                                </div>
                               </div>
-                              <div className="text-xs text-muted-foreground mt-1">
-                                {event.location}
+                              <div className="flex items-start gap-2">
+                                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm line-clamp-1">{event.location || "No location specified"}</p>
                               </div>
-                              <p className="text-sm mt-2">{event.description}</p>
+                              <div className="flex items-start gap-2">
+                                <Users className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm">Participants: {event.participants || 0}</p>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <Building2 className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm line-clamp-1">{event.client?.name || "No client assigned"}</p>
+                              </div>
                             </CardContent>
-                            <CardFooter className="flex justify-between">
-                              <div className="text-xs font-medium">{event.client?.name}</div>
-                              <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
+                            <CardFooter className="p-4 pt-0 flex justify-between gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                asChild
+                              >
+                                <a href={`/events/${event.id}`}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View
+                                </a>
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">More</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => {
                                     setSelectedEvent(event);
                                     setEventDialogOpen(true);
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                                <Button
-                                  variant="destructive"
-                                  size="sm"
-                                  onClick={() => handleDeleteEvent(event.id)}
-                                >
-                                  Delete
-                                </Button>
-                              </div>
+                                  }}>
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600"
+                                    onClick={() => handleDeleteEvent(event.id)}
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </CardFooter>
                           </Card>
                         ))
                       )}
+                    </div>
+                  </TabsContent>
+
+                  {/* Table View */}
+                  <TabsContent value="table" className="space-y-4">
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Title</TableHead>
+                            <TableHead>Client</TableHead>
+                            <TableHead>Location</TableHead>
+                            <TableHead>Dates</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {isLoading ? (
+                            <TableRow>
+                              <TableCell colSpan={6} className="h-24 text-center">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+                              </TableCell>
+                            </TableRow>
+                          ) : events.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={6} className="h-24 text-center">
+                                No events found
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            events.map((event) => (
+                              <TableRow key={event.id}>
+                                <TableCell className="font-medium">{event.title}</TableCell>
+                                <TableCell>{event.client?.name || "No client"}</TableCell>
+                                <TableCell className="max-w-[200px] truncate">{event.location}</TableCell>
+                                <TableCell>
+                                  <div className="flex flex-col">
+                                    <span className="text-xs">Start: {format(new Date(event.startDate), "PP")}</span>
+                                    <span className="text-xs">End: {format(new Date(event.endDate), "PP")}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge className={cn(
+                                    event.status === "PLANNED" && "bg-yellow-100 text-yellow-800",
+                                    event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800",
+                                    event.status === "COMPLETED" && "bg-green-100 text-green-800",
+                                    event.status === "CANCELLED" && "bg-red-100 text-red-800"
+                                  )}>
+                                    {event.status.replace("_", " ")}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      asChild
+                                    >
+                                      <a href={`/events/${event.id}`}>
+                                        <Eye className="h-4 w-4" />
+                                        <span className="sr-only">View</span>
+                                      </a>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      onClick={() => {
+                                        setSelectedEvent(event);
+                                        setEventDialogOpen(true);
+                                      }}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="h-4 w-4"
+                                      >
+                                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                        <path d="m15 5 4 4" />
+                                      </svg>
+                                      <span className="sr-only">Edit</span>
+                                    </Button>
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      className="text-red-500"
+                                      onClick={() => handleDeleteEvent(event.id)}
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        className="h-4 w-4"
+                                      >
+                                        <path d="M3 6h18" />
+                                        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                        <line x1="10" x2="10" y1="11" y2="17" />
+                                        <line x1="14" x2="14" y1="11" y2="17" />
+                                      </svg>
+                                      <span className="sr-only">Delete</span>
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
                     </div>
                   </TabsContent>
                   <TabsContent value="upcoming" className="space-y-4">
