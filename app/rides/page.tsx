@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { PlusIcon, Search as SearchIcon, MapPin as MapPinIcon, Clock as ClockIcon, Car as CarIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { PlusIcon, Search as SearchIcon, MapPin as MapPinIcon, Clock as ClockIcon, Car as CarIcon, Loader2, Eye, MoreHorizontal, Users, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/lib/hooks/use-debounce";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +18,20 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { RideForm } from "../../components/forms/ride-form/RideForm";
 import { RidesList, Ride } from "@/components/rides/rides-list";
 
@@ -168,6 +184,8 @@ export default function RidesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [rideDialogOpen, setRideDialogOpen] = useState(false);
   const [missionDialogOpen, setMissionDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const debouncedSearchQuery = useDebounce(searchTerm, 500); // 500ms debounce delay
 
   // Filter rides based on search term
   const filteredRides = mockRides.filter(ride =>
@@ -311,29 +329,130 @@ export default function RidesPage() {
               <div className="px-4 lg:px-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex w-full max-w-sm items-center space-x-2">
-                    <Input
-                      placeholder="Search rides..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="h-9"
-                    />
-                    <Button variant="ghost" size="sm" className="h-9 px-2">
-                      <SearchIcon className="h-4 w-4" />
-                      <span className="sr-only">Search</span>
-                    </Button>
+                    <form className="flex w-full max-w-sm items-center space-x-2" onSubmit={(e) => e.preventDefault()}>
+                      <Input
+                        placeholder="Search rides..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="h-9"
+                      />
+                      <Button type="submit" variant="ghost" size="sm" className="h-9 px-2">
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <SearchIcon className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">Search</span>
+                      </Button>
+                    </form>
                   </div>
                 </div>
               </div>
 
-              {/* Rides List */}
+              {/* Rides List with Tabs */}
               <div className="px-4 lg:px-6">
-                <RidesList
-                  rides={filteredRides}
-                  title="All Rides"
-                  description="View and manage all your rides"
-                  showSearch={true}
-                />
+                <Tabs defaultValue="grid" className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <TabsList>
+                      <TabsTrigger value="grid">Grid View</TabsTrigger>
+                      <TabsTrigger value="table">Table View</TabsTrigger>
+                    </TabsList>
+                    <div className="text-sm text-muted-foreground">
+                      {filteredRides.length} rides found
+                    </div>
+                  </div>
 
+                  {/* Grid View */}
+                  <TabsContent value="grid" className="space-y-4">
+                    <RidesList
+                      rides={filteredRides}
+                      title=""
+                      description=""
+                      showSearch={false}
+                    />
+                  </TabsContent>
+
+                  {/* Table View */}
+                  <TabsContent value="table" className="space-y-4">
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Ride #</TableHead>
+                            <TableHead>Passenger</TableHead>
+                            <TableHead>Pickup</TableHead>
+                            <TableHead>Dropoff</TableHead>
+                            <TableHead>Category</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {isLoading ? (
+                            <TableRow>
+                              <TableCell colSpan={7} className="h-24 text-center">
+                                <Loader2 className="h-6 w-6 animate-spin text-primary mx-auto" />
+                              </TableCell>
+                            </TableRow>
+                          ) : filteredRides.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={7} className="h-24 text-center">
+                                No rides found
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            filteredRides.map((ride) => (
+                              <TableRow key={ride.id}>
+                                <TableCell className="font-medium">{ride.rideNumber}</TableCell>
+                                <TableCell>{ride.passengerName}</TableCell>
+                                <TableCell className="max-w-[200px] truncate">
+                                  <div className="flex items-center">
+                                    <MapPinIcon className="mr-1 h-3 w-3 text-muted-foreground" />
+                                    <span className="truncate">{ride.pickupAddress}</span>
+                                  </div>
+                                  <div className="flex items-center text-xs text-muted-foreground">
+                                    <ClockIcon className="mr-1 h-3 w-3" />
+                                    <span>{new Date(ride.pickupTime).toLocaleString()}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell className="max-w-[200px] truncate">
+                                  <span className="truncate">{ride.dropoffAddress}</span>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline" className="px-1.5 text-xs">
+                                    {getCategoryDisplayName(ride.category)}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge className={`${getStatusColor(ride.status)} px-1.5 text-xs`}>
+                                    {ride.status}
+                                  </Badge>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <Button
+                                      variant="ghost"
+                                      size="icon"
+                                      asChild
+                                    >
+                                      <a href={`/rides/${ride.id}`}>
+                                        <Eye className="h-4 w-4" />
+                                        <span className="sr-only">View</span>
+                                      </a>
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </div>
