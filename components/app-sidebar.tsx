@@ -69,8 +69,8 @@ const data = {
     },
     {
       title: "Vehicles",
-      url: "/vehicles",
-      icon: DatabaseIcon,
+      url: "/cars",
+      icon: CarIcon,
     },
     {
       title: "Partners",
