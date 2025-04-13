@@ -29,40 +29,40 @@ import {
   ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 const chartData = [
-  { date: "2024-04-01", desktop: 222, mobile: 150 },
-  { date: "2024-04-02", desktop: 97, mobile: 180 },
-  { date: "2024-04-03", desktop: 167, mobile: 120 },
-  { date: "2024-04-04", desktop: 242, mobile: 260 },
-  { date: "2024-04-05", desktop: 373, mobile: 290 },
-  { date: "2024-04-06", desktop: 301, mobile: 340 },
-  { date: "2024-04-07", desktop: 245, mobile: 180 },
-  { date: "2024-04-08", desktop: 409, mobile: 320 },
-  { date: "2024-04-09", desktop: 59, mobile: 110 },
-  { date: "2024-04-10", desktop: 261, mobile: 190 },
-  { date: "2024-04-11", desktop: 327, mobile: 350 },
-  { date: "2024-04-12", desktop: 292, mobile: 210 },
-  { date: "2024-04-13", desktop: 342, mobile: 380 },
-  { date: "2024-04-14", desktop: 137, mobile: 220 },
-  { date: "2024-04-15", desktop: 120, mobile: 170 },
-  { date: "2024-04-16", desktop: 138, mobile: 190 },
-  { date: "2024-04-17", desktop: 446, mobile: 360 },
-  { date: "2024-04-18", desktop: 364, mobile: 410 },
-  { date: "2024-04-19", desktop: 243, mobile: 180 },
-  { date: "2024-04-20", desktop: 89, mobile: 150 },
-  { date: "2024-04-21", desktop: 137, mobile: 200 },
-  { date: "2024-04-22", desktop: 224, mobile: 170 },
-  { date: "2024-04-23", desktop: 138, mobile: 230 },
-  { date: "2024-04-24", desktop: 387, mobile: 290 },
-  { date: "2024-04-25", desktop: 215, mobile: 250 },
-  { date: "2024-04-26", desktop: 75, mobile: 130 },
-  { date: "2024-04-27", desktop: 383, mobile: 420 },
-  { date: "2024-04-28", desktop: 122, mobile: 180 },
-  { date: "2024-04-29", desktop: 315, mobile: 240 },
-  { date: "2024-04-30", desktop: 454, mobile: 380 },
-  { date: "2024-05-01", desktop: 165, mobile: 220 },
-  { date: "2024-05-02", desktop: 293, mobile: 310 },
-  { date: "2024-05-03", desktop: 247, mobile: 190 },
-  { date: "2024-05-04", desktop: 385, mobile: 420 },
+  { date: "2024-04-01", cityTransfers: 12, airportTransfers: 8 },
+  { date: "2024-04-02", cityTransfers: 9, airportTransfers: 10 },
+  { date: "2024-04-03", cityTransfers: 15, airportTransfers: 7 },
+  { date: "2024-04-04", cityTransfers: 18, airportTransfers: 12 },
+  { date: "2024-04-05", cityTransfers: 22, airportTransfers: 15 },
+  { date: "2024-04-06", cityTransfers: 16, airportTransfers: 9 },
+  { date: "2024-04-07", cityTransfers: 14, airportTransfers: 11 },
+  { date: "2024-04-08", cityTransfers: 19, airportTransfers: 14 },
+  { date: "2024-04-09", cityTransfers: 8, airportTransfers: 6 },
+  { date: "2024-04-10", cityTransfers: 13, airportTransfers: 9 },
+  { date: "2024-04-11", cityTransfers: 17, airportTransfers: 13 },
+  { date: "2024-04-12", cityTransfers: 21, airportTransfers: 11 },
+  { date: "2024-04-13", cityTransfers: 18, airportTransfers: 14 },
+  { date: "2024-04-14", cityTransfers: 12, airportTransfers: 10 },
+  { date: "2024-04-15", cityTransfers: 9, airportTransfers: 8 },
+  { date: "2024-04-16", cityTransfers: 11, airportTransfers: 9 },
+  { date: "2024-04-17", cityTransfers: 23, airportTransfers: 16 },
+  { date: "2024-04-18", cityTransfers: 20, airportTransfers: 18 },
+  { date: "2024-04-19", cityTransfers: 15, airportTransfers: 12 },
+  { date: "2024-04-20", cityTransfers: 13, airportTransfers: 10 },
+  { date: "2024-04-21", cityTransfers: 9, airportTransfers: 7 },
+  { date: "2024-04-22", cityTransfers: 14, airportTransfers: 9 },
+  { date: "2024-04-23", cityTransfers: 16, airportTransfers: 12 },
+  { date: "2024-04-24", cityTransfers: 19, airportTransfers: 15 },
+  { date: "2024-04-25", cityTransfers: 17, airportTransfers: 13 },
+  { date: "2024-04-26", cityTransfers: 15, airportTransfers: 11 },
+  { date: "2024-04-27", cityTransfers: 21, airportTransfers: 16 },
+  { date: "2024-04-28", cityTransfers: 8, airportTransfers: 6 },
+  { date: "2024-04-29", cityTransfers: 13, airportTransfers: 10 },
+  { date: "2024-04-30", cityTransfers: 18, airportTransfers: 14 },
+  { date: "2024-05-01", cityTransfers: 11, airportTransfers: 9 },
+  { date: "2024-05-02", cityTransfers: 16, airportTransfers: 12 },
+  { date: "2024-05-03", cityTransfers: 14, airportTransfers: 10 },
+  { date: "2024-05-04", cityTransfers: 20, airportTransfers: 15 },
   { date: "2024-05-05", desktop: 481, mobile: 390 },
   { date: "2024-05-06", desktop: 498, mobile: 520 },
   { date: "2024-05-07", desktop: 388, mobile: 300 },
@@ -163,12 +163,12 @@ export function ChartAreaInteractive() {
   return (
     <Card className="@container/card">
       <CardHeader className="relative">
-        <CardTitle>Total Visitors</CardTitle>
+        <CardTitle>Ride Analytics</CardTitle>
         <CardDescription>
           <span className="@[540px]/card:block hidden">
-            Total for the last 3 months
+            Ride distribution by category
           </span>
-          <span className="@[540px]/card:hidden">Last 3 months</span>
+          <span className="@[540px]/card:hidden">Ride distribution</span>
         </CardDescription>
         <div className="absolute right-4 top-4">
           <ToggleGroup
@@ -271,18 +271,20 @@ export function ChartAreaInteractive() {
               }
             />
             <Area
-              dataKey="mobile"
+              dataKey="airportTransfers"
               type="natural"
               fill="url(#fillMobile)"
               stroke="var(--color-mobile)"
               stackId="a"
+              name="Airport Transfers"
             />
             <Area
-              dataKey="desktop"
+              dataKey="cityTransfers"
               type="natural"
               fill="url(#fillDesktop)"
               stroke="var(--color-desktop)"
               stackId="a"
+              name="City Transfers"
             />
           </AreaChart>
         </ChartContainer>

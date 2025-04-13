@@ -25,11 +25,11 @@ export default function Home() {
           />
 
           <h1 className="text-2xl font-bold tracking-tight text-[#131316] mb-2 text-center">
-            Welcome to DropNow
+            Welcome to NextIS Chauffeur
           </h1>
 
           <p className="text-[#5E5F6E] text-sm mb-6 text-center">
-            Sign in to access your chauffeur management dashboard
+            Sign in to access your premium chauffeur management platform
           </p>
 
           <SignedIn>
@@ -46,7 +46,7 @@ export default function Home() {
       </div>
 
       <footer className="mt-8 text-center text-sm text-gray-500">
-        <p>© {new Date().getFullYear()} DropNow. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} NextIS Chauffeur. All rights reserved.</p>
       </footer>
     </div>
   )
