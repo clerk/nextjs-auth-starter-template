@@ -1,35 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon, SearchIcon, MapPinIcon, ClockIcon, CarIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import {
   Dialog,
   DialogContent,
@@ -38,11 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
 import { RideForm } from "../../components/forms/ride-form/RideForm";
+import { RidesList, Ride } from "@/components/rides/rides-list";
 
 // Mock data for rides
-const mockRides = [
+const mockRides: Ride[] = [
   {
     id: "1",
     rideNumber: "RD-001",
@@ -347,155 +324,15 @@ export default function RidesPage() {
                 </div>
               </div>
 
-              {/* Tabs and Table */}
+              {/* Rides List */}
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="all">
-                  <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-                    <TabsTrigger value="assigned">Assigned</TabsTrigger>
-                    <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                    <TabsTrigger value="completed">Completed</TabsTrigger>
-                  </TabsList>
+                <RidesList
+                  rides={filteredRides}
+                  title="All Rides"
+                  description="View and manage all your rides"
+                  showSearch={true}
+                />
 
-                  <TabsContent value="all" className="mt-0">
-                    <Card>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Ride #</TableHead>
-                              <TableHead>Passenger</TableHead>
-                              <TableHead>Chauffeur</TableHead>
-                              <TableHead>Pickup</TableHead>
-                              <TableHead>Dropoff</TableHead>
-                              <TableHead>Category</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>Fare</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredRides.length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={8} className="text-center h-24">
-                                  No rides found.
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredRides.map((ride) => (
-                                <TableRow key={ride.id}>
-                                  <TableCell className="font-medium">{ride.rideNumber}</TableCell>
-                                  <TableCell>{ride.passengerName}</TableCell>
-                                  <TableCell>{ride.chauffeurName || "—"}</TableCell>
-                                  <TableCell className="max-w-[200px] truncate" title={ride.pickupAddress}>
-                                    <div className="flex items-center">
-                                      <MapPinIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                                      <span className="truncate">{ride.pickupAddress}</span>
-                                    </div>
-                                    <div className="flex items-center text-xs text-muted-foreground">
-                                      <ClockIcon className="mr-1 h-3 w-3" />
-                                      <span>{new Date(ride.pickupTime).toLocaleString()}</span>
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="max-w-[200px] truncate" title={ride.dropoffAddress}>
-                                    <span className="truncate">{ride.dropoffAddress}</span>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant="outline" className="px-1.5 text-xs">
-                                      {getCategoryDisplayName(ride.category)}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge className={`${getStatusColor(ride.status)} px-1.5 text-xs`}>
-                                      {ride.status}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>${ride.fare.toFixed(2)}</TableCell>
-                                </TableRow>
-                              ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-
-                  {/* Other status tabs */}
-                  <TabsContent value="scheduled" className="mt-0">
-                    <Card>
-                      <CardContent className="p-0">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Ride #</TableHead>
-                              <TableHead>Passenger</TableHead>
-                              <TableHead>Chauffeur</TableHead>
-                              <TableHead>Pickup</TableHead>
-                              <TableHead>Dropoff</TableHead>
-                              <TableHead>Category</TableHead>
-                              <TableHead>Status</TableHead>
-                              <TableHead>Fare</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {filteredRides.filter(ride => ride.status === "SCHEDULED").length === 0 ? (
-                              <TableRow>
-                                <TableCell colSpan={8} className="text-center h-24">
-                                  No scheduled rides found.
-                                </TableCell>
-                              </TableRow>
-                            ) : (
-                              filteredRides
-                                .filter(ride => ride.status === "SCHEDULED")
-                                .map((ride) => (
-                                  <TableRow key={ride.id}>
-                                    <TableCell className="font-medium">{ride.rideNumber}</TableCell>
-                                    <TableCell>{ride.passengerName}</TableCell>
-                                    <TableCell>{ride.chauffeurName || "—"}</TableCell>
-                                    <TableCell className="max-w-[200px] truncate" title={ride.pickupAddress}>
-                                      <div className="flex items-center">
-                                        <MapPinIcon className="mr-1 h-3 w-3 text-muted-foreground" />
-                                        <span className="truncate">{ride.pickupAddress}</span>
-                                      </div>
-                                      <div className="flex items-center text-xs text-muted-foreground">
-                                        <ClockIcon className="mr-1 h-3 w-3" />
-                                        <span>{new Date(ride.pickupTime).toLocaleString()}</span>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="max-w-[200px] truncate" title={ride.dropoffAddress}>
-                                      <span className="truncate">{ride.dropoffAddress}</span>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Badge variant="outline" className="px-1.5 text-xs">
-                                        {getCategoryDisplayName(ride.category)}
-                                      </Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                      <Badge className={`${getStatusColor(ride.status)} px-1.5 text-xs`}>
-                                        {ride.status}
-                                      </Badge>
-                                    </TableCell>
-                                    <TableCell>${ride.fare.toFixed(2)}</TableCell>
-                                  </TableRow>
-                                ))
-                            )}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
-                  </TabsContent>
-
-                  {/* Similar tables for other statuses */}
-                  <TabsContent value="assigned" className="mt-0">
-                    {/* Similar table with filtered data for assigned rides */}
-                  </TabsContent>
-                  <TabsContent value="in-progress" className="mt-0">
-                    {/* Similar table with filtered data for in-progress rides */}
-                  </TabsContent>
-                  <TabsContent value="completed" className="mt-0">
-                    {/* Similar table with filtered data for completed rides */}
-                  </TabsContent>
-                </Tabs>
               </div>
             </div>
           </div>

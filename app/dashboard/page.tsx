@@ -7,14 +7,10 @@ import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
 import { SiteHeader } from "@/components/site-header"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { MapPinIcon, ClockIcon, CarIcon, UserIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { RidesList, Ride } from "@/components/rides/rides-list"
 
-// Import mock rides data from the rides page
-const mockRides = [
+// Import mock rides data
+const mockRides: Ride[] = [
   {
     id: "1",
     rideNumber: "RD-001",
@@ -75,34 +71,41 @@ const mockRides = [
     duration: 180,
     createdAt: "2023-05-14T18:10:00Z",
   },
+  {
+    id: "5",
+    rideNumber: "RD-005",
+    passengerName: "Michael Johnson",
+    chauffeurName: "Sarah Wilson",
+    pickupAddress: "Times Square, New York, NY",
+    dropoffAddress: "Brooklyn Bridge, New York, NY",
+    pickupTime: "2023-05-18T14:00:00Z",
+    status: "SCHEDULED",
+    category: "CITY_TRANSFER",
+    fare: 85.00,
+    distance: 7.3,
+    duration: 35,
+    createdAt: "2023-05-15T09:20:00Z",
+  },
+  {
+    id: "6",
+    rideNumber: "RD-006",
+    passengerName: "Sarah Davis",
+    chauffeurName: "Thomas Brown",
+    pickupAddress: "Newark Liberty International Airport",
+    dropoffAddress: "Wall Street, New York, NY",
+    pickupTime: "2023-05-19T10:15:00Z",
+    status: "SCHEDULED",
+    category: "AIRPORT_TRANSFER",
+    fare: 135.00,
+    distance: 22.1,
+    duration: 55,
+    createdAt: "2023-05-15T11:45:00Z",
+  },
 ];
-
-// Helper function to format date
-function formatDate(dateString: string) {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date);
-}
-
-// Get status badge color
-function getStatusColor(status: string) {
-  switch (status) {
-    case 'SCHEDULED': return 'bg-blue-100 text-blue-800';
-    case 'ASSIGNED': return 'bg-purple-100 text-purple-800';
-    case 'IN_PROGRESS': return 'bg-yellow-100 text-yellow-800';
-    case 'COMPLETED': return 'bg-green-100 text-green-800';
-    case 'CANCELLED': return 'bg-red-100 text-red-800';
-    default: return 'bg-gray-100 text-gray-800';
-  }
-}
 
 export default function Page() {
   // Filter rides for today
-  const [todayRides, setTodayRides] = useState<typeof mockRides>([]);
+  const [todayRides, setTodayRides] = useState<Ride[]>([]);
 
   useEffect(() => {
     // In a real app, you would fetch this data from an API
@@ -129,55 +132,12 @@ export default function Page() {
 
               {/* Daily Rides Section */}
               <div className="px-4 lg:px-6">
-                <h2 className="text-2xl font-bold mb-4">Today's Rides</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {todayRides.map((ride) => (
-                    <Card key={ride.id} className="overflow-hidden">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <CardTitle className="text-lg">{ride.rideNumber}</CardTitle>
-                            <CardDescription>{ride.category.replace('_', ' ')}</CardDescription>
-                          </div>
-                          <Badge className={getStatusColor(ride.status)}>
-                            {ride.status.replace('_', ' ')}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pb-2">
-                        <div className="space-y-2">
-                          <div className="flex items-start gap-2">
-                            <UserIcon className="h-4 w-4 mt-1 text-muted-foreground" />
-                            <div>
-                              <p className="text-sm font-medium">{ride.passengerName}</p>
-                              <p className="text-xs text-muted-foreground">Chauffeur: {ride.chauffeurName}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <MapPinIcon className="h-4 w-4 mt-1 text-muted-foreground" />
-                            <div>
-                              <p className="text-sm font-medium">From: {ride.pickupAddress}</p>
-                              <p className="text-sm font-medium">To: {ride.dropoffAddress}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                            <p className="text-sm">{formatDate(ride.pickupTime)}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <CarIcon className="h-4 w-4 text-muted-foreground" />
-                            <p className="text-sm">{ride.distance} km • {ride.duration} min • €{ride.fare.toFixed(2)}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter>
-                        <Link href={`/rides?id=${ride.id}`} className="w-full">
-                          <Button variant="outline" className="w-full">View Details</Button>
-                        </Link>
-                      </CardFooter>
-                    </Card>
-                  ))}
-                </div>
+                <RidesList
+                  rides={todayRides}
+                  title="Today's Rides"
+                  description="View and manage rides scheduled for today"
+                  showSearch={false}
+                />
               </div>
             </div>
           </div>
