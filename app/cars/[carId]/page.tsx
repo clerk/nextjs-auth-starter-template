@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { PlateCarDialog } from "../components/plate-car-dialog";
+import { VehicleAssignmentDialog } from "../components/vehicle-assignment-dialog";
 import { CarFormValues } from "../schemas/car-schema";
 import { deleteVehicle, getVehicleById, updateVehicle } from "../actions";
 
@@ -119,6 +120,7 @@ export default function CarDetailPage() {
   const [car, setCar] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [maintenanceHistory, setMaintenanceHistory] = useState(mockMaintenanceHistory);
   const [rideHistory, setRideHistory] = useState(mockRideHistory);
 
@@ -331,6 +333,14 @@ export default function CarDetailPage() {
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
                   </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => setAssignmentDialogOpen(true)}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Assign
+                  </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline">
@@ -352,6 +362,29 @@ export default function CarDetailPage() {
                   </DropdownMenu>
                 </div>
               </div>
+
+              {/* Current Assignment (if any) */}
+              {car.status === "IN_USE" && (
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg flex items-center">
+                      <Calendar className="h-5 w-5 mr-2 text-blue-600" />
+                      Current Assignment
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                      <div>
+                        <p className="font-medium">Assigned to Event: Corporate Meeting</p>
+                        <p className="text-sm text-muted-foreground">April 15, 2025 - April 20, 2025</p>
+                      </div>
+                      <Button variant="outline" size="sm" className="md:self-end">
+                        View Details
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Car details */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -673,6 +706,12 @@ export default function CarDetailPage() {
         onOpenChange={setCarDialogOpen}
         onSubmit={handleCarUpdate}
         defaultValues={car}
+      />
+      <VehicleAssignmentDialog
+        open={assignmentDialogOpen}
+        onOpenChange={setAssignmentDialogOpen}
+        vehicleId={car?.id || ""}
+        vehicleName={`${car?.make || ""} ${car?.model || ""} (${car?.licensePlate || ""})`}
       />
     </SidebarProvider>
   );

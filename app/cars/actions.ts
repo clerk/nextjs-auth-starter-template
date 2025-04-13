@@ -11,7 +11,7 @@ export async function getVehicles() {
         createdAt: "desc",
       },
     });
-    
+
     return { success: true, data: vehicles };
   } catch (error) {
     console.error("Error fetching vehicles:", error);
@@ -27,11 +27,11 @@ export async function getVehicleById(id: string) {
         id,
       },
     });
-    
+
     if (!vehicle) {
       return { success: false, error: "Vehicle not found" };
     }
-    
+
     return { success: true, data: vehicle };
   } catch (error) {
     console.error("Error fetching vehicle:", error);
@@ -55,7 +55,7 @@ export async function createVehicle(data: any) {
         isFrenchPlate: data.isFrenchPlate,
       },
     });
-    
+
     revalidatePath("/cars");
     return { success: true, data: vehicle };
   } catch (error) {
@@ -83,7 +83,7 @@ export async function updateVehicle(id: string, data: any) {
         isFrenchPlate: data.isFrenchPlate,
       },
     });
-    
+
     revalidatePath("/cars");
     revalidatePath(`/cars/${id}`);
     return { success: true, data: vehicle };
@@ -101,11 +101,55 @@ export async function deleteVehicle(id: string) {
         id,
       },
     });
-    
+
     revalidatePath("/cars");
     return { success: true };
   } catch (error) {
     console.error("Error deleting vehicle:", error);
     return { success: false, error: "Failed to delete vehicle" };
+  }
+}
+
+// Assign a vehicle to an entity
+export async function assignVehicle(data: {
+  vehicleId: string;
+  assignmentType: string;
+  entityId: string;
+  startDate?: Date;
+  endDate?: Date;
+  notes?: string;
+}) {
+  try {
+    // In a real implementation, you would create the appropriate assignment record
+    // based on the assignment type (Premier Event, Event, Mission, Ride, or Chauffeur)
+
+    // For now, we'll just update the vehicle status to IN_USE
+    const vehicle = await prisma.vehicle.update({
+      where: {
+        id: data.vehicleId,
+      },
+      data: {
+        status: "IN_USE",
+      },
+    });
+
+    // In a real implementation, you would create a record in the appropriate table
+    // For example, if assigning to an event:
+    // const eventVehicle = await prisma.eventVehicle.create({
+    //   data: {
+    //     eventId: data.entityId,
+    //     vehicleId: data.vehicleId,
+    //     assignedAt: new Date(),
+    //     status: "ASSIGNED",
+    //     notes: data.notes,
+    //   },
+    // });
+
+    revalidatePath("/cars");
+    revalidatePath(`/cars/${data.vehicleId}`);
+    return { success: true, data: vehicle };
+  } catch (error) {
+    console.error("Error assigning vehicle:", error);
+    return { success: false, error: "Failed to assign vehicle" };
   }
 }
