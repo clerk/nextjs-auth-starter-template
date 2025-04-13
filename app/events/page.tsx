@@ -247,113 +247,16 @@ export default function EventsPage() {
                 </div>
               </div>
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="grid" className="space-y-4">
+                <Tabs defaultValue="table" className="space-y-4">
                   <div className="flex items-center justify-between">
                     <TabsList>
-                      <TabsTrigger value="grid">Grid View</TabsTrigger>
                       <TabsTrigger value="table">Table View</TabsTrigger>
+                      <TabsTrigger value="grid">Grid View</TabsTrigger>
                     </TabsList>
                     <div className="text-sm text-muted-foreground">
                       {events.length} events found
                     </div>
                   </div>
-
-                  {/* Grid View */}
-                  <TabsContent value="grid" className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                      {isLoading ? (
-                        <div className="flex justify-center items-center h-40">
-                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                        </div>
-                      ) : events.length === 0 ? (
-                        <div className="flex justify-center items-center h-40">
-                          <p className="text-muted-foreground">No events found</p>
-                        </div>
-                      ) : (
-                        events.map((event) => (
-                          <Card key={event.id} className="overflow-hidden">
-                            <CardHeader className="p-4 pb-0">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <CardTitle className="text-lg font-semibold">
-                                    {event.title}
-                                  </CardTitle>
-                                  <CardDescription className="line-clamp-1">
-                                    {event.client?.name || "No client assigned"}
-                                  </CardDescription>
-                                </div>
-                                <Badge className={cn(
-                                  event.status === "PLANNED" && "bg-yellow-100 text-yellow-800",
-                                  event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800",
-                                  event.status === "COMPLETED" && "bg-green-100 text-green-800",
-                                  event.status === "CANCELLED" && "bg-red-100 text-red-800"
-                                )}>
-                                  {event.status.replace("_", " ")}
-                                </Badge>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="p-4 pt-2 space-y-3">
-                              <div className="flex items-start gap-2">
-                                <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                                <div>
-                                  <p className="text-sm">
-                                    {format(new Date(event.startDate), "PPP")} - {format(new Date(event.endDate), "PPP")}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                                <p className="text-sm line-clamp-1">{event.location || "No location specified"}</p>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <Users className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                                <p className="text-sm">Participants: {event.participants || 0}</p>
-                              </div>
-                              <div className="flex items-start gap-2">
-                                <Building2 className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                                <p className="text-sm line-clamp-1">{event.client?.name || "No client assigned"}</p>
-                              </div>
-                            </CardContent>
-                            <CardFooter className="p-4 pt-0 flex justify-between gap-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full"
-                                asChild
-                              >
-                                <a href={`/events/${event.id}`}>
-                                  <Eye className="mr-2 h-4 w-4" />
-                                  View
-                                </a>
-                              </Button>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                    <span className="sr-only">More</span>
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => {
-                                    setSelectedEvent(event);
-                                    setEventDialogOpen(true);
-                                  }}>
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    className="text-red-600"
-                                    onClick={() => handleDeleteEvent(event.id)}
-                                  >
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </CardFooter>
-                          </Card>
-                        ))
-                      )}
-                    </div>
-                  </TabsContent>
 
                   {/* Table View */}
                   <TabsContent value="table" className="space-y-4">
@@ -472,6 +375,104 @@ export default function EventsPage() {
                       </Table>
                     </div>
                   </TabsContent>
+
+                  {/* Grid View */}
+                  <TabsContent value="grid" className="space-y-4">
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      {isLoading ? (
+                        <div className="flex justify-center items-center h-40">
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                      ) : events.length === 0 ? (
+                        <div className="flex justify-center items-center h-40">
+                          <p className="text-muted-foreground">No events found</p>
+                        </div>
+                      ) : (
+                        events.map((event) => (
+                          <Card key={event.id} className="overflow-hidden">
+                            <CardHeader className="p-4 pb-0">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <CardTitle className="text-lg font-semibold">
+                                    {event.title}
+                                  </CardTitle>
+                                  <CardDescription className="line-clamp-1">
+                                    {event.client?.name || "No client assigned"}
+                                  </CardDescription>
+                                </div>
+                                <Badge className={cn(
+                                  event.status === "PLANNED" && "bg-yellow-100 text-yellow-800",
+                                  event.status === "IN_PROGRESS" && "bg-blue-100 text-blue-800",
+                                  event.status === "COMPLETED" && "bg-green-100 text-green-800",
+                                  event.status === "CANCELLED" && "bg-red-100 text-red-800"
+                                )}>
+                                  {event.status.replace("_", " ")}
+                                </Badge>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="p-4 pt-2 space-y-3">
+                              <div className="flex items-start gap-2">
+                                <Calendar className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <div>
+                                  <p className="text-sm">
+                                    {format(new Date(event.startDate), "PPP")} - {format(new Date(event.endDate), "PPP")}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm line-clamp-1">{event.location || "No location specified"}</p>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <Users className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm">Participants: {event.participants || 0}</p>
+                              </div>
+                              <div className="flex items-start gap-2">
+                                <Building2 className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                                <p className="text-sm line-clamp-1">{event.client?.name || "No client assigned"}</p>
+                              </div>
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0 flex justify-between gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                asChild
+                              >
+                                <a href={`/events/${event.id}`}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View
+                                </a>
+                              </Button>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <MoreHorizontal className="h-4 w-4" />
+                                    <span className="sr-only">More</span>
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  <DropdownMenuItem onClick={() => {
+                                    setSelectedEvent(event);
+                                    setEventDialogOpen(true);
+                                  }}>
+                                    Edit
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-red-600"
+                                    onClick={() => handleDeleteEvent(event.id)}
+                                  >
+                                    Delete
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </CardFooter>
+                          </Card>
+                        ))
+                      )}
+                    </div>
+                  </TabsContent>
+
                   <TabsContent value="upcoming" className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                       {isLoading ? (

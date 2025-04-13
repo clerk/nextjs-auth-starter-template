@@ -354,26 +354,16 @@ export default function RidesPage() {
 
               {/* Rides List with Tabs */}
               <div className="px-4 lg:px-6">
-                <Tabs defaultValue="grid" className="space-y-4">
+                <Tabs defaultValue="table" className="space-y-4">
                   <div className="flex items-center justify-between">
                     <TabsList>
-                      <TabsTrigger value="grid">Grid View</TabsTrigger>
                       <TabsTrigger value="table">Table View</TabsTrigger>
+                      <TabsTrigger value="grid">Grid View</TabsTrigger>
                     </TabsList>
                     <div className="text-sm text-muted-foreground">
                       {filteredRides.length} rides found
                     </div>
                   </div>
-
-                  {/* Grid View */}
-                  <TabsContent value="grid" className="space-y-4">
-                    <RidesList
-                      rides={filteredRides}
-                      title=""
-                      description=""
-                      showSearch={false}
-                    />
-                  </TabsContent>
 
                   {/* Table View */}
                   <TabsContent value="table" className="space-y-4">
@@ -451,6 +441,16 @@ export default function RidesPage() {
                         </TableBody>
                       </Table>
                     </div>
+                  </TabsContent>
+
+                  {/* Grid View */}
+                  <TabsContent value="grid" className="space-y-4">
+                    <RidesList
+                      rides={filteredRides}
+                      title=""
+                      description=""
+                      showSearch={false}
+                    />
                   </TabsContent>
                 </Tabs>
               </div>
