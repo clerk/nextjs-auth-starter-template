@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Users, MapPin, Clock, Edit, Trash2, MoreHorizontal, Loader2 } from "lucide-react";
+import { ArrowLeft, Calendar, Users, MapPin, Edit, MoreHorizontal, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { AppSidebar } from "@/components/app-sidebar";
@@ -18,8 +18,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EventVehicleAssignmentDialog } from "../components/event-vehicle-assignment-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -132,6 +132,7 @@ export default function EventDetailPage() {
   const router = useRouter();
   const [event, setEvent] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [assignmentDialogOpen, setAssignmentDialogOpen] = useState(false);
   const [missions, setMissions] = useState(mockMissions);
   const [participants, setParticipants] = useState(mockParticipants);
   const [vehicles, setVehicles] = useState(mockVehicles);
@@ -312,7 +313,7 @@ export default function EventDetailPage() {
                       <DropdownMenuItem onClick={() => router.push(`/events/${event.id}/participants/new`)}>
                         Add Participant
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => router.push(`/events/${event.id}/vehicles/assign`)}>
+                      <DropdownMenuItem onClick={() => setAssignmentDialogOpen(true)}>
                         Assign Vehicles
                       </DropdownMenuItem>
                       <DropdownMenuItem className="text-red-600" onClick={handleDeleteEvent}>
@@ -460,7 +461,7 @@ export default function EventDetailPage() {
                 <TabsContent value="vehicles" className="mt-4">
                   <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl font-semibold">Assigned Vehicles</h2>
-                    <Button onClick={() => router.push(`/events/${event.id}/vehicles/assign`)}>
+                    <Button onClick={() => setAssignmentDialogOpen(true)}>
                       Assign Vehicles
                     </Button>
                   </div>
@@ -502,6 +503,12 @@ export default function EventDetailPage() {
           </div>
         </div>
       </SidebarInset>
+      <EventVehicleAssignmentDialog
+        open={assignmentDialogOpen}
+        onOpenChange={setAssignmentDialogOpen}
+        eventId={event?.id || ""}
+        eventName={event?.name || ""}
+      />
     </SidebarProvider>
   );
 }
