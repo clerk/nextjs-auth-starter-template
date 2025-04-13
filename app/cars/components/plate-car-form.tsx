@@ -63,24 +63,51 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
       capacity: defaultValues?.capacity || 4,
       vehicleType: defaultValues?.vehicleType || "SEDAN",
       status: defaultValues?.status || "AVAILABLE",
-      isFrenchPlate: true, // Always true for simplicity
+      isFrenchPlate: defaultValues?.isFrenchPlate !== false, // Default to true unless explicitly set to false
     },
   });
 
   const licensePlate = form.watch("licensePlate");
+  const isFrenchPlate = form.watch("isFrenchPlate");
 
-  // Function to check if a license plate is in the French format (XX-123-XX)
+  // Function to check if a license plate is in the French format (XX-123-XX or XX123XX)
   const isFrenchPlateFormat = (plate: string) => {
     // Match format like DV-412-HL (2 letters, 3 digits, 2 letters with hyphens)
-    const regex = /^[A-Z]{2}-\d{3}-[A-Z]{2}$/;
-    return regex.test(plate);
+    const regexWithHyphens = /^[A-Z]{2}-\d{3}-[A-Z]{2}$/;
+    // Match format like AB123CD (2 letters, 3 digits, 2 letters without hyphens)
+    const regexWithoutHyphens = /^[A-Z]{2}\d{3}[A-Z]{2}$/;
+
+    return regexWithHyphens.test(plate) || regexWithoutHyphens.test(plate);
+  };
+
+  // Function to format license plate with hyphens if needed
+  const formatLicensePlate = (plate: string) => {
+    // If the plate already has hyphens, return it as is
+    if (plate.includes('-')) {
+      return plate;
+    }
+
+    // If the plate is in the format AB123CD, convert it to AB-123-CD
+    const regexWithoutHyphens = /^([A-Z]{2})(\d{3})([A-Z]{2})$/;
+    const match = plate.match(regexWithoutHyphens);
+
+    if (match) {
+      return `${match[1]}-${match[2]}-${match[3]}`;
+    }
+
+    // Return the original plate if it doesn't match the expected format
+    return plate;
   };
 
   // Function to fetch vehicle data from the API
   const fetchVehicleData = async (plate: string) => {
     try {
       setIsCheckingPlate(true);
-      const response = await fetch(`https://api-immat.vercel.app/getDataImmatriculation?plaque=${plate}&region=`);
+
+      // Format the license plate to ensure it has hyphens
+      const formattedPlate = formatLicensePlate(plate);
+
+      const response = await fetch(`https://api-immat.vercel.app/getDataImmatriculation?plaque=${formattedPlate}&region=`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch vehicle data");
@@ -109,14 +136,25 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
             form.setValue("color", data.data.couleur);
           }
 
-          // Set capacity based on vehicle type if available
-          const vehicleType = data.data.genreVCGNGC;
-          if (vehicleType === "VP") { // VP = Véhicule Particulier (passenger car)
-            form.setValue("vehicleType", "SEDAN");
-            form.setValue("capacity", 4); // Default for passenger cars
-          } else if (vehicleType === "CTTE") { // CTTE = Camionnette (van)
-            form.setValue("vehicleType", "VAN");
-            form.setValue("capacity", 2); // Default for vans
+          // Set vehicle type based on energy type
+          if (data.info.energy) {
+            // Set luxury type for high-end brands
+            const luxuryBrands = ["MERCEDES", "BMW", "AUDI", "LEXUS", "INFINITI", "PORSCHE", "BENTLEY", "ROLLS-ROYCE", "FERRARI", "LAMBORGHINI", "MASERATI"];
+            if (luxuryBrands.includes(data.info.marque.toUpperCase())) {
+              form.setValue("vehicleType", "LUXURY");
+            }
+
+            // Set capacity based on vehicle type if available
+            const vehicleType = data.data.genreVCGNGC;
+            if (vehicleType === "VP") { // VP = Véhicule Particulier (passenger car)
+              if (form.getValues("vehicleType") !== "LUXURY") {
+                form.setValue("vehicleType", "SEDAN");
+              }
+              form.setValue("capacity", 4); // Default for passenger cars
+            } else if (vehicleType === "CTTE") { // CTTE = Camionnette (van)
+              form.setValue("vehicleType", "VAN");
+              form.setValue("capacity", 2); // Default for vans
+            }
           }
         }
 
@@ -134,14 +172,15 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
 
   // Debounce function for license plate check
   useEffect(() => {
-    if (licensePlate && isFrenchPlateFormat(licensePlate)) {
+    // Only fetch data if the French plate toggle is on and the license plate is in the correct format
+    if (isFrenchPlate && licensePlate && isFrenchPlateFormat(licensePlate)) {
       const timer = setTimeout(() => {
         fetchVehicleData(licensePlate);
       }, 1000);
 
       return () => clearTimeout(timer);
     }
-  }, [licensePlate]);
+  }, [licensePlate, isFrenchPlate]);
 
   const handleSubmit = async (data: CarFormValues) => {
     try {
@@ -158,6 +197,29 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+          <FormField
+            control={form.control}
+            name="isFrenchPlate"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel className="text-base">French License Plate</FormLabel>
+                  <FormDescription>
+                    Is this a French vehicle? Toggle on to auto-fetch vehicle information.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        </div>
+
         <div className="grid grid-cols-1 gap-4">
           <FormField
             control={form.control}
@@ -168,9 +230,10 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                 <FormControl>
                   <div className="relative">
                     <Input
-                      placeholder="XX-123-XX"
+                      placeholder={isFrenchPlate ? "XX-123-XX or XX123XX" : "License Plate"}
                       {...field}
                       disabled={isCheckingPlate}
+                      autoCapitalize="characters"
                     />
                     {isCheckingPlate && (
                       <div className="absolute right-2 top-2">
@@ -180,7 +243,9 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                   </div>
                 </FormControl>
                 <FormDescription>
-                  Enter the license plate in format XX-123-XX (e.g., DV-412-HL)
+                  {isFrenchPlate
+                    ? "Enter the license plate in format XX-123-XX (e.g., DV-412-HL) or without hyphens (e.g., DV412HL)"
+                    : "Enter the license plate number"}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
