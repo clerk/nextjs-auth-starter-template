@@ -83,7 +83,9 @@ const mockChauffeurs = [
 ];
 
 // Define the form schema
+// The assignmentType follows the hierarchical order: Premier Event > Event > Mission > Ride > Chauffeur
 const assignmentSchema = z.object({
+  // Assignment type in hierarchical order (highest to lowest)
   assignmentType: z.enum(["PREMIER_EVENT", "EVENT", "MISSION", "RIDE", "CHAUFFEUR"]),
   entityId: z.string().min(1, "Please select an entity"),
   startDate: z.date().optional(),
@@ -224,6 +226,9 @@ export function VehicleAssignmentDialog({
                   </Select>
                   <FormDescription>
                     Select the type of entity to assign this vehicle to.
+                    <span className="block mt-1 text-xs text-blue-600">
+                      Hierarchy: Premier Event &gt; Event &gt; Mission &gt; Ride &gt; Chauffeur
+                    </span>
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

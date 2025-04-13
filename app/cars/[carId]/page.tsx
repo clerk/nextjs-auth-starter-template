@@ -377,6 +377,9 @@ export default function CarDetailPage() {
                       <div>
                         <p className="font-medium">Assigned to Event: Corporate Meeting</p>
                         <p className="text-sm text-muted-foreground">April 15, 2025 - April 20, 2025</p>
+                        <p className="text-xs text-blue-600 mt-1">
+                          <span className="font-medium">Hierarchy:</span> Premier Event: VIP Conference 2025 &gt; Event: Corporate Meeting
+                        </p>
                       </div>
                       <Button variant="outline" size="sm" className="md:self-end">
                         View Details

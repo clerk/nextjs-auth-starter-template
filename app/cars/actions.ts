@@ -110,9 +110,12 @@ export async function deleteVehicle(id: string) {
   }
 }
 
-// Assign a vehicle to an entity
+// Assign a vehicle to an entity following the hierarchical order:
+// Premier Event > Event > Mission > Ride > Chauffeur
 export async function assignVehicle(data: {
   vehicleId: string;
+  // The assignment type follows the hierarchical order (from highest to lowest):
+  // PREMIER_EVENT > EVENT > MISSION > RIDE > CHAUFFEUR
   assignmentType: string;
   entityId: string;
   startDate?: Date;
@@ -122,6 +125,7 @@ export async function assignVehicle(data: {
   try {
     // In a real implementation, you would create the appropriate assignment record
     // based on the assignment type (Premier Event, Event, Mission, Ride, or Chauffeur)
+    // Higher-level assignments (Premier Event) take precedence over lower-level ones (Chauffeur)
 
     // For now, we'll just update the vehicle status to IN_USE
     const vehicle = await prisma.vehicle.update({
@@ -134,16 +138,38 @@ export async function assignVehicle(data: {
     });
 
     // In a real implementation, you would create a record in the appropriate table
-    // For example, if assigning to an event:
-    // const eventVehicle = await prisma.eventVehicle.create({
-    //   data: {
-    //     eventId: data.entityId,
-    //     vehicleId: data.vehicleId,
-    //     assignedAt: new Date(),
-    //     status: "ASSIGNED",
-    //     notes: data.notes,
-    //   },
-    // });
+    // based on the hierarchical level of the assignment:
+    //
+    // if (data.assignmentType === "PREMIER_EVENT") {
+    //   // Highest level assignment - Premier Event
+    //   await prisma.premierEventVehicle.create({
+    //     data: {
+    //       premierEventId: data.entityId,
+    //       vehicleId: data.vehicleId,
+    //       assignedAt: new Date(),
+    //       startDate: data.startDate,
+    //       endDate: data.endDate,
+    //       status: "ASSIGNED",
+    //       notes: data.notes,
+    //     },
+    //   });
+    // } else if (data.assignmentType === "EVENT") {
+    //   // Second level assignment - Event
+    //   await prisma.eventVehicle.create({
+    //     data: {
+    //       eventId: data.entityId,
+    //       vehicleId: data.vehicleId,
+    //       assignedAt: new Date(),
+    //       startDate: data.startDate,
+    //       endDate: data.endDate,
+    //       status: "ASSIGNED",
+    //       notes: data.notes,
+    //     },
+    //   });
+    // } else if (data.assignmentType === "MISSION") {
+    //   // Third level assignment - Mission
+    //   // And so on for RIDE and CHAUFFEUR...
+    // }
 
     revalidatePath("/cars");
     revalidatePath(`/cars/${data.vehicleId}`);
