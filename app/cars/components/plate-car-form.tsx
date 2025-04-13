@@ -212,8 +212,16 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
     }
   };
 
+  // Check if we're in edit mode (defaultValues has an id)
+  const isEditMode = !!defaultValues?.id;
+
   // Debounce function for license plate check
   useEffect(() => {
+    // Skip API call if we're in edit mode - use the existing data from the database
+    if (isEditMode) {
+      return;
+    }
+
     // Only fetch data if the French plate toggle is on and the license plate is in the correct format
     if (isFrenchPlate && licensePlate && isFrenchPlateFormat(licensePlate)) {
       const timer = setTimeout(() => {
@@ -222,7 +230,7 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
 
       return () => clearTimeout(timer);
     }
-  }, [licensePlate, isFrenchPlate]);
+  }, [licensePlate, isFrenchPlate, isEditMode]);
 
   const handleSubmit = async (data: CarFormValues) => {
     try {
@@ -238,6 +246,13 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
 
   return (
     <Form {...form}>
+      {isEditMode && (
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+          <p className="text-blue-700 text-sm">
+            <strong>Edit Mode:</strong> You are editing an existing vehicle. The data is loaded from the database.
+          </p>
+        </div>
+      )}
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
           <FormField
@@ -289,9 +304,11 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                   </div>
                 </FormControl>
                 <FormDescription>
-                  {isFrenchPlate
-                    ? "Enter the license plate in format XX-123-XX (e.g., DV-412-HL) or without hyphens (e.g., DV412HL)"
-                    : "Enter the license plate number"}
+                  {isEditMode
+                    ? "License plate from database. Changing it will not trigger auto-fetch."
+                    : isFrenchPlate
+                      ? "Enter the license plate in format XX-123-XX (e.g., DV-412-HL) or without hyphens (e.g., DV412HL)"
+                      : "Enter the license plate number"}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
