@@ -40,131 +40,38 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { PlateCarDialog } from "./components/plate-car-dialog";
 import { CarFormValues } from "./schemas/car-schema";
-
-// Mock data for cars
-const mockCars = [
-  {
-    id: "1",
-    make: "Mercedes-Benz",
-    model: "S-Class",
-    year: 2023,
-    licensePlate: "AB-123-CD",
-    color: "Black",
-    capacity: 4,
-    vehicleType: "LUXURY",
-    status: "AVAILABLE",
-    lastMaintenance: "2023-04-15T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-01-10T14:30:00Z",
-  },
-  {
-    id: "2",
-    make: "BMW",
-    model: "7 Series",
-    year: 2022,
-    licensePlate: "EF-456-GH",
-    color: "Silver",
-    capacity: 4,
-    vehicleType: "LUXURY",
-    status: "IN_USE",
-    lastMaintenance: "2023-03-20T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-01-15T10:45:00Z",
-  },
-  {
-    id: "3",
-    make: "Audi",
-    model: "A8",
-    year: 2023,
-    licensePlate: "IJ-789-KL",
-    color: "White",
-    capacity: 4,
-    vehicleType: "LUXURY",
-    status: "AVAILABLE",
-    lastMaintenance: "2023-05-05T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-02-01T09:15:00Z",
-  },
-  {
-    id: "4",
-    make: "Mercedes-Benz",
-    model: "V-Class",
-    year: 2022,
-    licensePlate: "MN-012-OP",
-    color: "Black",
-    capacity: 7,
-    vehicleType: "VAN",
-    status: "AVAILABLE",
-    lastMaintenance: "2023-04-10T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-02-10T16:20:00Z",
-  },
-  {
-    id: "5",
-    make: "Cadillac",
-    model: "Escalade",
-    year: 2023,
-    licensePlate: "QR-345-ST",
-    color: "Black",
-    capacity: 6,
-    vehicleType: "SUV",
-    status: "MAINTENANCE",
-    lastMaintenance: "2023-06-01T00:00:00Z",
-    isFrenchPlate: false,
-    createdAt: "2023-03-05T11:30:00Z",
-  },
-  {
-    id: "6",
-    make: "Lincoln",
-    model: "Continental",
-    year: 2022,
-    licensePlate: "UV-678-WX",
-    color: "White",
-    capacity: 4,
-    vehicleType: "SEDAN",
-    status: "AVAILABLE",
-    lastMaintenance: "2023-05-15T00:00:00Z",
-    isFrenchPlate: false,
-    createdAt: "2023-03-15T14:45:00Z",
-  },
-  {
-    id: "7",
-    make: "Rolls-Royce",
-    model: "Phantom",
-    year: 2023,
-    licensePlate: "YZ-901-AB",
-    color: "Black",
-    capacity: 4,
-    vehicleType: "LUXURY",
-    status: "AVAILABLE",
-    lastMaintenance: "2023-06-10T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-04-01T09:00:00Z",
-  },
-  {
-    id: "8",
-    make: "Mercedes-Benz",
-    model: "Sprinter",
-    year: 2022,
-    licensePlate: "CD-234-EF",
-    color: "Silver",
-    capacity: 12,
-    vehicleType: "VAN",
-    status: "OUT_OF_SERVICE",
-    lastMaintenance: "2023-02-20T00:00:00Z",
-    isFrenchPlate: true,
-    createdAt: "2023-04-10T13:15:00Z",
-  },
-];
+import { createVehicle, deleteVehicle, getVehicles, updateVehicle } from "./actions";
 
 export default function CarsPage() {
-  const [cars, setCars] = useState(mockCars);
-  const [isLoading, setIsLoading] = useState(false);
+  const [cars, setCars] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<string | null>(null);
   const [carDialogOpen, setCarDialogOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<any | null>(null);
   const debouncedSearchQuery = useDebounce(searchTerm, 500); // 500ms debounce delay
+
+  // Fetch vehicles from the database
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      setIsLoading(true);
+      try {
+        const result = await getVehicles();
+        if (result.success) {
+          setCars(result.data);
+        } else {
+          toast.error(result.error || "Failed to fetch vehicles");
+        }
+      } catch (error) {
+        console.error("Error fetching vehicles:", error);
+        toast.error("An error occurred while fetching vehicles");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchVehicles();
+  }, []);
 
   // Filter cars based on search term and status
   const filteredCars = cars.filter((car) => {
@@ -183,26 +90,33 @@ export default function CarsPage() {
     try {
       setIsLoading(true);
 
-      // In a real app, you would call an API here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-
+      let result;
       if (selectedCar) {
         // Update existing car
-        setCars(cars.map(car => car.id === selectedCar.id ? { ...car, ...data } : car));
-        toast.success("Vehicle updated successfully");
+        result = await updateVehicle(selectedCar.id, data);
+        if (result.success) {
+          // Update the car in the local state
+          setCars(cars.map(car => car.id === selectedCar.id ? result.data : car));
+          toast.success("Vehicle updated successfully");
+        } else {
+          toast.error(result.error || "Failed to update vehicle");
+        }
       } else {
         // Create new car
-        const newCar = {
-          id: `${cars.length + 1}`,
-          ...data,
-          createdAt: new Date().toISOString(),
-        };
-        setCars([...cars, newCar]);
-        toast.success("Vehicle created successfully");
+        result = await createVehicle(data);
+        if (result.success) {
+          // Add the new car to the local state
+          setCars([result.data, ...cars]);
+          toast.success("Vehicle created successfully");
+        } else {
+          toast.error(result.error || "Failed to create vehicle");
+        }
       }
 
-      setCarDialogOpen(false);
-      setSelectedCar(null);
+      if (result.success) {
+        setCarDialogOpen(false);
+        setSelectedCar(null);
+      }
     } catch (error) {
       console.error("Error handling car submit:", error);
       toast.error("Failed to save vehicle");
@@ -216,11 +130,15 @@ export default function CarsPage() {
     try {
       setIsLoading(true);
 
-      // In a real app, you would call an API here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      const result = await deleteVehicle(id);
 
-      setCars(cars.filter(car => car.id !== id));
-      toast.success("Vehicle deleted successfully");
+      if (result.success) {
+        // Remove the car from the local state
+        setCars(cars.filter(car => car.id !== id));
+        toast.success("Vehicle deleted successfully");
+      } else {
+        toast.error(result.error || "Failed to delete vehicle");
+      }
     } catch (error) {
       console.error("Error deleting car:", error);
       toast.error("Failed to delete vehicle");

@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { PlateCarDialog } from "../components/plate-car-dialog";
 import { CarFormValues } from "../schemas/car-schema";
+import { deleteVehicle, getVehicleById, updateVehicle } from "../actions";
 
 // Mock data for a single car (in a real app, this would come from an API)
 const mockCar = {
@@ -122,15 +123,31 @@ export default function CarDetailPage() {
   const [rideHistory, setRideHistory] = useState(mockRideHistory);
 
   useEffect(() => {
-    // In a real app, you would fetch the car data from an API
     const fetchCar = async () => {
       setLoading(true);
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
+        if (!params.carId || typeof params.carId !== 'string') {
+          toast.error("Invalid vehicle ID");
+          return;
+        }
 
-        // In a real app, you would fetch the car with the ID from params.carId
-        setCar(mockCar);
+        const result = await getVehicleById(params.carId);
+
+        if (result.success) {
+          setCar({
+            ...result.data,
+            // Add additional mock details for the detail page
+            vin: "WDDUG8CB7LA456789",
+            fuelType: "Diesel",
+            mileage: 15000,
+            nextMaintenanceDue: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days from now
+            insuranceExpiryDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(), // 180 days from now
+            registrationExpiryDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 365 days from now
+            notes: "Vehicle information fetched from database. Additional details are mock data.",
+          });
+        } else {
+          toast.error(result.error || "Failed to load vehicle details");
+        }
       } catch (error) {
         console.error("Error fetching car:", error);
         toast.error("Failed to load vehicle details");
@@ -145,12 +162,30 @@ export default function CarDetailPage() {
   // Handle car update
   const handleCarUpdate = async (data: CarFormValues) => {
     try {
-      // In a real app, you would call an API here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      if (!car || !car.id) {
+        toast.error("No vehicle to update");
+        return;
+      }
 
-      setCar({ ...car, ...data });
-      toast.success("Vehicle updated successfully");
-      setCarDialogOpen(false);
+      const result = await updateVehicle(car.id, data);
+
+      if (result.success) {
+        // Update the car in the local state, preserving the mock data
+        setCar({
+          ...result.data,
+          vin: car.vin,
+          fuelType: car.fuelType,
+          mileage: car.mileage,
+          nextMaintenanceDue: car.nextMaintenanceDue,
+          insuranceExpiryDate: car.insuranceExpiryDate,
+          registrationExpiryDate: car.registrationExpiryDate,
+          notes: car.notes,
+        });
+        toast.success("Vehicle updated successfully");
+        setCarDialogOpen(false);
+      } else {
+        toast.error(result.error || "Failed to update vehicle");
+      }
     } catch (error) {
       console.error("Error updating car:", error);
       toast.error("Failed to update vehicle");
@@ -160,11 +195,19 @@ export default function CarDetailPage() {
   // Handle car deletion
   const handleDeleteCar = async () => {
     try {
-      // In a real app, you would call an API here
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      if (!car || !car.id) {
+        toast.error("No vehicle to delete");
+        return;
+      }
 
-      toast.success("Vehicle deleted successfully");
-      router.push("/cars");
+      const result = await deleteVehicle(car.id);
+
+      if (result.success) {
+        toast.success("Vehicle deleted successfully");
+        router.push("/cars");
+      } else {
+        toast.error(result.error || "Failed to delete vehicle");
+      }
     } catch (error) {
       console.error("Error deleting car:", error);
       toast.error("Failed to delete vehicle");

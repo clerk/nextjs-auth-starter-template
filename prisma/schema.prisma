@@ -111,6 +111,7 @@ model Partner {
   eventParticipations EventPartner[]
   missionPartners     MissionPartner[]
   ridePartners        RidePartner[]
+  vehicles            Vehicle[]         @relation("PartnerVehicles")
 
   createdAt         DateTime        @default(now())
   updatedAt         DateTime        @updatedAt
@@ -139,9 +140,12 @@ model Vehicle {
   capacity        Int            @default(4)
   vehicleType     VehicleType    @default(SEDAN)
   status          VehicleStatus  @default(AVAILABLE)
+  isFrenchPlate   Boolean        @default(true)
   lastMaintenance DateTime?
+  partnerId       String?
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  partner         Partner?       @relation("PartnerVehicles", fields: [partnerId], references: [id])
   chauffeurs      Chauffeur[]
   eventVehicles   EventVehicle[]
 }
@@ -416,3 +420,5 @@ enum PartnerRideStatus {
   COMPLETED
   CANCELLED
 }
+
+
