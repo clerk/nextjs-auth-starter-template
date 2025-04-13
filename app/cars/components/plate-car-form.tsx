@@ -71,6 +71,7 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
 
   // Function to check if a license plate is in the French format (XX-123-XX)
   const isFrenchPlateFormat = (plate: string) => {
+    // Match format like DV-412-HL (2 letters, 3 digits, 2 letters with hyphens)
     const regex = /^[A-Z]{2}-\d{3}-[A-Z]{2}$/;
     return regex.test(plate);
   };
@@ -80,25 +81,45 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
     try {
       setIsCheckingPlate(true);
       const response = await fetch(`https://api-immat.vercel.app/getDataImmatriculation?plaque=${plate}&region=`);
-      
+
       if (!response.ok) {
         throw new Error("Failed to fetch vehicle data");
       }
-      
+
       const data = await response.json();
       console.log("API response:", data);
-      
-      if (data && data.success) {
-        // Update form with fetched data
-        form.setValue("make", data.marque || "");
-        form.setValue("model", data.modele || "");
-        if (data.date_mise_circulation) {
-          const dateParts = data.date_mise_circulation.split('/');
+
+      if (data && data.info) {
+        // Update form with fetched data from the info object
+        form.setValue("make", data.info.marque || "");
+        form.setValue("model", data.info.modele || "");
+
+        // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
+        if (data.info.dateMiseEnCirculation) {
+          const dateParts = data.info.dateMiseEnCirculation.split('-');
           if (dateParts.length === 3) {
-            form.setValue("year", parseInt(dateParts[2]));
+            form.setValue("year", parseInt(dateParts[0]));
           }
         }
-        
+
+        // Set additional data if available
+        if (data.data) {
+          // Set color if available (not in the example response)
+          if (data.data.couleur) {
+            form.setValue("color", data.data.couleur);
+          }
+
+          // Set capacity based on vehicle type if available
+          const vehicleType = data.data.genreVCGNGC;
+          if (vehicleType === "VP") { // VP = Véhicule Particulier (passenger car)
+            form.setValue("vehicleType", "SEDAN");
+            form.setValue("capacity", 4); // Default for passenger cars
+          } else if (vehicleType === "CTTE") { // CTTE = Camionnette (van)
+            form.setValue("vehicleType", "VAN");
+            form.setValue("capacity", 2); // Default for vans
+          }
+        }
+
         toast.success("Vehicle information retrieved successfully");
       } else {
         toast.error("Could not find vehicle information");
@@ -117,7 +138,7 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
       const timer = setTimeout(() => {
         fetchVehicleData(licensePlate);
       }, 1000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [licensePlate]);
@@ -146,9 +167,9 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                 <FormLabel>License Plate *</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Input 
-                      placeholder="XX-123-XX" 
-                      {...field} 
+                    <Input
+                      placeholder="XX-123-XX"
+                      {...field}
                       disabled={isCheckingPlate}
                     />
                     {isCheckingPlate && (
@@ -159,7 +180,7 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                   </div>
                 </FormControl>
                 <FormDescription>
-                  Enter the license plate in format XX-123-XX
+                  Enter the license plate in format XX-123-XX (e.g., DV-412-HL)
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -205,9 +226,9 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
               <FormItem>
                 <FormLabel>Year *</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Year" 
+                  <Input
+                    type="number"
+                    placeholder="Year"
                     {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || new Date().getFullYear())}
                   />
@@ -238,9 +259,9 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
               <FormItem>
                 <FormLabel>Capacity *</FormLabel>
                 <FormControl>
-                  <Input 
-                    type="number" 
-                    placeholder="Capacity" 
+                  <Input
+                    type="number"
+                    placeholder="Capacity"
                     {...field}
                     onChange={(e) => field.onChange(parseInt(e.target.value) || 4)}
                   />
