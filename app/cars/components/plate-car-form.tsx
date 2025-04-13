@@ -72,31 +72,41 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
 
   // Function to check if a license plate is in the French format (XX-123-XX or XX123XX)
   const isFrenchPlateFormat = (plate: string) => {
+    if (!plate) return false;
+
+    // Convert to uppercase and remove any spaces
+    const cleanPlate = plate.toUpperCase().replace(/\s/g, '');
+
     // Match format like DV-412-HL (2 letters, 3 digits, 2 letters with hyphens)
     const regexWithHyphens = /^[A-Z]{2}-\d{3}-[A-Z]{2}$/;
     // Match format like AB123CD (2 letters, 3 digits, 2 letters without hyphens)
     const regexWithoutHyphens = /^[A-Z]{2}\d{3}[A-Z]{2}$/;
 
-    return regexWithHyphens.test(plate) || regexWithoutHyphens.test(plate);
+    return regexWithHyphens.test(cleanPlate) || regexWithoutHyphens.test(cleanPlate);
   };
 
   // Function to format license plate with hyphens if needed
   const formatLicensePlate = (plate: string) => {
+    if (!plate) return '';
+
+    // Convert to uppercase and remove any spaces
+    const cleanPlate = plate.toUpperCase().replace(/\s/g, '');
+
     // If the plate already has hyphens, return it as is
-    if (plate.includes('-')) {
-      return plate;
+    if (cleanPlate.includes('-')) {
+      return cleanPlate;
     }
 
     // If the plate is in the format AB123CD, convert it to AB-123-CD
     const regexWithoutHyphens = /^([A-Z]{2})(\d{3})([A-Z]{2})$/;
-    const match = plate.match(regexWithoutHyphens);
+    const match = cleanPlate.match(regexWithoutHyphens);
 
     if (match) {
       return `${match[1]}-${match[2]}-${match[3]}`;
     }
 
     // Return the original plate if it doesn't match the expected format
-    return plate;
+    return cleanPlate;
   };
 
   // Function to fetch vehicle data from the API
@@ -107,7 +117,17 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
       // Format the license plate to ensure it has hyphens
       const formattedPlate = formatLicensePlate(plate);
 
-      const response = await fetch(`https://api-immat.vercel.app/getDataImmatriculation?plaque=${formattedPlate}&region=`);
+      // Log the API request URL for debugging
+      // The correct parameter is 'plaque' not 'plate'
+      const apiUrl = `https://api-immat.vercel.app/getDataImmatriculation?plaque=${formattedPlate}&region=`;
+      console.log("API request URL:", apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch vehicle data");
@@ -116,24 +136,21 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
       const data = await response.json();
       console.log("API response:", data);
 
-      if (data && data.info) {
+      // Check if we have valid data in the response
+      if (data && (data.info || data.data)) {
+        console.log("Processing API response data:", data);
+
         // Update form with fetched data from the info object
-        form.setValue("make", data.info.marque || "");
-        form.setValue("model", data.info.modele || "");
+        if (data.info) {
+          form.setValue("make", data.info.marque || "");
+          form.setValue("model", data.info.modele || "");
 
-        // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
-        if (data.info.dateMiseEnCirculation) {
-          const dateParts = data.info.dateMiseEnCirculation.split('-');
-          if (dateParts.length === 3) {
-            form.setValue("year", parseInt(dateParts[0]));
-          }
-        }
-
-        // Set additional data if available
-        if (data.data) {
-          // Set color if available (not in the example response)
-          if (data.data.couleur) {
-            form.setValue("color", data.data.couleur);
+          // Extract year from dateMiseEnCirculation (format: YYYY-MM-DD)
+          if (data.info.dateMiseEnCirculation) {
+            const dateParts = data.info.dateMiseEnCirculation.split('-');
+            if (dateParts.length === 3) {
+              form.setValue("year", parseInt(dateParts[0]));
+            }
           }
 
           // Set vehicle type based on energy type
@@ -143,18 +160,43 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
             if (luxuryBrands.includes(data.info.marque.toUpperCase())) {
               form.setValue("vehicleType", "LUXURY");
             }
+          }
+        }
 
-            // Set capacity based on vehicle type if available
-            const vehicleType = data.data.genreVCGNGC;
-            if (vehicleType === "VP") { // VP = Véhicule Particulier (passenger car)
-              if (form.getValues("vehicleType") !== "LUXURY") {
-                form.setValue("vehicleType", "SEDAN");
-              }
-              form.setValue("capacity", 4); // Default for passenger cars
-            } else if (vehicleType === "CTTE") { // CTTE = Camionnette (van)
-              form.setValue("vehicleType", "VAN");
-              form.setValue("capacity", 2); // Default for vans
+        // Set additional data if available
+        if (data.data) {
+          // If info object didn't have the make/model, try to get it from data object
+          if (!form.getValues("make") && data.data.marque) {
+            form.setValue("make", data.data.marque || "");
+          }
+
+          if (!form.getValues("model") && data.data.modele) {
+            form.setValue("model", data.data.modele || "");
+          }
+
+          // Extract year from date1erCir_us (format: YYYY-MM-DD) if not already set
+          if (!form.getValues("year") && data.data.date1erCir_us) {
+            const dateParts = data.data.date1erCir_us.split('-');
+            if (dateParts.length === 3) {
+              form.setValue("year", parseInt(dateParts[0]));
             }
+          }
+
+          // Set color if available (not in the example response)
+          if (data.data.couleur) {
+            form.setValue("color", data.data.couleur);
+          }
+
+          // Set capacity based on vehicle type if available
+          const vehicleType = data.data.genreVCGNGC;
+          if (vehicleType === "VP") { // VP = Véhicule Particulier (passenger car)
+            if (form.getValues("vehicleType") !== "LUXURY") {
+              form.setValue("vehicleType", "SEDAN");
+            }
+            form.setValue("capacity", 4); // Default for passenger cars
+          } else if (vehicleType === "CTTE") { // CTTE = Camionnette (van)
+            form.setValue("vehicleType", "VAN");
+            form.setValue("capacity", 2); // Default for vans
           }
         }
 
@@ -234,6 +276,10 @@ export function PlateCarForm({ defaultValues, onSubmit, onCancel }: PlateCarForm
                       {...field}
                       disabled={isCheckingPlate}
                       autoCapitalize="characters"
+                      onChange={(e) => {
+                        // Convert to uppercase as the user types
+                        field.onChange(e.target.value.toUpperCase());
+                      }}
                     />
                     {isCheckingPlate && (
                       <div className="absolute right-2 top-2">
