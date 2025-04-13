@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Search as SearchIcon, MapPin as MapPinIcon, Clock as ClockIcon, Car as CarIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
