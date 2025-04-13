@@ -26,7 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CarDialog } from "../components/car-dialog";
+import { PlateCarDialog } from "../components/plate-car-dialog";
 import { CarFormValues } from "../schemas/car-schema";
 
 // Mock data for a single car (in a real app, this would come from an API)
@@ -128,7 +128,7 @@ export default function CarDetailPage() {
       try {
         // Simulate API call
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // In a real app, you would fetch the car with the ID from params.carId
         setCar(mockCar);
       } catch (error) {
@@ -147,7 +147,7 @@ export default function CarDetailPage() {
     try {
       // In a real app, you would call an API here
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      
+
       setCar({ ...car, ...data });
       toast.success("Vehicle updated successfully");
       setCarDialogOpen(false);
@@ -162,7 +162,7 @@ export default function CarDetailPage() {
     try {
       // In a real app, you would call an API here
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      
+
       toast.success("Vehicle deleted successfully");
       router.push("/cars");
     } catch (error) {
@@ -404,9 +404,9 @@ export default function CarDetailPage() {
                         </Badge>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium text-muted-foreground">Upcoming Maintenance</h3>
                       <div className="flex items-start gap-2">
@@ -417,9 +417,9 @@ export default function CarDetailPage() {
                         </div>
                       </div>
                     </div>
-                    
+
                     <Separator />
-                    
+
                     <div className="space-y-2">
                       <h3 className="text-sm font-medium text-muted-foreground">Documents</h3>
                       <div className="flex flex-col gap-2">
@@ -625,7 +625,7 @@ export default function CarDetailPage() {
           </div>
         </div>
       </SidebarInset>
-      <CarDialog
+      <PlateCarDialog
         open={carDialogOpen}
         onOpenChange={setCarDialogOpen}
         onSubmit={handleCarUpdate}

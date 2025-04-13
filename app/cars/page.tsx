@@ -38,7 +38,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { CarDialog } from "./components/car-dialog";
+import { PlateCarDialog } from "./components/plate-car-dialog";
 import { CarFormValues } from "./schemas/car-schema";
 
 // Mock data for cars
@@ -172,9 +172,9 @@ export default function CarsPage() {
       car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
       car.licensePlate.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = filterStatus ? car.status === filterStatus : true;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -182,10 +182,10 @@ export default function CarsPage() {
   const handleCarSubmit = async (data: CarFormValues) => {
     try {
       setIsLoading(true);
-      
+
       // In a real app, you would call an API here
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      
+
       if (selectedCar) {
         // Update existing car
         setCars(cars.map(car => car.id === selectedCar.id ? { ...car, ...data } : car));
@@ -200,7 +200,7 @@ export default function CarsPage() {
         setCars([...cars, newCar]);
         toast.success("Vehicle created successfully");
       }
-      
+
       setCarDialogOpen(false);
       setSelectedCar(null);
     } catch (error) {
@@ -215,10 +215,10 @@ export default function CarsPage() {
   const handleDeleteCar = async (id: string) => {
     try {
       setIsLoading(true);
-      
+
       // In a real app, you would call an API here
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
-      
+
       setCars(cars.filter(car => car.id !== id));
       toast.success("Vehicle deleted successfully");
     } catch (error) {
@@ -277,7 +277,7 @@ export default function CarsPage() {
                       <PlusIcon className="mr-2 h-4 w-4" />
                       Add Vehicle
                     </Button>
-                    <CarDialog
+                    <PlateCarDialog
                       open={carDialogOpen}
                       onOpenChange={setCarDialogOpen}
                       onSubmit={handleCarSubmit}
@@ -286,7 +286,7 @@ export default function CarsPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Search and Filters */}
               <div className="px-4 lg:px-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -332,7 +332,7 @@ export default function CarsPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Cars List with Tabs */}
               <div className="px-4 lg:px-6">
                 <Tabs defaultValue="table" className="space-y-4">
@@ -345,7 +345,7 @@ export default function CarsPage() {
                       {filteredCars.length} vehicles found
                     </div>
                   </div>
-                  
+
                   {/* Table View */}
                   <TabsContent value="table" className="space-y-4">
                     <div className="rounded-md border">
@@ -458,7 +458,7 @@ export default function CarsPage() {
                       </Table>
                     </div>
                   </TabsContent>
-                  
+
                   {/* Grid View */}
                   <TabsContent value="grid" className="space-y-4">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
