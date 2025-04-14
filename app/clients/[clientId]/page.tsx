@@ -893,7 +893,7 @@ export default function ClientDetailPage() {
 
       {/* Client Edit Dialog */}
       <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[600px] lg:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>Edit Client</DialogTitle>
             <DialogDescription>
@@ -903,7 +903,7 @@ export default function ClientDetailPage() {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid gap-6 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="name"
@@ -935,7 +935,7 @@ export default function ClientDetailPage() {
                 <Separator />
                 <h3 className="text-sm font-medium">Organization Contact Information</h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="email"
@@ -972,7 +972,7 @@ export default function ClientDetailPage() {
                     : "Add primary contact information. Note: A new user account will be created in a separate step."}
                 </p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contactFirstName"
@@ -1001,7 +1001,7 @@ export default function ClientDetailPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contactEmail"
@@ -1070,7 +1070,7 @@ export default function ClientDetailPage() {
                   )}
                 />
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="city"
@@ -1112,11 +1112,20 @@ export default function ClientDetailPage() {
                   />
                 </div>
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowClientDialog(false)}>
+              <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowClientDialog(false)}
+                  className="mt-3 sm:mt-0 w-full sm:w-auto"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

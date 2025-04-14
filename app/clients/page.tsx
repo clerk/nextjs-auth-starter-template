@@ -663,7 +663,7 @@ export default function ClientsPage() {
 
       {/* Client Dialog (Add/Edit) */}
       <Dialog open={showClientDialog} onOpenChange={setShowClientDialog}>
-        <DialogContent className="sm:max-w-[550px]">
+        <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[600px] lg:max-w-[700px]">
           <DialogHeader>
             <DialogTitle>{isEditMode ? "Edit Client" : "Add New Client"}</DialogTitle>
             <DialogDescription>
@@ -681,7 +681,7 @@ export default function ClientsPage() {
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid gap-6 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="name"
@@ -713,7 +713,7 @@ export default function ClientsPage() {
                 <Separator />
                 <h3 className="text-sm font-medium">Organization Contact Information</h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="email"
@@ -750,7 +750,7 @@ export default function ClientsPage() {
                     : "This person will receive an invitation to create an account"}
                 </p>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contactFirstName"
@@ -779,7 +779,7 @@ export default function ClientsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contactEmail"
@@ -833,7 +833,7 @@ export default function ClientsPage() {
                 <Separator />
                 <h3 className="text-sm font-medium">Contract Information</h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contractStart"
@@ -902,7 +902,7 @@ export default function ClientsPage() {
                   )}
                 />
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   <FormField
                     control={form.control}
                     name="city"
@@ -947,7 +947,7 @@ export default function ClientsPage() {
                 <Separator />
                 <h3 className="text-sm font-medium">Contract Information</h3>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="contractStart"
@@ -999,11 +999,20 @@ export default function ClientsPage() {
                   )}
                 />
               </div>
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setShowClientDialog(false)}>
+              <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowClientDialog(false)}
+                  className="mt-3 sm:mt-0 w-full sm:w-auto"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full sm:w-auto"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
