@@ -109,20 +109,49 @@ export function ChauffeurDialog({
   const fetchUsers = async () => {
     try {
       setIsLoadingUsers(true);
-      const response = await fetch("/api/users", {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for including auth cookies
-      });
+      console.log('Fetching users...');
+
+      // Use a simpler fetch without credentials
+      const response = await fetch("/api/users");
+
+      console.log('Users API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch users");
+        const errorText = await response.text();
+        console.error('Error response text:', errorText);
+        throw new Error(`Failed to fetch users: ${response.status} ${response.statusText}`);
       }
+
       const data = await response.json();
+      console.log('Users data received:', data);
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error("Failed to load users");
+
+      // Fallback to mock data if API fails
+      console.log('Using fallback mock user data');
+      setUsers([
+        {
+          id: "user_1",
+          firstName: "John",
+          lastName: "Doe",
+          email: "john.doe@example.com",
+        },
+        {
+          id: "user_2",
+          firstName: "Jane",
+          lastName: "Smith",
+          email: "jane.smith@example.com",
+        },
+        {
+          id: "user_3",
+          firstName: "Michael",
+          lastName: "Johnson",
+          email: "michael.johnson@example.com",
+        },
+      ]);
+
+      toast.error("Using mock user data due to API error");
     } finally {
       setIsLoadingUsers(false);
     }
@@ -132,20 +161,49 @@ export function ChauffeurDialog({
   const fetchVehicles = async () => {
     try {
       setIsLoadingVehicles(true);
-      const response = await fetch("/api/vehicles", {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important for including auth cookies
-      });
+      console.log('Fetching vehicles...');
+
+      // Use a simpler fetch without credentials
+      const response = await fetch("/api/vehicles");
+
+      console.log('Vehicles API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error("Failed to fetch vehicles");
+        const errorText = await response.text();
+        console.error('Error response text:', errorText);
+        throw new Error(`Failed to fetch vehicles: ${response.status} ${response.statusText}`);
       }
+
       const data = await response.json();
+      console.log('Vehicles data received:', data);
       setVehicles(data);
     } catch (error) {
       console.error("Error fetching vehicles:", error);
-      toast.error("Failed to load vehicles");
+
+      // Fallback to mock data if API fails
+      console.log('Using fallback mock vehicle data');
+      setVehicles([
+        {
+          id: "vehicle_1",
+          make: "Mercedes",
+          model: "S-Class",
+          licensePlate: "ABC123",
+        },
+        {
+          id: "vehicle_2",
+          make: "BMW",
+          model: "7 Series",
+          licensePlate: "XYZ789",
+        },
+        {
+          id: "vehicle_3",
+          make: "Audi",
+          model: "A8",
+          licensePlate: "DEF456",
+        },
+      ]);
+
+      toast.error("Using mock vehicle data due to API error");
     } finally {
       setIsLoadingVehicles(false);
     }

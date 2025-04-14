@@ -1,30 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs";
+
+// OPTIONS handler for CORS preflight requests
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+}
 
 // GET /api/users - Get all users
 export async function GET(req: NextRequest) {
   try {
-    // Authentication is handled by the middleware
-    const { userId } = auth();
-
-    // Just a double-check, but middleware should already handle this
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get query parameters
-    const url = new URL(req.url);
-    const role = url.searchParams.get("role");
-
-    // Build the where clause based on filters
-    const where: any = {};
-    if (role) {
-      where.role = role;
-    }
-
-    // For now, return mock users since we're still developing
-    // In a real implementation, you would fetch users from the database
+    // Simple mock data without any authentication checks
     const mockUsers = [
       {
         id: "user_1",
@@ -55,15 +47,24 @@ export async function GET(req: NextRequest) {
       },
     ];
 
-    // In a real implementation, you would filter users based on the role parameter
-    const formattedUsers = mockUsers;
-
-    return NextResponse.json(formattedUsers);
+    // Set CORS headers to allow requests from any origin
+    return new NextResponse(JSON.stringify(mockUsers), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
   } catch (error) {
     console.error("Error fetching users:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch users" },
-      { status: 500 }
-    );
+    return new NextResponse(JSON.stringify({ error: "Failed to fetch users" }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
   }
 }
