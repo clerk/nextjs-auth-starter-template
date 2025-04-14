@@ -1,0 +1,588 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { CalendarIcon, CheckIcon, ChevronsUpDown, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { chauffeurFormSchema, ChauffeurFormValues, Chauffeur, User, Vehicle, ChauffeurCategory } from "./types";
+
+interface ChauffeurDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (data: ChauffeurFormValues) => void;
+  defaultValues?: Chauffeur;
+}
+
+export function ChauffeurDialog({
+  open,
+  onOpenChange,
+  onSubmit,
+  defaultValues,
+}: ChauffeurDialogProps) {
+  const [users, setUsers] = useState<User[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Initialize the form
+  const form = useForm<ChauffeurFormValues>({
+    resolver: zodResolver(chauffeurFormSchema),
+    defaultValues: defaultValues
+      ? {
+          userId: defaultValues.userId,
+          licenseNumber: defaultValues.licenseNumber,
+          licenseExpiry: new Date(defaultValues.licenseExpiry),
+          vtcCardNumber: defaultValues.vtcCardNumber,
+          vtcValidationDate: new Date(defaultValues.vtcValidationDate),
+          vehicleId: defaultValues.vehicle?.id || null,
+          status: defaultValues.status,
+          category: defaultValues.category,
+          notes: defaultValues.notes || "",
+        }
+      : {
+          userId: "",
+          licenseNumber: "",
+          licenseExpiry: new Date(),
+          vtcCardNumber: "",
+          vtcValidationDate: new Date(),
+          vehicleId: null,
+          status: "AVAILABLE",
+          category: "AVERAGE",
+          notes: "",
+        },
+  });
+
+  // Fetch users and vehicles when the dialog opens
+  useEffect(() => {
+    if (open) {
+      fetchUsers();
+      fetchVehicles();
+    }
+  }, [open]);
+
+  // Fetch users from the API
+  const fetchUsers = async () => {
+    try {
+      setIsLoadingUsers(true);
+      const response = await fetch("/api/users", {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for including auth cookies
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast.error("Failed to load users");
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  // Fetch vehicles from the API
+  const fetchVehicles = async () => {
+    try {
+      setIsLoadingVehicles(true);
+      const response = await fetch("/api/vehicles", {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for including auth cookies
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch vehicles");
+      }
+      const data = await response.json();
+      setVehicles(data);
+    } catch (error) {
+      console.error("Error fetching vehicles:", error);
+      toast.error("Failed to load vehicles");
+    } finally {
+      setIsLoadingVehicles(false);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (data: ChauffeurFormValues) => {
+    try {
+      setIsSubmitting(true);
+      await onSubmit(data);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error("Failed to save chauffeur");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
+            {defaultValues ? "Edit Chauffeur" : "Create Chauffeur"}
+          </DialogTitle>
+          <DialogDescription>
+            {defaultValues
+              ? "Update the chauffeur's information"
+              : "Create a new chauffeur profile"}
+          </DialogDescription>
+        </DialogHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            {/* User Selection */}
+            <FormField
+              control={form.control}
+              name="userId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>User</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                          disabled={!!defaultValues}
+                        >
+                          {isLoadingUsers ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : field.value ? (
+                            users.find((user) => user.id === field.value)
+                              ? `${
+                                  users.find((user) => user.id === field.value)
+                                    ?.firstName
+                                } ${
+                                  users.find((user) => user.id === field.value)
+                                    ?.lastName
+                                }`
+                              : "Select user"
+                          ) : (
+                            "Select user"
+                          )}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search users..." />
+                        <CommandEmpty>No users found.</CommandEmpty>
+                        <CommandGroup>
+                          {users.map((user) => (
+                            <CommandItem
+                              key={user.id}
+                              value={user.id}
+                              onSelect={() => {
+                                form.setValue("userId", user.id);
+                              }}
+                            >
+                              <CheckIcon
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  user.id === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {user.firstName} {user.lastName} ({user.email})
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Select the user to assign as a chauffeur.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* License Number */}
+            <FormField
+              control={form.control}
+              name="licenseNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>License Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter license number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    The chauffeur's driving license number.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* License Expiry */}
+            <FormField
+              control={form.control}
+              name="licenseExpiry"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>License Expiry Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date(new Date().setHours(0, 0, 0, 0))
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    The expiration date of the chauffeur's license.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* VTC Card Number */}
+            <FormField
+              control={form.control}
+              name="vtcCardNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>VTC Card Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter VTC card number" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    The chauffeur's VTC professional card number.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* VTC Validation Date */}
+            <FormField
+              control={form.control}
+              name="vtcValidationDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>VTC Validation Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-full pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    The validation date of the chauffeur's VTC card.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Vehicle Selection */}
+            <FormField
+              control={form.control}
+              name="vehicleId"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Vehicle (Optional)</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-full justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {isLoadingVehicles ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : field.value ? (
+                            vehicles.find(
+                              (vehicle) => vehicle.id === field.value
+                            )
+                              ? `${
+                                  vehicles.find(
+                                    (vehicle) => vehicle.id === field.value
+                                  )?.make
+                                } ${
+                                  vehicles.find(
+                                    (vehicle) => vehicle.id === field.value
+                                  )?.model
+                                } (${
+                                  vehicles.find(
+                                    (vehicle) => vehicle.id === field.value
+                                  )?.licensePlate
+                                })`
+                              : "Select vehicle"
+                          ) : (
+                            "Select vehicle (optional)"
+                          )}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput placeholder="Search vehicles..." />
+                        <CommandEmpty>No vehicles found.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            value="none"
+                            onSelect={() => {
+                              form.setValue("vehicleId", null);
+                            }}
+                          >
+                            <CheckIcon
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                field.value === null ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            No vehicle
+                          </CommandItem>
+                          {vehicles.map((vehicle) => (
+                            <CommandItem
+                              key={vehicle.id}
+                              value={vehicle.id}
+                              onSelect={() => {
+                                form.setValue("vehicleId", vehicle.id);
+                              }}
+                            >
+                              <CheckIcon
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  vehicle.id === field.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                              {vehicle.make} {vehicle.model} ({vehicle.licensePlate})
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  <FormDescription>
+                    Assign a vehicle to this chauffeur (optional).
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Status */}
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="AVAILABLE">Available</SelectItem>
+                      <SelectItem value="BUSY">Busy</SelectItem>
+                      <SelectItem value="ON_BREAK">On Break</SelectItem>
+                      <SelectItem value="OFF_DUTY">Off Duty</SelectItem>
+                      <SelectItem value="ON_LEAVE">On Leave</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    The current status of the chauffeur.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Category */}
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="HIGH_END">High End</SelectItem>
+                      <SelectItem value="BUSINESS">Business</SelectItem>
+                      <SelectItem value="ECONOMY">Economy</SelectItem>
+                      <SelectItem value="AVERAGE">Average</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    The category of service the chauffeur provides.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Notes */}
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Enter notes about the chauffeur"
+                      className="resize-none"
+                      {...field}
+                      value={field.value || ""}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Additional notes about the chauffeur.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : defaultValues ? (
+                  "Update Chauffeur"
+                ) : (
+                  "Create Chauffeur"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+}
