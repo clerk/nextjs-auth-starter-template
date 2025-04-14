@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs";
 
 // GET /api/vehicles - Get all vehicles
 export async function GET(req: NextRequest) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
-    
-    // Check if user is authenticated
+
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -17,7 +16,7 @@ export async function GET(req: NextRequest) {
     // Get query parameters
     const url = new URL(req.url);
     const status = url.searchParams.get("status");
-    
+
     // Build the where clause based on filters
     const where: any = {};
     if (status) {
@@ -61,9 +60,9 @@ export async function GET(req: NextRequest) {
         status: "AVAILABLE",
       },
     ];
-    
+
     // In a real implementation, you would filter vehicles based on the status parameter
-    const filteredVehicles = status 
+    const filteredVehicles = status
       ? mockVehicles.filter(vehicle => vehicle.status === status)
       : mockVehicles;
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs";
 
 // GET /api/chauffeurs/[id] - Get a specific chauffeur
 export async function GET(
@@ -9,10 +8,10 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
 
-    // Check if user is authenticated
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -86,10 +85,10 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
 
-    // Check if user is authenticated
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -155,10 +154,10 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
 
-    // Check if user is authenticated
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

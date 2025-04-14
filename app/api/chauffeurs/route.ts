@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { currentUser } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs";
 
 // GET /api/chauffeurs - Get all chauffeurs
 export async function GET(req: NextRequest) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
 
-    // Check if user is authenticated
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -87,10 +86,10 @@ export async function GET(req: NextRequest) {
 // POST /api/chauffeurs - Create a new chauffeur
 export async function POST(req: NextRequest) {
   try {
-    // Get the auth session
+    // Authentication is handled by the middleware
     const { userId } = auth();
 
-    // Check if user is authenticated
+    // Just a double-check, but middleware should already handle this
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
