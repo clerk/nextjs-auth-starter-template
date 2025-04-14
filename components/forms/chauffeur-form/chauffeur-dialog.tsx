@@ -224,7 +224,7 @@ export function ChauffeurDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[600px] lg:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>
             {defaultValues ? "Edit Chauffeur" : "Create Chauffeur"}
@@ -236,7 +236,7 @@ export function ChauffeurDialog({
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             {/* User Selection */}
             <FormField
               control={form.control}
@@ -275,7 +275,7 @@ export function ChauffeurDialog({
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
+                    <PopoverContent className="w-[calc(100vw-2rem)] md:w-full p-0" sideOffset={4}>
                       <Command>
                         <CommandInput placeholder="Search users..." />
                         <CommandEmpty>No users found.</CommandEmpty>
@@ -311,130 +311,133 @@ export function ChauffeurDialog({
               )}
             />
 
-            {/* License Number */}
-            <FormField
-              control={form.control}
-              name="licenseNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>License Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter license number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    The chauffeur's driving license number.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* License and VTC Information - Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* License Number */}
+              <FormField
+                control={form.control}
+                name="licenseNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>License Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter license number" {...field} />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      The chauffeur's driving license number.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* License Expiry */}
-            <FormField
-              control={form.control}
-              name="licenseExpiry"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>License Expiry Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date(new Date().setHours(0, 0, 0, 0))
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    The expiration date of the chauffeur's license.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* License Expiry */}
+              <FormField
+                control={form.control}
+                name="licenseExpiry"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>License Expiry Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start" sideOffset={4}>
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date < new Date(new Date().setHours(0, 0, 0, 0))
+                          }
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription className="text-xs">
+                      The expiration date of the chauffeur's license.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* VTC Card Number */}
-            <FormField
-              control={form.control}
-              name="vtcCardNumber"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>VTC Card Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter VTC card number" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    The chauffeur's VTC professional card number.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* VTC Card Number */}
+              <FormField
+                control={form.control}
+                name="vtcCardNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>VTC Card Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter VTC card number" {...field} />
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      The chauffeur's VTC professional card number.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* VTC Validation Date */}
-            <FormField
-              control={form.control}
-              name="vtcValidationDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>VTC Validation Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <FormDescription>
-                    The validation date of the chauffeur's VTC card.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* VTC Validation Date */}
+              <FormField
+                control={form.control}
+                name="vtcValidationDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col">
+                    <FormLabel>VTC Validation Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start" sideOffset={4}>
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormDescription className="text-xs">
+                      The validation date of the chauffeur's VTC card.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Vehicle Selection */}
             <FormField
@@ -481,7 +484,7 @@ export function ChauffeurDialog({
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
+                    <PopoverContent className="w-[calc(100vw-2rem)] md:w-full p-0" sideOffset={4}>
                       <Command>
                         <CommandInput placeholder="Search vehicles..." />
                         <CommandEmpty>No vehicles found.</CommandEmpty>
@@ -531,68 +534,71 @@ export function ChauffeurDialog({
               )}
             />
 
-            {/* Status */}
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="AVAILABLE">Available</SelectItem>
-                      <SelectItem value="BUSY">Busy</SelectItem>
-                      <SelectItem value="ON_BREAK">On Break</SelectItem>
-                      <SelectItem value="OFF_DUTY">Off Duty</SelectItem>
-                      <SelectItem value="ON_LEAVE">On Leave</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    The current status of the chauffeur.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Status and Category - Grid Layout */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Status */}
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="AVAILABLE">Available</SelectItem>
+                        <SelectItem value="BUSY">Busy</SelectItem>
+                        <SelectItem value="ON_BREAK">On Break</SelectItem>
+                        <SelectItem value="OFF_DUTY">Off Duty</SelectItem>
+                        <SelectItem value="ON_LEAVE">On Leave</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription className="text-xs">
+                      The current status of the chauffeur.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Category */}
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="HIGH_END">High End</SelectItem>
-                      <SelectItem value="BUSINESS">Business</SelectItem>
-                      <SelectItem value="ECONOMY">Economy</SelectItem>
-                      <SelectItem value="AVERAGE">Average</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    The category of service the chauffeur provides.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+              {/* Category */}
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="HIGH_END">High End</SelectItem>
+                        <SelectItem value="BUSINESS">Business</SelectItem>
+                        <SelectItem value="ECONOMY">Economy</SelectItem>
+                        <SelectItem value="AVERAGE">Average</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormDescription className="text-xs">
+                      The category of service the chauffeur provides.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             {/* Notes */}
             <FormField
@@ -604,12 +610,12 @@ export function ChauffeurDialog({
                   <FormControl>
                     <Textarea
                       placeholder="Enter notes about the chauffeur"
-                      className="resize-none"
+                      className="resize-none min-h-[80px]"
                       {...field}
                       value={field.value || ""}
                     />
                   </FormControl>
-                  <FormDescription>
+                  <FormDescription className="text-xs">
                     Additional notes about the chauffeur.
                   </FormDescription>
                   <FormMessage />
@@ -617,15 +623,20 @@ export function ChauffeurDialog({
               )}
             />
 
-            <DialogFooter>
+            <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="mt-3 sm:mt-0 w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full sm:w-auto"
+              >
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
