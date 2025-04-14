@@ -271,7 +271,7 @@ export default function RidesPage() {
                           New Ride
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[800px]">
+                      <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[800px]">
                         <DialogHeader>
                           <DialogTitle>Create New Ride</DialogTitle>
                           <DialogDescription>
@@ -299,7 +299,7 @@ export default function RidesPage() {
                           Create Mission
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-[800px]">
+                      <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[800px]">
                         <DialogHeader>
                           <DialogTitle>Create New Mission</DialogTitle>
                           <DialogDescription>

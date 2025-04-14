@@ -56,7 +56,7 @@ export const MilestonesStep: React.FC<StepProps> = ({ form }) => {
                                 <TrashIcon className="h-4 w-4" />
                             </Button>
                             <CardContent className="pt-6">
-                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <FormField
                                         control={form.control}
                                         name={`milestones.${index}.type`}

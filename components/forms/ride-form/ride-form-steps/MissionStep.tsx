@@ -45,7 +45,7 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                 <h3 className="text-lg font-medium">Mission Details</h3>
                 <FormField control={form.control} name="mission.title" render={({ field }) => (<FormItem><FormLabel>Mission Title</FormLabel><FormControl><Input placeholder="Mission Title" {...field} /></FormControl><FormMessage /></FormItem>)} />
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormField control={form.control} name="mission.clientId" render={({ field }) => (<FormItem><FormLabel>Client</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select client" /></SelectTrigger></FormControl><SelectContent>{clients.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
                     <FormField
                         control={form.control}
@@ -62,7 +62,7 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                 </div>
 
                 {/* Partner/Chauffeur/Project */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {isExternalPartner ? (
                         <FormField control={form.control} name="mission.partnerId" render={({ field }) => (<FormItem><FormLabel>External Partner</FormLabel><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue placeholder="Select partner" /></SelectTrigger></FormControl><SelectContent>{partners.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}</SelectContent></Select><FormMessage /></FormItem>)} />
                     ) : (
@@ -78,7 +78,7 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>Passengers</FormLabel>
-                            <div className="grid grid-cols-2 gap-2 p-3 border rounded-md max-h-32 overflow-y-auto">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 p-3 border rounded-md max-h-32 overflow-y-auto">
                                 {users.map((user) => (
                                     <div key={user.id} className="flex items-center space-x-2">
                                         <Checkbox
@@ -109,11 +109,11 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                 />
 
                 {/* Dates & Duration */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormField control={form.control} name="mission.startDate" render={({ field }) => <DatePicker label="Start Date" value={field.value} onChange={field.onChange} />} />
                     <FormField control={form.control} name="mission.endDate" render={({ field }) => <DatePicker label="End Date" value={field.value} onChange={field.onChange} />} />
                 </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormField control={form.control} name="mission.duration" render={({ field }) => (<FormItem><FormLabel>Duration (Hours)</FormLabel><FormControl><Input type="number" min="1" step="0.5" placeholder={`${DEFAULT_DURATION}`} {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value))} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
                     <FormField control={form.control} name="mission.totalBudget" render={({ field }) => (<FormItem><FormLabel>Total Budget (Optional)</FormLabel><FormControl><Input type="number" step="0.01" placeholder="0.00" {...field} onChange={e => field.onChange(e.target.value === "" ? undefined : parseFloat(e.target.value))} value={field.value ?? ""} /></FormControl><FormMessage /></FormItem>)} />
                 </div>
@@ -147,7 +147,7 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                                         <TrashIcon className="h-4 w-4" />
                                     </Button>
                                     <CardContent className="pt-6">
-                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                             <FormField
                                                 control={form.control}
                                                 name={`mission.rides.${index}.category`}
@@ -172,7 +172,7 @@ export const MissionStep: React.FC<StepProps> = ({ form, clients = [], chauffeur
                                                 render={({ field }) => <DateTimePicker label="Pickup Time" value={field.value} onChange={field.onChange} />}
                                             />
                                         </div>
-                                        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 mt-4">
+                                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-4">
                                             <FormField control={form.control} name={`mission.rides.${index}.pickupAddress`} render={({ field }) => (<FormItem><FormLabel>Pickup Address</FormLabel><FormControl><Input placeholder="Pickup Address" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                             <FormField control={form.control} name={`mission.rides.${index}.dropoffAddress`} render={({ field }) => (<FormItem><FormLabel>Dropoff Address</FormLabel><FormControl><Input placeholder="Dropoff Address" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                         </div>

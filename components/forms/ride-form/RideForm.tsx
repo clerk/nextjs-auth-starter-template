@@ -224,7 +224,7 @@ export function RideForm({
                 <form onSubmit={handleSubmit(processAndSubmit)} className="space-y-6">
                     {/* Progress Bar */}
                     <div className="mb-8">
-                        <div className="flex justify-between mb-2">
+                        <div className="flex justify-between mb-2 flex-wrap gap-y-2">
                             {steps.map((step, index) => (
                                 <div key={step.id} className={`text-xs font-medium ${index <= currentStep ? 'text-primary' : 'text-muted-foreground'}`}>
                                     {step.label}
@@ -237,12 +237,12 @@ export function RideForm({
                     </div>
 
                     {/* Step Content */}
-                    <div className="min-h-[400px]">{renderStepContent()}</div>
+                    <div className="min-h-[400px] overflow-x-hidden">{renderStepContent()}</div>
 
                     {/* Conditional "Create Mission" button */}
                     {(currentStep === 0 || currentStep === 1) && showMissionButton && !isMission && getValues("mission.chauffeurId") && (
                         <div className="flex justify-end pt-2">
-                            <Button type="button" variant="outline" onClick={createNewMissionForChauffeur}>
+                            <Button type="button" variant="outline" onClick={createNewMissionForChauffeur} className="w-full sm:w-auto">
                                 Create Mission for Chauffeur
                             </Button>
                         </div>
@@ -268,19 +268,19 @@ export function RideForm({
                     )}
 
                     {/* Navigation Buttons */}
-                    <div className="flex justify-between items-center pt-6 border-t">
+                    <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t">
                         {currentStep > 0 ? (
-                            <Button type="button" variant="outline" onClick={prevStep}>
+                            <Button type="button" variant="outline" onClick={prevStep} className="w-full sm:w-auto">
                                 <ChevronLeftIcon className="mr-2 h-4 w-4" /> Previous
                             </Button>
                         ) : <div />}
 
                         {currentStep < steps.length - 1 ? (
-                            <Button type="button" onClick={handleNext}>
+                            <Button type="button" onClick={handleNext} className="w-full sm:w-auto">
                                 Next <ChevronRightIcon className="ml-2 h-4 w-4" />
                             </Button>
                         ) : (
-                            <Button type="submit">{buttonText}</Button>
+                            <Button type="submit" className="w-full sm:w-auto">{buttonText}</Button>
                         )}
                     </div>
                 </form>
