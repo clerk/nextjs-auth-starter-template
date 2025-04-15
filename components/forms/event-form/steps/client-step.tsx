@@ -49,7 +49,7 @@ export function EventClientStep({ form, clients, isLoading, onAddClient }: Event
           render={({ field }) => (
             <FormItem>
               <FormLabel>Client</FormLabel>
-              <div className="flex space-x-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Select onValueChange={field.onChange} value={field.value} disabled={isLoading}>
                   <FormControl>
                     <SelectTrigger className="w-full">
@@ -71,11 +71,11 @@ export function EventClientStep({ form, clients, isLoading, onAddClient }: Event
                     ))}
                   </SelectContent>
                 </Select>
-                <Button 
-                  type="button" 
-                  variant="outline" 
+                <Button
+                  type="button"
+                  variant="outline"
                   onClick={onAddClient}
-                  className="flex items-center"
+                  className="flex items-center w-full sm:w-auto justify-center"
                 >
                   <PlusCircle className="mr-2 h-4 w-4" />
                   <span>New Client</span>

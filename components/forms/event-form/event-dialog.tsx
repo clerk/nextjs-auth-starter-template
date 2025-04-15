@@ -88,7 +88,7 @@ export function EventDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="w-[95vw] max-w-[95vw] max-h-[90vh] overflow-y-auto md:max-w-[700px]">
         <DialogHeader>
           <DialogTitle>
             {defaultValues ? "Edit Event" : "Create New Event"}

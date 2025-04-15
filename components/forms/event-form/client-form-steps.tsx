@@ -89,7 +89,7 @@ export function ClientFormSteps({
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -121,7 +121,7 @@ export function ClientFormSteps({
             <Separator />
             <h3 className="text-sm font-medium">Primary Contact Person</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="contactFirstName"
@@ -165,17 +165,18 @@ export function ClientFormSteps({
             />
           </div>
 
-          <div className="flex justify-between pt-4">
+          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={onCancel}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            
-            <Button type="submit" disabled={isSubmitting}>
+
+            <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

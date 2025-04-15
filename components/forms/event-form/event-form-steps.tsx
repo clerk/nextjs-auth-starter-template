@@ -252,7 +252,7 @@ export function EventFormSteps({
     <div className="space-y-6">
       {/* Progress indicator */}
       <div className="space-y-2">
-        <div className="flex justify-between">
+        <div className="flex justify-between flex-wrap gap-y-2">
           {steps.map((s, i) => (
             <div
               key={i}
@@ -286,12 +286,13 @@ export function EventFormSteps({
           {step === 2 && <EventLocationStep form={form} />}
           {step === 3 && <EventPricingStep form={form} />}
 
-          <div className="flex justify-between pt-4">
+          <div className="flex flex-col-reverse sm:flex-row justify-between gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={step === 0 ? onCancel : handleBack}
               disabled={isSubmitting}
+              className="w-full sm:w-auto"
             >
               {step === 0 ? (
                 "Cancel"
@@ -304,12 +305,12 @@ export function EventFormSteps({
             </Button>
 
             {step < totalSteps - 1 ? (
-              <Button type="button" onClick={handleNext}>
+              <Button type="button" onClick={handleNext} className="w-full sm:w-auto">
                 Next
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             ) : (
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
