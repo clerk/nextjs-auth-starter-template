@@ -65,9 +65,16 @@ export default function EventsPage() {
           url += `?status=${filterStatus}`;
         }
 
-        const response = await fetch(url);
+        const response = await fetch(url, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Important for including auth cookies
+        });
+
         if (!response.ok) {
-          throw new Error('Failed to fetch events');
+          console.error('Error response:', response.status, response.statusText);
+          throw new Error(`Failed to fetch events: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -86,7 +93,7 @@ export default function EventsPage() {
         setEvents(filteredData);
       } catch (error) {
         console.error('Error fetching events:', error);
-        toast.error('Failed to load events');
+        toast.error(error instanceof Error ? error.message : 'Failed to load events');
       } finally {
         setIsLoading(false);
       }
@@ -113,6 +120,7 @@ export default function EventsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Important for including auth cookies
         body: JSON.stringify({
           ...data,
           startDate: data.startDate.toISOString(),
@@ -130,10 +138,17 @@ export default function EventsPage() {
       setSelectedEvent(null);
 
       // Refresh events list
-      const eventsResponse = await fetch('/api/events');
+      const eventsResponse = await fetch('/api/events', {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for including auth cookies
+      });
       if (eventsResponse.ok) {
         const eventsData = await eventsResponse.json();
         setEvents(eventsData);
+      } else {
+        console.error('Error refreshing events:', eventsResponse.status, eventsResponse.statusText);
       }
     } catch (error) {
       console.error('Error saving event:', error);
@@ -149,6 +164,10 @@ export default function EventsPage() {
     try {
       const response = await fetch(`/api/events/${id}`, {
         method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for including auth cookies
       });
 
       if (!response.ok) {
