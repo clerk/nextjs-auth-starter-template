@@ -15,6 +15,7 @@
     "@types/react-dom": "^19.0.3",
     "@types/react-syntax-highlighter": "^15.5.13",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.9.0",
     "clsx": "^2.1.1",
     "next": "15.2.3",
     "postcss": "^8.5.1",
