@@ -1,12 +1,9 @@
 import { UserDetails } from "../components/user-details";
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
-import { CodeSwitcher } from "../components/code-switcher";
-import { LearnMore } from "../components/learn-more";
+import {  UserButton } from "@clerk/nextjs";
 import { Footer } from "../components/footer";
 import { ClerkLogo } from "../components/clerk-logo";
 import { NextLogo } from "../components/next-logo";
 
-import { DASHBOARD_CARDS } from "../consts/cards";
 
 export default async function DashboardPage() {
   return (
@@ -21,13 +18,7 @@ export default async function DashboardPage() {
                 <NextLogo />
               </div>
               <div className="flex items-center gap-2">
-                <OrganizationSwitcher
-                  appearance={{
-                    elements: {
-                      organizationPreviewAvatarBox: "size-6",
-                    },
-                  }}
-                />
+               
                 <UserButton
                   afterSignOutUrl="/"
                   appearance={{
@@ -40,12 +31,12 @@ export default async function DashboardPage() {
             </header>
             <UserDetails />
           </div>
-          <div className="pt-[3.5rem]">
+          {/* <div className="pt-[3.5rem]">
             <CodeSwitcher />
-          </div>
+          </div> */}
         </div>
       </main>
-      <LearnMore cards={DASHBOARD_CARDS} />
+      {/* <LearnMore cards={DASHBOARD_CARDS} /> */}
       <Footer />
     </>
   );
