@@ -68,7 +68,7 @@ export function UserDetails() {
 
   useEffect(() => {
     async function createUserIfNeeded() {
-      if (user) {
+      if (!user) return;
         const userData = {
           clerkId: user.id,
           email: user.emailAddresses[0].emailAddress,
@@ -92,7 +92,6 @@ export function UserDetails() {
           }
         }
       }
-    }
   
     createUserIfNeeded();
   }, [user]);
