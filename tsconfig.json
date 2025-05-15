@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["node","class-variance-authority","tailwind-variants"],
-    "target": "ES2017",
+    "target": "ES2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -14,15 +13,26 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "baseUrl": ".",
+    "types": ["node", "jest", "@testing-library/jest-dom"],
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./app/*"],
+      "@components/*": ["./app/components/*"],
+      "@lib/*": ["./app/lib/*"],
+      "@utils/*": ["./app/utils/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "types"
+  ],
   "exclude": ["node_modules"]
 }

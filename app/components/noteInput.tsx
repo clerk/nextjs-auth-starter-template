@@ -1,14 +1,14 @@
 'use client';
-import { Button } from "@/app/components/atoms/Button";
 import { useState, useRef, useEffect } from 'react';
-// import {
-//   DragDropContext,
-//   Droppable,
-//   Draggable,
-//   DropResult
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult
         
-// } from '@hello-pangea/dnd'; 
-import { Note } from '@/app/components/types';
+} from '@hello-pangea/dnd'; 
+import { Button } from './atoms/Button';
+import { Note } from './types';
 
 interface NoteInputProps {
   onSave: (note: Note) => Promise<void>;
@@ -227,7 +227,7 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
               </div>
             )}
 
-            {/* {newNote.isChecklist ? (
+            {newNote.isChecklist ? (
               <DragDropContext onDragEnd={handleDragEnd}>
                 <Droppable droppableId="tasks">
                   {(provided) => (
@@ -287,7 +287,7 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
                 placeholder="Take a note..."
                 rows={3}
               />
-            )} */}
+            )} 
 
             <div className="flex justify-end items-center p-2 rounded-b-lg">
               <Button

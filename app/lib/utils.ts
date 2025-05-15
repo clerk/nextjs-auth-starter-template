@@ -2,7 +2,7 @@ import axios from 'axios';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { cva, type VariantProps } from "class-variance-authority";
-import { Note } from '../app/components/types';
+import { Note } from '../components/types';
 
 
 // Better Tailwind button class manager using CVA

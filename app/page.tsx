@@ -46,18 +46,18 @@ export default function Home() {
     }
   };
 
-  // const handleCreateNote = async (note: Partial<Note>) => {
-  //   try {
-  //     const newNote = await createNote({
-  //       ...note,
-  //       id: note.id || generateId(), // Generate an id if not provided
-  //       createdAt: new Date() // Set createdAt field if not present
-  //     });
-  //     setNotes(prev => [...prev, validateNote(newNote)]);
-  //   } catch (err) {
-  //     setError(err instanceof Error ? err.message : 'Failed to create note');
-  //   }
-  // };
+  const handleCreateNote = async (note: Partial<Note>) => {
+    try {
+      const newNote = await createNote({
+        ...note,
+        id: note.id || generateId(), // Generate an id if not provided
+        createdAt: new Date() // Set createdAt field if not present
+      });
+      setNotes(prev => [...prev, validateNote(newNote)]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create note');
+    }
+  };
   
   function generateId(): string {
     return Math.random().toString(36).substr(2, 9); // Example ID generator
@@ -84,24 +84,24 @@ export default function Home() {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      {/* <NoteInput onSubmit={handleCreateNote} /> */}
+      <NoteInput onSubmit={handleCreateNote} />
       {error && (
         <div className="text-red-500 my-4 p-2 bg-red-50 rounded">
           {error}
         </div>
       )}
-      {/* {isLoading ? (
+      {isLoading ? (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500" />
         </div>
       ) : (
-        // <NotesList 
-        //   notes={notes} 
-        //   onUpdate={handleUpdateNote}
-        //   onDelete={handleDeleteNote}
-        //   onRefresh={loadNotes}
-        // />
-      )} */}
+        <NotesList 
+          notes={notes} 
+          onUpdate={handleUpdateNote}
+          onDelete={handleDeleteNote}
+          onRefresh={loadNotes}
+        />
+      )}
     </main>
   );
 }

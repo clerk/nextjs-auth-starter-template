@@ -1,36 +1,23 @@
 "use client";
 
-import { useOrganization, useSession, useUser } from "@clerk/nextjs";
-import clsx from "clsx";
-import { useState } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import theme from "./theme";
+import { useState } from 'react';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import clsx from 'clsx';
 
-const TYPES = ["user", "session", "organization"];
+interface CodeSwitcherProps {
+  typesToShow: string[];
+  codeMap: Record<string, string>;
+  theme?: any; // Replace with proper theme type from react-syntax-highlighter
+}
 
-export function CodeSwitcher() {
-  const [selectedType, setSelectedType] = useState(TYPES[0]);
-  const { user } = useUser();
-  const { session } = useSession();
-  const { organization } = useOrganization();
-
-  const selectedCode = JSON.stringify(
-    {
-      user,
-      session,
-      organization,
-    }[selectedType],
-    null,
-    2
-  );
-
-  const typesToShow = organization
-    ? TYPES
-    : TYPES.filter((type) => type !== "organization");
+export function CodeSwitcher({ typesToShow, codeMap, theme = docco }: CodeSwitcherProps) {
+  const [selectedType, setSelectedType] = useState(typesToShow[0]);
+  const selectedCode = codeMap[selectedType];
 
   return (
-    <div className={clsx(organization ? "h-[54.625rem]" : "h-[41.625rem]")}>
-      <div className="w-full bg-[#F7F7F8] rounded-md p-[0.1875rem] flex gap-1.5">
+    <div className="rounded-lg border border-[#EEEEF0] bg-[#FAFAFA] p-4">
+      <div className="mb-4 flex gap-2 rounded bg-[#EEEEF0] p-1">
         {typesToShow.map((type) => (
           <button
             className={clsx(
@@ -48,7 +35,6 @@ export function CodeSwitcher() {
       </div>
       <div className="relative h-[calc(100%-42px)]">
         <div className="mask h-full">
-          {/* @ts-expect-error */}
           <SyntaxHighlighter language="javascript" style={theme}>
             {selectedCode}
           </SyntaxHighlighter>

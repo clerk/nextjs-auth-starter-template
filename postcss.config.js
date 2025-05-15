@@ -1,7 +1,6 @@
-// ✅ Valid postcss.config.js
 module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};
+  plugins: [
+    'tailwindcss', // Currently using the string Next.js seems to expect
+    'autoprefixer',
+  ],
+}

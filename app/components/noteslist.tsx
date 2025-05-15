@@ -8,9 +8,12 @@ import {
   DropResult,
 } from "@hello-pangea/dnd";
 import { Note } from "./types";
-import { Button } from "@/app/components/atoms/Button";
 import { useNotes } from "./hooks/useNotes";
+import { Button } from "./atoms/Button";
 import { useTasks } from "./hooks/useTasks";
+import { TaskForm } from "./hooks/TaskForm";
+import { useNoteInput } from "./hooks/useNoteInput";
+
 
 interface NotesListProps {
   notes: Note[];
@@ -43,6 +46,7 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
         setShowDeleteMenuId(null);
       }
     };
+    
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -181,50 +185,51 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
                                   >
                                     <span
                                       {...provided.dragHandleProps}
-                                      className="mr-2 text-neutral-500 hover:text-white cursor-grab invisible group-hover:visible"
+                                      className="mr-2 text-neutral-500 hover:text-neutral-700 cursor-grab invisible group-hover:visible"
                                     >
                                       ≡
                                     </span>
                                     <input
-                                      type="checkbox"
-                                      checked={task.completed}
-                                      onChange={() =>
-                                        toggleTaskCompletion(task.id)
-                                      }
-                                      className="mr-2"
-                                    />
-                                    <input
                                       ref={(el) => {
-                                        taskInputRefs.current[index] = el;
+                                        if (el) {
+                                          (taskInputRefs.current as HTMLInputElement[])[index] = el;
+                                        }
                                       }}
                                       type="text"
                                       value={task.text}
-                                      onChange={(e) =>
-                                        handleTaskTextChange(
-                                          displayNote.tasks,
-                                          (tasks) =>
-                                            setEditingNote({
-                                              ...editingNote!,
-                                              tasks,
-                                            })
-                                        )(task.id, e.target.value)
-                                      }
-                                      onKeyDown={(e) =>
-                                        handleTaskKeyDown(
-                                          displayNote.tasks,
-                                          (tasks) =>
-                                            setEditingNote({
-                                              ...editingNote!,
-                                              tasks,
-                                            })
-                                        )(e, index)
-                                      }
-                                      className={`flex-1 bg-transparent ${
-                                        task.completed
-                                          ? "line-through text-neutral-500"
-                                          : "text-neutral-200"
-                                      }`}
-                                      placeholder="List item"
+                                      onChange={(e) => {
+                                        if (displayNote?.tasks) {
+                                          handleTaskTextChange(
+                                            displayNote.tasks,
+                                            (updatedTasks) => {
+                                              setEditingNote((prev) => {
+                                                if (!prev) return prev;
+                                                return {
+                                                  ...prev,
+                                                  tasks: updatedTasks
+                                                };
+                                              });
+                                            }
+                                          )(task.id, e.target.value);
+                                        }
+                                      }}
+                                      className="flex-1 bg-transparent outline-none"
+                                      placeholder="Enter task..."
+                                      onKeyDown={(e) => {
+                                        if (displayNote?.tasks) {
+                                          handleTaskKeyDown(
+                                            displayNote.tasks,
+                                            (updatedTasks) => {
+                                              if (editingNote) {
+                                                setEditingNote({
+                                                  ...editingNote,
+                                                  tasks: updatedTasks
+                                                });
+                                              }
+                                            }
+                                          )(e, index);
+                                        }
+                                      }}
                                     />
                                   </div>
                                 )}
@@ -251,7 +256,7 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
                     <Button
                       onClick={closeEditor}
                       disabled={isUpdating}
-                      variant="default" // or "outline", "ghost", etc.
+                      variant="default"
                       size="md"
                     >
                       {isUpdating ? "Saving..." : "Close"}
@@ -272,7 +277,7 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
                           <input
                             type="checkbox"
                             checked={task.completed}
-                            readOnly
+                            onChange={() => toggleTaskCompletion(note.id, task.id)}
                             className="mr-2 h-4 w-4"
                           />
                           <span

@@ -1,111 +1,32 @@
-import { useState, useRef } from "react";
-import { Note, Task } from "../types";
+import { useState, useRef, useEffect } from "react";
+import { Note } from "../types";
 
-type NoteState = {
-  title: string;
-  content: string;
-  tasks: Task[];
-  isChecklist: boolean;
-  isOpen: boolean;
-  images: string[];
-};
-
-interface UseNoteInputProps {
-  onSave: (note: Note) => Promise<void>;
-}
-
-export const useNoteInput = ({ onSave }: UseNoteInputProps) => {
+export const useNoteInput = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const titleInputRef = useRef<HTMLInputElement>(null);
+  const taskInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [newNote, setNewNote] = useState<NoteState>({
+
+  const [newNote, setNewNote] = useState<Note>({
     title: "",
     content: "",
     tasks: [{ id: Date.now().toString(), text: "", completed: false }],
     isOpen: true,
     isChecklist: false,
     images: [],
+    id: "",
+    createdAt: new Date(),
   });
 
-  const toggleChecklist = () => {
-    setNewNote((prev) => ({
-      ...prev,
-      isChecklist: !prev.isChecklist,
-      tasks: prev.isChecklist
-        ? []
-        : [{ id: Date.now().toString(), text: "", completed: false }],
-    }));
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    const validImageTypes = ["image/jpeg", "image/png", "image/gif"];
-    const validFiles = Array.from(files).filter((file) =>
-      validImageTypes.includes(file.type)
-    );
-
-    const imageUrls = validFiles.map((file) => URL.createObjectURL(file));
-    setNewNote((prev) => ({
-      ...prev,
-      images: [...prev.images, ...imageUrls],
-    }));
-  };
-
-  const removeImage = (index: number) => {
-    setNewNote((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (
-      newNote.title.trim() ||
-      newNote.tasks.some((task) => task.text.trim()) ||
-      newNote.content.trim() ||
-      newNote.images.length > 0
-    ) {
-      setIsSaving(true);
-      try {
-        const noteToAdd: Note = {
-          ...newNote,
-          id: Date.now().toString(),
-          tasks: newNote.tasks.filter((task) => task.text.trim()),
-          isOpen: false,
-          createdAt: new Date(),
-        };
-        await onSave(noteToAdd);
-        setNewNote({
-          title: "",
-          content: "",
-          tasks: [{ id: Date.now().toString(), text: "", completed: false }],
-          isOpen: false,
-          isChecklist: false,
-          images: [],
-        });
-      } catch (error) {
-        console.error("Failed to save note:", error);
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
   return {
-    newNote,
-    setNewNote,
-    isSaving,
     fileInputRef,
     titleInputRef,
+    taskInputRefs,
     textareaRef,
-    toggleChecklist,
-    handleImageUpload,
-    removeImage,
-    handleSubmit,
+    isSaving,
+    setIsSaving,
+    newNote,
+    setNewNote,
   };
 };
