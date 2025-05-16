@@ -19,7 +19,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="flex bg-neutral-950 text-white">
+    <div className="flex bg-neutral-950 text-white min-h-screen">
       <Sidebar isOpen={isSidebarOpen} isCollapsed={isCollapsed} />
       <div
         className={`flex flex-col flex-1 transition-all duration-300 ${
@@ -27,7 +27,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         }`}
       >
         <Header onMenuClick={toggleSidebar} />
-        <main className="p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4">
+          <div className="max-w-4xl mx-auto w-full">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

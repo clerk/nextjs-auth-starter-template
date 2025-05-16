@@ -1,19 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "@hello-pangea/dnd";
 import { Note } from "./types";
 import { useNotes } from "./hooks/useNotes";
 import { Button } from "./atoms/Button";
 import { useTasks } from "./hooks/useTasks";
-import { TaskForm } from "./hooks/TaskForm";
-import { useNoteInput } from "./hooks/useNoteInput";
-
 
 interface NotesListProps {
   notes: Note[];
@@ -24,7 +15,7 @@ interface NotesListProps {
 const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
   const [hoveredNoteId, setHoveredNoteId] = useState<string | null>(null);
   const [showDeleteMenuId, setShowDeleteMenuId] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const {
     editingNoteId,
@@ -46,7 +37,7 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
         setShowDeleteMenuId(null);
       }
     };
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -61,16 +52,6 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
     if (editingNote) {
       setEditingNote({ ...editingNote, content: e.target.value });
     }
-  };
-
-  const handleDragEnd = (result: DropResult) => {
-    if (!result.destination || !editingNote) return;
-
-    const updatedTasks = Array.from(editingNote.tasks);
-    const [movedTask] = updatedTasks.splice(result.source.index, 1);
-    updatedTasks.splice(result.destination.index, 0, movedTask);
-
-    setEditingNote({ ...editingNote, tasks: updatedTasks });
   };
 
   return (
@@ -163,83 +144,54 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
 
                   {/* Checklist mode */}
                   {displayNote.isChecklist ? (
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                      <Droppable droppableId={`tasks-${note.id}`}>
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                            className="px-4 py-2"
-                          >
-                            {displayNote.tasks.map((task, index) => (
-                              <Draggable
-                                key={task.id}
-                                draggableId={task.id}
-                                index={index}
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    className="flex items-center py-1 group"
-                                  >
-                                    <span
-                                      {...provided.dragHandleProps}
-                                      className="mr-2 text-neutral-500 hover:text-neutral-700 cursor-grab invisible group-hover:visible"
-                                    >
-                                      ≡
-                                    </span>
-                                    <input
-                                      ref={(el) => {
-                                        if (el) {
-                                          (taskInputRefs.current as HTMLInputElement[])[index] = el;
-                                        }
-                                      }}
-                                      type="text"
-                                      value={task.text}
-                                      onChange={(e) => {
-                                        if (displayNote?.tasks) {
-                                          handleTaskTextChange(
-                                            displayNote.tasks,
-                                            (updatedTasks) => {
-                                              setEditingNote((prev) => {
-                                                if (!prev) return prev;
-                                                return {
-                                                  ...prev,
-                                                  tasks: updatedTasks
-                                                };
-                                              });
-                                            }
-                                          )(task.id, e.target.value);
-                                        }
-                                      }}
-                                      className="flex-1 bg-transparent outline-none"
-                                      placeholder="Enter task..."
-                                      onKeyDown={(e) => {
-                                        if (displayNote?.tasks) {
-                                          handleTaskKeyDown(
-                                            displayNote.tasks,
-                                            (updatedTasks) => {
-                                              if (editingNote) {
-                                                setEditingNote({
-                                                  ...editingNote,
-                                                  tasks: updatedTasks
-                                                });
-                                              }
-                                            }
-                                          )(e, index);
-                                        }
-                                      }}
-                                    />
-                                  </div>
-                                )}
-                              </Draggable>
-                            ))}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </DragDropContext>
+                    <div className="px-4 py-2">
+                      {displayNote.tasks.map((task, index) => (
+                        <div key={task.id} className="flex items-center py-1 group">
+                          <input
+                            ref={(el) => {
+                              if (el) {
+                                (taskInputRefs.current as HTMLInputElement[])[index] = el;
+                              }
+                            }}
+                            type="text"
+                            value={task.text}
+                            onChange={(e) => {
+                              if (displayNote?.tasks) {
+                                handleTaskTextChange(
+                                  displayNote.tasks,
+                                  (updatedTasks) => {
+                                    setEditingNote((prev) => {
+                                      if (!prev) return prev;
+                                      return {
+                                        ...prev,
+                                        tasks: typeof updatedTasks === "function" ? updatedTasks(displayNote.tasks) : updatedTasks
+                                      };
+                                    });
+                                  }
+                                )(task.id, e.target.value);
+                              }
+                            }}
+                            className="flex-1 bg-transparent outline-none"
+                            placeholder="Enter task..."
+                            onKeyDown={(e) => {
+                              if (displayNote?.tasks) {
+                                handleTaskKeyDown(
+                                  displayNote.tasks,
+                                  (updatedTasks) => {
+                                    if (editingNote) {
+                                      setEditingNote({
+                                        ...editingNote,
+                                        tasks: typeof updatedTasks === "function" ? updatedTasks(displayNote.tasks) : updatedTasks
+                                      });
+                                    }
+                                  }
+                                )(e, index);
+                              }
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   ) : (
                     <textarea
                       value={displayNote.content}
@@ -277,7 +229,7 @@ const NotesList = ({ notes, onUpdate, onDelete }: NotesListProps) => {
                           <input
                             type="checkbox"
                             checked={task.completed}
-                            onChange={() => toggleTaskCompletion(note.id, task.id)}
+                            onChange={() => toggleTaskCompletion(task.id)}
                             className="mr-2 h-4 w-4"
                           />
                           <span

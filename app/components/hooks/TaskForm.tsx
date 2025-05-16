@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import * as yup from 'yup';
 import { useTasks } from "../hooks/useTasks";
+import { Note } from '../types';
 
 
 interface Task {
@@ -18,7 +19,7 @@ interface FormValues {
 }
 
 interface NoteInputProps {
-  onSave: (values: FormValues) => Promise<void>;
+  onSave: (note: Partial<Note>) => Promise<void>;  // Changed to Partial
 }
 
 const noteSchema = yup.object().shape({

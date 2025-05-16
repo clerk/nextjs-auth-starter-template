@@ -5,13 +5,12 @@ import {
   Droppable,
   Draggable,
   DropResult
-        
 } from '@hello-pangea/dnd'; 
 import { Button } from './atoms/Button';
 import { Note } from './types';
 
 interface NoteInputProps {
-  onSave: (note: Note) => Promise<void>;
+  onSave: (note: Omit<Note, 'id' | 'createdAt'>) => Promise<void>;
 }
 
 const NoteInput = ({ onSave }: NoteInputProps) => {
@@ -25,7 +24,7 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
     title: '',
     content: '',
     tasks: [{ id: Date.now().toString(), text: '', completed: false }],
-    isOpen: true, // Changed to true
+    isOpen: true,
     isChecklist: false,
     images: [] as string[]
   });
@@ -133,15 +132,13 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
     ) {
       setIsSaving(true);
       try {
-        const noteToAdd: Note = {
-          id: Date.now().toString(),
+        const noteToAdd = {
           title: newNote.title,
           tasks: newNote.tasks.filter(task => task.text.trim()),
           content: newNote.content,
           isChecklist: newNote.isChecklist,
           isOpen: false,
-          images: [...newNote.images],
-          createdAt: new Date()
+          images: [...newNote.images]
         };
 
         await onSave(noteToAdd);

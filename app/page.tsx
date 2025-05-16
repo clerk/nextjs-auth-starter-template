@@ -1,26 +1,29 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchTodos, createNote, updateNote, deleteNote } from '@/lib/utils';
 import { Note } from './components/types';
 import NoteInput from './components/noteInput';
 import NotesList from './components/noteslist';
 
+const LOCAL_STORAGE_KEY = 'notes-app-data';
+
 const validateNote = (note: Partial<Note>): Note => {
-  if (!note.id || !note.content || !note.createdAt) {
+  if (!note.id || !note.createdAt) {
     throw new Error('Invalid note data');
   }
   return {
     id: note.id,
     title: note.title || '',
-    content: note.content,
+    content: note.content || '',
     createdAt: note.createdAt,
     isOpen: note.isOpen ?? true,
     images: note.images || [],
     isChecklist: note.isChecklist ?? false,
-    tasks: note.tasks ?? []
+    tasks: note.tasks || []
   };
 };
+
+const generateId = () => Date.now().toString();
 
 export default function Home() {
   const [notes, setNotes] = useState<Note[]>([]);
@@ -31,77 +34,107 @@ export default function Home() {
     loadNotes();
   }, []);
 
-  const loadNotes = async () => {
+  const loadNotes = () => {
     try {
       setIsLoading(true);
-      const data = await fetchTodos();
-      const validatedNotes = data.map(validateNote);
-      setNotes(validatedNotes);
+      const savedNotes = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (savedNotes) {
+        const parsedNotes = JSON.parse(savedNotes);
+        const validatedNotes = parsedNotes.map(validateNote);
+        setNotes(validatedNotes);
+      }
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load notes');
+      setError('Failed to load notes');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreateNote = async (note: Partial<Note>) => {
+  const saveNotes = (newNotes: Note[]) => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newNotes));
+    setNotes(newNotes);
+  };
+
+  const handleCreateNote = async (note: Omit<Note, 'id' | 'createdAt'>) => {
     try {
-      const newNote = await createNote({
+      const completeNote: Note = {
         ...note,
-        id: note.id || generateId(), // Generate an id if not provided
-        createdAt: new Date() // Set createdAt field if not present
-      });
-      setNotes(prev => [...prev, validateNote(newNote)]);
+        id: generateId(),
+        createdAt: new Date(),
+        title: note.title || 'Untitled Note',
+        content: note.content || '',
+        tasks: note.tasks || [],
+        images: note.images || [],
+        isChecklist: note.isChecklist || false,
+        isOpen: note.isOpen || false
+      };
+      
+      const newNotes = [...notes, completeNote];
+      saveNotes(newNotes);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create note');
+      setError('Failed to create note');
+      throw err;
     }
   };
-  
-  function generateId(): string {
-    return Math.random().toString(36).substr(2, 9); // Example ID generator
-  }
-  
 
-  const handleUpdateNote = async (id: string, updates: Partial<Note>) => {
+  const handleUpdateNote = async (note: Note) => {
     try {
-      await updateNote(id, updates);
-      await loadNotes();
+      const updatedNotes = notes.map(n => 
+        n.id === note.id ? { ...n, ...note } : n
+      );
+      saveNotes(updatedNotes);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update note');
+      setError('Failed to update note');
     }
   };
 
   const handleDeleteNote = async (id: string) => {
     try {
-      await deleteNote(id);
-      setNotes(prev => prev.filter(note => note.id !== id));
+      const filteredNotes = notes.filter(note => note.id !== id);
+      saveNotes(filteredNotes);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete note');
+      setError('Failed to delete note');
     }
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <NoteInput onSubmit={handleCreateNote} />
+    <div className="flex flex-col pt-16">
+  {/* sticky NoteInput */}
+  <div className="sticky top-16 z-10 p-4 -mx-4">
+    <NoteInput onSave={handleCreateNote} />
+  </div>
+
+
+      {/* Error display */}
       {error && (
-        <div className="text-red-500 my-4 p-2 bg-red-50 rounded">
+        <div className="text-red-500 my-4 p-2 bg-red-50/10 rounded">
           {error}
         </div>
       )}
-      {isLoading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500" />
+
+      {/* Notes list with proper spacing */}
+      <div className="mt-4">
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500" />
+          </div>
+        ) : (
+          <NotesList 
+            notes={notes} 
+            onUpdate={handleUpdateNote}
+            onDelete={handleDeleteNote}
+          />
+        )}
+      </div>
+
+      {/* Pagination controls */}
+      {notes.length > 0 && (
+        <div className="mt-8 flex justify-center">
+          {/* Your pagination component here */}
         </div>
-      ) : (
-        <NotesList 
-          notes={notes} 
-          onUpdate={handleUpdateNote}
-          onDelete={handleDeleteNote}
-          onRefresh={loadNotes}
-        />
       )}
-    </main>
+    </div>
   );
 }
