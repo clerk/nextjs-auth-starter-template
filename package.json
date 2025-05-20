@@ -23,10 +23,11 @@
     "next": "15.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.56.3",
+    "react-hook-form": "^7.56.4",
     "react-syntax-highlighter": "^15.6.1",
     "tailwind-merge": "^3.3.0",
     "tailwind-variants": "^1.0.0",
+    "uuid": "^11.1.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/node": "^20",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.5",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.3.0",

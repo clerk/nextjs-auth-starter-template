@@ -11,11 +11,12 @@ const validateNote = (note: Partial<Note>): Note => {
   if (!note.id || !note.createdAt) {
     throw new Error('Invalid note data');
   }
+
   return {
     id: note.id,
     title: note.title || '',
     content: note.content || '',
-    createdAt: note.createdAt,
+    createdAt: new Date(note.createdAt),
     isOpen: note.isOpen ?? true,
     images: note.images || [],
     isChecklist: note.isChecklist ?? false,
@@ -68,9 +69,9 @@ export default function Home() {
         tasks: note.tasks || [],
         images: note.images || [],
         isChecklist: note.isChecklist || false,
-        isOpen: note.isOpen || false
+        isOpen: false
       };
-      
+
       const newNotes = [...notes, completeNote];
       saveNotes(newNotes);
     } catch (err) {
@@ -79,62 +80,46 @@ export default function Home() {
     }
   };
 
-  const handleUpdateNote = async (note: Note) => {
+  const handleUpdateNote = async (updatedNote: Note) => {
     try {
-      const updatedNotes = notes.map(n => 
-        n.id === note.id ? { ...n, ...note } : n
+      const updatedNotes = notes.map(note =>
+        note.id === updatedNote.id ? updatedNote : note
       );
       saveNotes(updatedNotes);
     } catch (err) {
       setError('Failed to update note');
+      throw err;
     }
   };
 
   const handleDeleteNote = async (id: string) => {
     try {
-      const filteredNotes = notes.filter(note => note.id !== id);
-      saveNotes(filteredNotes);
+      const updatedNotes = notes.filter(note => note.id !== id);
+      saveNotes(updatedNotes);
     } catch (err) {
       setError('Failed to delete note');
+      throw err;
     }
   };
 
   return (
-    <div className="flex flex-col pt-16">
-  {/* sticky NoteInput */}
-  <div className="sticky top-16 z-10 p-4 -mx-4">
-    <NoteInput onSave={handleCreateNote} />
-  </div>
+    <main className="min-h-screen p-4  text-white">
+      <h1 className="text-2xl font-bold mb-4">My Notes</h1>
+      <NoteInput onSave={handleCreateNote} />
 
-
-      {/* Error display */}
-      {error && (
-        <div className="text-red-500 my-4 p-2 bg-red-50/10 rounded">
-          {error}
-        </div>
+      {isLoading ? (
+        <p className="mt-4">Loading...</p>
+      ) : error ? (
+        <p className="mt-4 text-red-500">{error}</p>
+      ) : notes.length === 0 ? (
+        <p className="mt-4">No notes yet. Start writing one!</p>
+      ) : (
+        <NotesList
+          notes={notes}
+          onUpdate={handleUpdateNote}
+          onDelete={handleDeleteNote}
+        />
       )}
-
-      {/* Notes list with proper spacing */}
-      <div className="mt-4">
-        {isLoading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-orange-500" />
-          </div>
-        ) : (
-          <NotesList 
-            notes={notes} 
-            onUpdate={handleUpdateNote}
-            onDelete={handleDeleteNote}
-          />
-        )}
-      </div>
-
-      {/* Pagination controls */}
-      {notes.length > 0 && (
-        <div className="mt-8 flex justify-center">
-          {/* Your pagination component here */}
-        </div>
-      )}
-    </div>
+    </main>
   );
 }

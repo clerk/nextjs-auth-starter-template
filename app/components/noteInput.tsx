@@ -1,24 +1,97 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import {
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import {      
   DragDropContext,
   Droppable,
   Draggable,
   DropResult
 } from '@hello-pangea/dnd'; 
 import { Button } from './atoms/Button';
-import { Note } from './types';
+import { Note, noteSchema } from './types';
+import { useNotes } from './hooks/useNotes';
+import NotesList from './noteslist';
+
+export const useNoteForm = (onSubmit: (data: Note) => Promise<void>) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset
+  } = useForm({
+    resolver: yupResolver(noteSchema),
+    defaultValues: {
+      title: '',
+      content: '',
+      isChecklist: false,
+      tasks: [],
+      images: []
+    }
+  });
+
+  const submitHandler = handleSubmit(async (data) => {
+    try {
+      await onSubmit(data);
+      reset();
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
+  });
+
+  return {
+    register,
+    errors,
+    submitHandler
+  };
+};
+
+export const useNotes = () => {
+  const saveNote = async (note: Omit<Note, 'id' | 'createdAt'>) => {
+    try {
+      const newNote: Note = {
+        ...note,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+      };
+
+      const existingNotes = JSON.parse(localStorage.getItem('notes') || '[]');
+      const updatedNotes = [newNote, ...existingNotes];
+      
+      localStorage.setItem('notes', JSON.stringify(updatedNotes));
+      return newNote;
+    } catch (error) {
+      console.error('Error saving note:', error);
+      throw new Error('Failed to save note');
+    }
+  };
+
+  const getNotes = (): Note[] => {
+    try {
+      const notes = JSON.parse(localStorage.getItem('notes') || '[]');
+      return notes.sort((a: Note, b: Note) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    } catch (error) {
+      console.error('Error getting notes:', error);
+      return [];
+    }
+  };
+
+  return { saveNote, getNotes };
+};
 
 interface NoteInputProps {
-  onSave: (note: Omit<Note, 'id' | 'createdAt'>) => Promise<void>;
+  onSave: (note: Note) => Promise<void>;
 }
 
 const NoteInput = ({ onSave }: NoteInputProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const titleInputRef = useRef<HTMLInputElement>(null);
   const taskInputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  const { register, errors, submitHandler } = useNoteForm(onSave);
 
   const [newNote, setNewNote] = useState({
     title: '',
@@ -32,8 +105,6 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
   useEffect(() => {
     if (!newNote.isOpen) {
       textareaRef.current?.focus();
-    } else {
-      titleInputRef.current?.focus();
     }
   }, [newNote.isOpen]);
 
@@ -121,55 +192,16 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (
-      newNote.title.trim() ||
-      newNote.tasks.some(task => task.text.trim()) ||
-      newNote.content.trim() ||
-      newNote.images.length > 0
-    ) {
-      setIsSaving(true);
-      try {
-        const noteToAdd = {
-          title: newNote.title,
-          tasks: newNote.tasks.filter(task => task.text.trim()),
-          content: newNote.content,
-          isChecklist: newNote.isChecklist,
-          isOpen: false,
-          images: [...newNote.images]
-        };
-
-        await onSave(noteToAdd);
-        setNewNote({
-          title: '',
-          content: '',
-          tasks: [{ id: Date.now().toString(), text: '', completed: false }],
-          isOpen: false,
-          isChecklist: false,
-          images: []
-        });
-      } catch (error) {
-        console.error('Failed to save note:', error);
-      } finally {
-        setIsSaving(false);
-      }
-    }
-  };
-
   return (
     <div className="w-full max-w-2xl mx-auto mb-6">
       <div className={`w-full rounded-lg bg-neutral-800/50 hover:bg-neutral-800 transition-colors ${newNote.isOpen ? 'z-10 relative' : ''}`}>
         {newNote.isOpen ? (
-          <form onSubmit={handleSubmit} className="flex flex-col">
+          <form onSubmit={submitHandler} className="flex flex-col">
             <div className="flex items-center border-b border-neutral-700">
               <input
                 type="text"
                 placeholder="Title"
-                value={newNote.title}
-                ref={titleInputRef}
-                onChange={(e) => setNewNote(prev => ({ ...prev, title: e.target.value }))}
+                {...register('title')}
                 className="w-full px-4 py-3 bg-transparent text-lg font-medium text-white placeholder-neutral-500 focus:outline-none"
               />
 
@@ -278,8 +310,7 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
               <textarea
                 ref={textareaRef}
                 autoFocus
-                value={newNote.content}
-                onChange={(e) => setNewNote(prev => ({ ...prev, content: e.target.value }))}
+                {...register('content')}
                 className="w-full px-4 py-3 bg-transparent text-base text-neutral-200 placeholder-neutral-500 resize-none focus:outline-none"
                 placeholder="Take a note..."
                 rows={3}
@@ -313,4 +344,38 @@ const NoteInput = ({ onSave }: NoteInputProps) => {
   );
 };
 
-export default NoteInput;
+export default function Page() {
+  const { saveNote, getNotes } = useNotes();
+  const [notes, setNotes] = useState<Note[]>(getNotes());
+
+  const handleSave = async (noteData: Omit<Note, 'id' | 'createdAt'>) => {
+    try {
+      const savedNote = await saveNote(noteData);
+      setNotes(getNotes());
+    } catch (error) {
+      console.error('Error in handleSave:', error);
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <NoteInput onSave={handleSave} />
+      <NotesList 
+        notes={notes} 
+        onUpdate={async (updatedNote) => {
+          setNotes((prevNotes) =>
+            prevNotes.map((note) =>
+              note.id === updatedNote.id ? updatedNote : note
+            )
+          );
+        }}
+        onDelete={async (noteId) => {
+          setNotes((prevNotes) => prevNotes.filter((note) => note.id !== noteId));
+          const existingNotes = JSON.parse(localStorage.getItem('notes') || '[]');
+          const updatedNotes = existingNotes.filter((note: Note) => note.id !== noteId);
+          localStorage.setItem('notes', JSON.stringify(updatedNotes));
+        }}
+      />
+    </div>
+  );
+}
