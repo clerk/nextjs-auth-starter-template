@@ -1,20 +1,28 @@
+/* @import "tailwindcss/preflight"; */
+@tailwind utilities;
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 97%;
+    --grid-line: 0 0% 95%;
+  }
+  
+  [data-theme="dark"] {
+    --background: 0 0% 9%;
+    --grid-line: 0 0% 15%;
+  }
+}
 
 .background {
   overflow: hidden;
-  background: #f8f8f8;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 11px, #f2f2f2 11px, #f2f2f2 12px),
-    repeating-linear-gradient(90deg, transparent, transparent 11px, #f2f2f2 11px, #f2f2f2 12px);
-}
-
-.mask {
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 1) 40px,
-    rgba(0, 0, 0, 1) calc(100% - 20px),
-    rgba(0, 0, 0, 0) 100%
-  );
+  background-color: hsl(var(--background));
+  background-image: 
+    repeating-linear-gradient(0deg, 
+      transparent,
+      transparent 11px,
+      hsl(var(--grid-line)) 11px,
+      hsl(var(--grid-line)) 12px
+    );
 }

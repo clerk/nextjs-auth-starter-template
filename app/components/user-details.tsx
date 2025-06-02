@@ -1,6 +1,8 @@
 "use client";
 
 import { useOrganization, useSession, useUser } from "@clerk/nextjs";
+import axios from "axios";
+import { useEffect } from "react";
 
 function Row({
   desc,
@@ -56,10 +58,44 @@ function formatDateWithNumbers(date: Date): string {
   });
 }
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export function UserDetails() {
   const { user } = useUser();
   const { session } = useSession();
   const { organization } = useOrganization();
+
+
+  useEffect(() => {
+    async function createUserIfNeeded() {
+      if (!user) return;
+        const userData = {
+          clerkId: user.id,
+          email: user.emailAddresses[0].emailAddress,
+          firstName: user.firstName || "",
+          lastName: user.lastName || "",
+          imageUrl: user.imageUrl || "",
+        };
+  
+        try {
+          const response = await axios.post(`${API_URL}/users`, userData);
+          console.log("User stored successfully:", response.data);
+        } catch (error: any) {
+          if (axios.isAxiosError(error)) {
+            if (error.response?.status === 409) {
+              console.log("User already exists, no need to create.");
+            } else {
+              console.error("Unexpected error creating user:", error);
+            }
+          } else {
+            console.error("Non-Axios error:", error);
+          }
+        }
+      }
+  
+    createUserIfNeeded();
+  }, [user]);
+  
 
   if (!user || !session) return null;
 
