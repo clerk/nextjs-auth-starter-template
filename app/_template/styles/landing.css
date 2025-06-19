@@ -1,0 +1,47 @@
+/* Template-specific landing page styles */
+.landing-hero {
+  background: #fafafa;
+}
+
+.landing-container {
+  background: white;
+  max-width: 75rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #f2f2f2;
+  border-right: 1px solid #f2f2f2;
+  grid-row: span 3;
+}
+
+.landing-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: #f2f2f2;
+}
+
+.landing-logo {
+  width: 16rem;
+  height: 16rem;
+  background: transparent;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-23.75rem);
+  top: -1.5rem;
+  height: 51.375rem;
+  object-fit: contain;
+  width: 39.0625rem;
+}
+
+.landing-gradient {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 18.75rem;
+  background: linear-gradient(to top, white, transparent);
+}
