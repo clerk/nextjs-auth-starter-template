@@ -16,8 +16,15 @@ export const CARDS = [
     title: "Organizations",
     description:
       "Built for B2B SaaS: create and switch between orgs, manage and invite members, and assign custom roles.",
-    href: "https://clerk.com/docs/organizations/overview?utm_source=vercel-template&utm_medium=partner&utm_term=component_reference",
+    href: "https://clerk.com/docs/organizations/overview?utm_source=vercel-template&utm_medium=partner&utm_term=organizations",
     linkText: "Organizations",
+  },
+  {
+    title: "Billing",
+    description:
+      "Subscription billing without the headache: add subscription billing to your application with a few clicks and start collecting money.",
+    href: "https://clerk.com/docs/billing/overview?utm_source=vercel-template&utm_medium=partner&utm_term=billing",
+    linkText: "Billing",
   },
 ];
 
@@ -34,6 +41,27 @@ export const DASHBOARD_CARDS = [
     description: `Leverage customizable session tokens, public metadata, and Middleware to create a custom onboarding experience.`,
     href: "https://clerk.com/docs/guides/add-onboarding-flow?utm_source=vercel-template&utm_medium=partner&utm_term=onboarding",
     linkText: "Onboarding flow",
+  },
+  {
+    title: "Customize components",
+    description:
+      "Customize the look and feel of your application with Clerk's prebuilt components.",
+    href: "https://clerk.com/docs/customization/overview?utm_source=vercel-template&utm_medium=partner&utm_term=customization",
+    linkText: "Customization",
+  },
+  {
+    title: "Support subscriptions",
+    description:
+      "Subscription billing without the headache: add subscription billing to your application with a few clicks and start collecting money.",
+    href: "https://clerk.com/docs/billing/overview?utm_source=vercel-template&utm_medium=partner&utm_term=billing",
+    linkText: "Billing",
+  },
+  {
+    title: "Explore the B2B suite",
+    description:
+      "Built for B2B SaaS: create and switch between orgs, manage and invite members, and assign custom roles.",
+    href: "https://clerk.com/docs/organizations/overview?utm_source=vercel-template&utm_medium=partner&utm_term=organizations",
+    linkText: "Organizations",
   },
   {
     title: "Deploy to Production",

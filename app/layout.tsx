@@ -1,16 +1,10 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import Script from "next/script";
-import { Metadata } from "next";
 import localFont from "next/font/local";
+import { templateMetadata } from "./_template/content/metadata";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://clerk-next-app.vercel.app/"),
-  title: "Next.js Clerk Template",
-  description:
-    "A simple and powerful Next.js template featuring authentication and user management powered by Clerk.",
-  openGraph: { images: ["/og.png"] },
-};
+export const metadata = templateMetadata;
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -22,6 +16,23 @@ const geistMono = localFont({
   variable: "--font-geist-mono",
 });
 
+/**
+ * This object can be customized to change Clerk's built-in appearance. To learn more: https://clerk.com/docs/customization/overview
+ */
+const clerkAppearanceObject = {
+  variables: { colorPrimary: "#000000" },
+  elements: {
+    socialButtonsBlockButton:
+      "bg-white border-gray-200 hover:bg-transparent hover:border-black text-gray-600 hover:text-black",
+    socialButtonsBlockButtonText: "font-semibold",
+    formButtonReset:
+      "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black",
+    membersPageInviteButton:
+      "bg-black border border-black border-solid hover:bg-white hover:text-black",
+    card: "bg-[#fafafa]",
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -29,23 +40,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ClerkProvider
-        appearance={{
-          variables: { colorPrimary: "#000000" },
-          elements: {
-            formButtonPrimary:
-              "bg-black border border-black border-solid hover:bg-white hover:text-black",
-            socialButtonsBlockButton:
-              "bg-white border-gray-200 hover:bg-transparent hover:border-black text-gray-600 hover:text-black",
-            socialButtonsBlockButtonText: "font-semibold",
-            formButtonReset:
-              "bg-white border border-solid border-gray-200 hover:bg-transparent hover:border-black text-gray-500 hover:text-black",
-            membersPageInviteButton:
-              "bg-black border border-black border-solid hover:bg-white hover:text-black",
-            card: "bg-[#fafafa]",
-          },
-        }}
-      >
+      <ClerkProvider appearance={clerkAppearanceObject}>
         <body className={`min-h-screen flex flex-col antialiased`}>
           {children}
         </body>
