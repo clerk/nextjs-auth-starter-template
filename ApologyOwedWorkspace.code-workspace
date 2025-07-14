@@ -1,11 +1,13 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../apology-owed-ai"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "../apology-owed-ai"
+    }
+  ],
+  "settings": {
+    "remote.SSH.serverInstallPath": {}
+  }
 }
