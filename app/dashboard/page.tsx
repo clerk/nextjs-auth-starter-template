@@ -1,73 +1,75 @@
-import { UserDetails } from "../components/user-details";
 import { UserButton } from "@clerk/nextjs";
-import { auth } from "@clerk/nextjs/server";
-import { CodeSwitcher } from "../components/code-switcher";
-import { LearnMore } from "../_template/components/learn-more";
-import { Footer } from "../_template/components/footer";
-import { ClerkLogo } from "../_template/components/clerk-logo";
-import { NextLogo } from "../_template/components/next-logo";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import Link from "next/link";
 
-import { DASHBOARD_CARDS } from "../_template/content/cards";
-import { DeployButton } from "../_template/components/deploy-button";
-
 export default async function DashboardPage() {
-  await auth.protect();
+  const { userId } = await auth.protect();
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId);
+  const credits = user.publicMetadata.credits as number || 0;
+  const firstName = user.firstName || "User";
 
   return (
-    <>
-      <main className="max-w-[75rem] w-full mx-auto">
-        <div className="grid grid-cols-[1fr_20.5rem] gap-10 pb-10">
-          <div>
-            <header className="flex items-center justify-between w-full h-16 gap-4">
-              <div className="flex gap-4">
-                <div className="bg-[#F4F4F5] px-4 py-3 rounded-full inline-flex gap-4">
-                  <ClerkLogo />
-                  <div aria-hidden className="w-px h-6 bg-[#C7C7C8]" />
-                  <NextLogo />
-                </div>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 font-medium text-[0.8125rem] rounded-full px-3 py-2 hover:bg-gray-100"
-                >
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                  Back to Home
-                </Link>
-              </div>
-              <div className="flex items-center gap-2">
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonAvatarBox: "size-8",
-                    },
-                  }}
-                />
-              </div>
-            </header>
-            <UserDetails />
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center justify-center h-16 w-full">
-              <DeployButton className="h-8" />
-            </div>
-            <CodeSwitcher />
-          </div>
+    <main className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+      <header className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold text-[#6B46C1] dark:text-[#7D5A9E]">
+          ApologyOwed.ai Dashboard
+        </h1>
+        <div className="flex items-center gap-4">
+          {/* Dark mode toggle - implement with a button or use a library like next-themes */}
+          <button
+            aria-label="Toggle dark mode"
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-[#6B46C1]"
+          >
+            {/* Icon for toggle - add SVG or use heroicons */}
+            🌙
+          </button>
+          <UserButton
+            appearance={{
+              elements: {
+                userButtonAvatarBox: "size-8",
+              },
+            }}
+          />
         </div>
-      </main>
-      <LearnMore cards={DASHBOARD_CARDS} />
-      <Footer />
-    </>
+      </header>
+
+      <section className="max-w-4xl mx-auto p-6">
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-2">Welcome back, {firstName}!</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Create personalized apologies with AI.
+          </p>
+        </div>
+
+        {/* Credits bar */}
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg mb-8 flex justify-between items-center">
+          <div>
+            <span className="font-medium">Available Credits:</span> {credits}
+          </div>
+          <Link
+            href="/buy-credits" // Replace with your payments route
+            className="bg-[#6B46C1] text-white px-4 py-2 rounded-md hover:bg-[#7D5A9E] focus:outline-none focus:ring-2 focus:ring-[#6B46C1] transition-colors"
+          >
+            Buy More
+          </Link>
+        </div>
+
+        {/* Create button */}
+        <div className="text-center">
+          <Link
+            href="/create"
+            className="bg-[#6B46C1] text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-[#7D5A9E] focus:outline-none focus:ring-2 focus:ring-[#6B46C1] transition-colors"
+          >
+            Create New Apology
+          </Link>
+        </div>
+      </section>
+
+      {/* Footer or additional sections if needed */}
+      <footer className="text-center p-4 text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700">
+        © 2025 ApologyOwed.ai | Privacy-focused AI apologies
+      </footer>
+    </main>
   );
 }
