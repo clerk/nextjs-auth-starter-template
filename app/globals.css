@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+@layer theme, base, clerk, components, utilities;
+@import "tailwindcss";
 
 @theme {
   --color-primary-600: #6c47ff;
@@ -32,8 +33,20 @@
 .background {
   overflow: hidden;
   background: #f8f8f8;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 11px, #f2f2f2 11px, #f2f2f2 12px),
-    repeating-linear-gradient(90deg, transparent, transparent 11px, #f2f2f2 11px, #f2f2f2 12px);
+  background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 11px,
+      #f2f2f2 11px,
+      #f2f2f2 12px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 11px,
+      #f2f2f2 11px,
+      #f2f2f2 12px
+    );
 }
 
 .mask {
