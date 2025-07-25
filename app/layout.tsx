@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import type { Appearance } from "@clerk/types";
 import "./globals.css";
 import Script from "next/script";
 import localFont from "next/font/local";
@@ -20,6 +21,7 @@ const geistMono = localFont({
  * This object can be customized to change Clerk's built-in appearance. To learn more: https://clerk.com/docs/customization/overview
  */
 const clerkAppearanceObject = {
+  cssLayerName: "clerk",
   variables: { colorPrimary: "#000000" },
   elements: {
     socialButtonsBlockButton:
@@ -31,7 +33,7 @@ const clerkAppearanceObject = {
       "bg-black border border-black border-solid hover:bg-white hover:text-black",
     card: "bg-[#fafafa]",
   },
-};
+} satisfies Appearance;
 
 export default function RootLayout({
   children,
