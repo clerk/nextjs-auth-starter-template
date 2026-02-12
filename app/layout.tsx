@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import { ui } from "@clerk/ui";
 import type { Appearance } from "@clerk/ui/internal";
 import "./globals.css";
 import Script from "next/script";
@@ -42,7 +43,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ClerkProvider appearance={clerkAppearanceObject}>
+      <ClerkProvider ui={ui} appearance={clerkAppearanceObject}>
         <body className={`min-h-screen flex flex-col antialiased`}>
           {children}
         </body>
