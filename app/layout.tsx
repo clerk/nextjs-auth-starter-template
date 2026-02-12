@@ -1,5 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
-import type { Appearance } from "@clerk/shared/types";
+import type { Appearance } from "@clerk/ui/internal";
 import "./globals.css";
 import Script from "next/script";
 import localFont from "next/font/local";
