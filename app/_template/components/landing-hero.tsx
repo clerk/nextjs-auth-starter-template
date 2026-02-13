@@ -1,4 +1,4 @@
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignInButton, Show } from "@clerk/nextjs";
 import screenshotDevices from "../images/user-button@2xrl.webp";
 import signIn from "../images/sign-in@2xrl.webp";
 import verify from "../images/verify@2xrl.webp";
@@ -46,21 +46,21 @@ export function LandingHero() {
             user management powered by Clerk.
           </p>
           <div className="relative flex gap-3">
-            <SignedIn>
+            <Show when="signed-in">
               <Link
                 href="/dashboard"
                 className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
               >
                 Dashboard
               </Link>
-            </SignedIn>
-            <SignedOut>
+            </Show>
+            <Show when="signed-out">
               <SignInButton>
                 <button className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
                   Sign in
                 </button>
               </SignInButton>
-            </SignedOut>
+            </Show>
           </div>
         </div>
         <div className="flex gap-8 w-full h-165 scale-[1.03]">

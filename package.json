@@ -9,7 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "6.34.0",
+    "@clerk/nextjs": "^7.0.0-canary.v20260213015452",
+    "@clerk/ui": "^1.0.0-canary.v20260213015452",
     "@tailwindcss/postcss": "^4.1.16",
     "@types/node": "^24.0.3",
     "@types/react": "^19.2.2",
