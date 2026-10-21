@@ -3,27 +3,30 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.2.2",
-    "@clerk/ui": "^1.6.2",
-    "@tailwindcss/postcss": "^4.2.2",
-    "@types/node": "^24.0.3",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "@types/react-syntax-highlighter": "^15.5.13",
+    "@clerk/nextjs": "^7.9.18",
+    "@clerk/ui": "^1.41.0",
     "clsx": "^2.1.1",
-    "next": "16.2.4",
-    "postcss": "^8.5.10",
+    "next": "^16.4.2",
     "prism-react-renderer": "^2.4.1",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-syntax-highlighter": "^15.6.1",
-    "tailwindcss": "^4.2.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-syntax-highlighter": "^15.6.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4.3.3",
+    "@types/node": "^24.0.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/react-syntax-highlighter": "^15.5.13",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.2",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"

@@ -1,4 +1,6 @@
-export function Footer() {
+export async function Footer() {
+  "use cache";
+
   return (
     <footer className="max-w-300 bg-white w-full mx-auto pt-6 border-t border-[#EEEEF0] flex justify-between pb-24">
       <a
