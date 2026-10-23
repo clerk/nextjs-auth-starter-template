@@ -11,7 +11,7 @@ export function LearnMore({ cards }: { cards: Card[] }) {
       <div className="grid grid-cols-[1fr_3fr] gap-8 max-w-300 mx-auto w-full pt-16 pb-24">
         <div>
           <span className="text-[0.8125rem]/5 text-[#6C47FF] font-medium">
-            What's next
+            What&apos;s next
           </span>
           <h2 className="text-xl/[1.625rem] font-semibold text-[#131316] tracking-tight mt-2 mb-3">
             Learn more from our&nbsp;resources

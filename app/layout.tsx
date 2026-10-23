@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ui } from "@clerk/ui";
 import type { Appearance } from "@clerk/ui";
@@ -6,7 +7,7 @@ import Script from "next/script";
 import localFont from "next/font/local";
 import { templateMetadata } from "./_template/content/metadata";
 
-export const metadata = templateMetadata;
+export const metadata: Metadata = templateMetadata;
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -43,11 +44,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ClerkProvider ui={ui} appearance={clerkAppearanceObject}>
-        <body className={`min-h-screen flex flex-col antialiased`}>
+      <body className={`min-h-screen flex flex-col antialiased`}>
+        <ClerkProvider ui={ui} appearance={clerkAppearanceObject}>
           {children}
-        </body>
-      </ClerkProvider>
+        </ClerkProvider>
+      </body>
 
       <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js" />
       <Script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js" />

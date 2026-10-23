@@ -8,6 +8,7 @@ import logo from "../images/logo.png";
 import "../styles/landing.css";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ClerkLogo } from "./clerk-logo";
 import { NextLogo } from "./next-logo";
 import { DeployButton } from "./deploy-button";
@@ -46,21 +47,23 @@ export function LandingHero() {
             user management powered by Clerk.
           </p>
           <div className="relative flex gap-3">
-            <Show when="signed-in">
-              <Link
-                href="/dashboard"
-                className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
-              >
-                Dashboard
-              </Link>
-            </Show>
-            <Show when="signed-out">
-              <SignInButton>
-                <button className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
-                  Sign in
-                </button>
-              </SignInButton>
-            </Show>
+            <Suspense>
+              <Show when="signed-in">
+                <Link
+                  href="/dashboard"
+                  className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold"
+                >
+                  Dashboard
+                </Link>
+              </Show>
+              <Show when="signed-out">
+                <SignInButton>
+                  <button className="px-4 py-2 rounded-full bg-[#131316] text-white text-sm font-semibold">
+                    Sign in
+                  </button>
+                </SignInButton>
+              </Show>
+            </Suspense>
           </div>
         </div>
         <div className="flex gap-8 w-full h-165 scale-[1.03]">

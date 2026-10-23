@@ -1,1 +1,4 @@
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
 minimumReleaseAge: 2880

@@ -1,4 +1,4 @@
-export default {
+const theme = {
   'code[class*="language-"]': {
     color: '#c5c8c6',
     fontFamily: 'var(--font-geist-mono)',
@@ -152,3 +152,5 @@ export default {
     fontStyle: 'italic',
   },
 };
+
+export default theme;
